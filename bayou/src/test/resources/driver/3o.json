@@ -1,0 +1,43 @@
+{
+  "programs": [
+    {
+      "ast": {
+        "node": "DSubTree",
+        "_nodes": [
+          {
+            "node": "DAPICall",
+            "_call": "java.io.FileReader.FileReader(java.io.File)",
+            "_throws": [
+              "java.io.FileNotFoundException"
+            ],
+            "_returns": "void"
+          },
+          {
+            "node": "DAPICall",
+            "_call": "java.io.BufferedReader.BufferedReader(java.io.Reader)",
+            "_throws": [],
+            "_returns": "void"
+          },
+          {
+            "node": "DAPICall",
+            "_call": "java.io.BufferedReader.readLine()",
+            "_throws": [
+              "java.io.IOException"
+            ],
+            "_returns": "java.lang.String"
+          }
+        ]
+      },
+      "sequences": [
+        {
+          "calls": [
+            "java.io.FileReader.FileReader(java.io.File)",
+            "java.io.BufferedReader.BufferedReader(java.io.Reader)",
+            "java.io.BufferedReader.readLine()"
+          ]
+        }
+      ],
+      "javadoc": null
+    }
+  ]
+}

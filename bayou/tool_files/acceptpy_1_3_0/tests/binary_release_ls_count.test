@@ -1,0 +1,5 @@
+{
+  "test type": "shell command",
+  "command" : "ls -a ../out | grep -v logs | wc -l | sed -e's/^[^0-9]*//'",
+  "expect stdout": "10\n"
+}

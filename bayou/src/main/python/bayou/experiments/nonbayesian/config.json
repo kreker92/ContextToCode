@@ -1,0 +1,18 @@
+{
+    "batch_size": 50,
+    "num_epochs": 100,
+    "learning_rate": 0.0002,
+    "print_step": 1,
+    "units": 128,
+    "evidence": [
+        {
+            "name": "apicalls"
+        },
+        {
+            "name": "types"
+        }
+    ],
+    "decoder": {
+        "max_ast_depth": 32
+    }
+}

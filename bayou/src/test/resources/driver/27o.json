@@ -1,0 +1,48 @@
+{
+  "programs": [
+    {
+      "ast": {
+        "node": "DSubTree",
+        "_nodes": [
+          {
+            "node": "DExcept",
+            "_try": [
+              {
+                "node": "DAPICall",
+                "_call": "android.bluetooth.BluetoothSocket.connect()",
+                "_throws": [
+                  "java.io.IOException"
+                ],
+                "_returns": "void"
+              }
+            ],
+            "_catch": [
+              {
+                "node": "DAPICall",
+                "_call": "android.bluetooth.BluetoothSocket.close()",
+                "_throws": [
+                  "java.io.IOException"
+                ],
+                "_returns": "void"
+              }
+            ]
+          }
+        ]
+      },
+      "sequences": [
+        {
+          "calls": [
+            "android.bluetooth.BluetoothSocket.connect()",
+            "android.bluetooth.BluetoothSocket.close()"
+          ]
+        },
+        {
+          "calls": [
+            "android.bluetooth.BluetoothSocket.connect()"
+          ]
+        }
+      ],
+      "javadoc": null
+    }
+  ]
+}
