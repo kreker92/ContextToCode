@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <taskdef classname="org.codehaus.groovy.ant.Groovy" name="groovy" classpathref="maven.plugin.classpath"/>
+  <groovy>import groovy.text.SimpleTemplateEngine
+import gherkin.GherkinDialect
+import gherkin.GherkinDialectProvider
+
+def engine = new SimpleTemplateEngine()
+def templateSource = new File(project.baseDir, &quot;src${File.separator}main${File.separator}code_generator${File.separator}I18n.java.txt&quot;).getText()
+
+def normalize(s) {
+  if(System.getProperty(&quot;java.version&quot;).startsWith(&quot;1.6&quot;)) {
+    return s
+  } else {
+    return java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFC)
+  }
+}
+
+def localeFor(lang) {
+  languageAndCountry = lang.split(&quot;-&quot;)
+  if (languageAndCountry.length == 1) {
+    return new Locale(lang)
+  } else {
+    return new Locale(languageAndCountry[0], languageAndCountry[1])
+  }
+}
+
+// TODO: Need to add i18n.getName() and i18n.getNative() for better names.
+def package_html = &quot;&quot;&quot;\
+&lt;body&gt;
+&lt;p&gt;
+    \${locale.getDisplayLanguage()}
+&lt;/p&gt;
+&lt;/body&gt;
+&quot;&quot;&quot;
+
+def unsupported = [&quot;em&quot;] // The generated files for Emoij do not compile.
+def dialectProvider = new GherkinDialectProvider()
+
+GherkinDialectProvider.DIALECTS.keySet().each { language -&gt;
+  def dialect = dialectProvider.getDialect(language, null)
+  def normalized_language = dialect.language.replaceAll(&quot;[\\s-]&quot;, &quot;_&quot;).toLowerCase()
+  if (!unsupported.contains(normalized_language)) {
+    dialect.stepKeywords.findAll { !it.contains(&apos;*&apos;) &amp;&amp; !it.matches(&quot;^\\d.*&quot;) }.unique().each { kw -&gt;
+      def normalized_kw = normalize(kw.replaceAll(&quot;[\\s&apos;,!\u00AD]&quot;, &quot;&quot;))
+      def binding = [&quot;lang&quot;:normalized_language, &quot;kw&quot;:normalized_kw]
+      def template = engine.createTemplate(templateSource).make(binding)
+      def file = new File(project.baseDir, &quot;target${File.separator}generated-sources${File.separator}i18n${File.separator}java${File.separator}cucumber${File.separator}api${File.separator}java${File.separator}${normalized_language}${File.separator}${normalized_kw}.java&quot;)
+      if(!file.exists()) {
+        // Haitian has two translations that only differ by case - Sipozeke and SipozeKe
+        // Some file systems are unable to distiguish between them and overwrite the other one :-(
+        file.parentFile.mkdirs()
+        file.write(template.toString(), &quot;UTF-8&quot;)
+      }
+    }
+
+    // html
+    def locale = localeFor(dialect.language)
+    def binding = [&quot;locale&quot;:locale]
+    def html = engine.createTemplate(package_html).make(binding).toString()
+    def file = new File(project.baseDir, &quot;target${File.separator}generated-sources${File.separator}i18n${File.separator}java${File.separator}cucumber${File.separator}api${File.separator}java${File.separator}${normalized_language}${File.separator}package.html&quot;)
+    file.write(html, &quot;UTF-8&quot;)
+  }
+}</groovy>
+</target>
+</project>
