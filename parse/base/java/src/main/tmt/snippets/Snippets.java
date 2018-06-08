@@ -1,4 +1,4 @@
-package com.detectum.request;
+package tmt.snippets;
 
 import java.util.Iterator;
 import java.util.List;
@@ -13,24 +13,26 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.text.Normalizer;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.nio.charset.Charset;
 import java.nio.CharBuffer;
 
-import com.detectum.SearchContext;
-import com.detectum.config.*;
-import com.detectum.config.synonym.Synonym;
-import com.detectum.config.synonym.WordSynKey;
-import com.detectum.data.Index;
-import com.detectum.request.speller.Speller;
-import com.detectum.request.stemmer.GrsInfo;
-import com.detectum.request.stemmer.Stemmer;
 import org.apache.commons.collections4.iterators.IteratorChain;
 
 import com.google.gson.Gson;
 
-public class Request {
+public class Snippets {
   
-  public Request(String request_, SearchConfiguration configuration_, SearchLanguage lang_) {
+  String  file = "/root/stackoverflow/Posts.xml";
+  
+  public Snippets() throws Exception {
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+         // process the line.
+      }
+  }
   }
 }
 
