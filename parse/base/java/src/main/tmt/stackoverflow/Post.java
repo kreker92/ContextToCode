@@ -1,5 +1,9 @@
 package tmt.stackoverflow;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /***
  * @Id:6
 @PostTypeId:1
@@ -34,6 +38,33 @@ row
  * @author user
  *
  */
+@XmlRootElement
 public class Post {
+    String CreationDate;
+    String Body;
+    String LastEditDate;
+    String LastActivityDate;
+    String Title;
+    String Tags;
+    int CommentCount;
+    int LastEditorUserId;
+    int OwnerUserId;
+    int ParentId;
+    int Score;
+    int ViewCount;
+    int PostTypeId;
+    int AcceptedAnswerId;
+    int id;
+    int FavoriteCount;
+    int AnswerCount;
+
+    public int getId() {
+        return id;
+    }
+
+    @XmlAttribute
+    public void setId(int id) {
+        this.id = id;
+    }
 
 }
