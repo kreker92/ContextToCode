@@ -18,19 +18,19 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
 
-public class Snippets {
+public class SaveToFile {
 
   static String  file = "/root/stackoverflow/Posts.xml";
   private static ArrayList<Row> java_rows = new ArrayList<Row>();
 
-  public Snippets() {
+  public SaveToFile() {
   }
-  
+
   public static void main(String[] args) throws FileNotFoundException, IOException {
     try (BufferedReader br = new BufferedReader(new FileReader(file))) {
       String line;
       int count = 0;
-      while ((line = br.readLine()) != null) {// && count < 30) {
+      while (((line = br.readLine()) != null) && count < 30000) {
         try {
           JAXBContext jaxbContext = JAXBContext.newInstance(Row.class);
 
@@ -39,7 +39,7 @@ public class Snippets {
 
           Row row = (Row) jaxbUnmarshaller.unmarshal(reader);
           row.parseTags();
-          
+
           if (!row.getTags().isEmpty() && row.getTags().contains("java")){
             java_rows.add(row);
             count ++;
@@ -49,11 +49,11 @@ public class Snippets {
           e.printStackTrace();
         }
       }
-      
+
       try (Writer writer = new FileWriter("/root/stackoverflow/output.json")) {
         Gson gson = new GsonBuilder().create();
         gson.toJson(java_rows, writer);
-    }
+      }
     }
   }
 }

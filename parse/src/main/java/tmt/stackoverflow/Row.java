@@ -12,6 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import tmt.utils.Utils;
+
 /***
  * @Id:6
 @PostTypeId:1
@@ -90,12 +92,7 @@ public class Row {
   }
 
   public void parseTags() {
-    if (tags != null) {
-      Pattern p = Pattern.compile("\\<(.*?)\\>");
-      Matcher m = p.matcher(tags);
-      while(m.find())
-        tags_arr.add(m.group(1));
-    }
+    tags_arr = Utils.parse(tags, "<", ">");
   }
 
   public String toString() {
@@ -104,5 +101,9 @@ public class Row {
 
   public ArrayList<String> getTags() {
     return tags_arr;
+  }
+
+  public String getBody() {
+    return body;
   }
 }
