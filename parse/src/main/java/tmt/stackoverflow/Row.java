@@ -1,8 +1,16 @@
 package tmt.stackoverflow;
 
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 /***
  * @Id:6
@@ -38,33 +46,63 @@ row
  * @author user
  *
  */
-@XmlRootElement
-public class Post {
-    String CreationDate;
-    String Body;
-    String LastEditDate;
-    String LastActivityDate;
-    String Title;
-    String Tags;
-    int CommentCount;
-    int LastEditorUserId;
-    int OwnerUserId;
-    int ParentId;
-    int Score;
-    int ViewCount;
-    int PostTypeId;
-    int AcceptedAnswerId;
-    int id;
-    int FavoriteCount;
-    int AnswerCount;
+@XmlRootElement(name = "row")
+//@XmlAccessorType(XmlAccessType.FIELD)
+public class Row {
+  @XmlAttribute(name = "CreationDate")
+  String creation_date;
+  @XmlAttribute(name = "Body")
+  String body;
+  @XmlAttribute(name = "LastEditDate")
+  String last_edit_date;
+  @XmlAttribute(name = "LastActivityDate")
+  String last_activity_date;
+  @XmlAttribute(name = "Title")
+  String title;
+  @XmlAttribute(name = "Tags")
+  String tags;
+  ArrayList<String> tags_arr = new ArrayList<>();
+  @XmlAttribute(name = "CommentCount")
+  int comment_count;
+  @XmlAttribute(name = "LastEditorUserId")
+  int last_editor_user_id;
+  @XmlAttribute(name = "OwnerUserId")
+  int owner_user_id;
+  @XmlAttribute(name = "ParentId")
+  int parent_id;
+  @XmlAttribute(name = "Score")
+  int score;
+  @XmlAttribute(name = "ViewCount")
+  int view_count;
+  @XmlAttribute(name = "PostTypeId")
+  int post_type_id;
+  @XmlAttribute(name = "AcceptedAnswerId")
+  int accepted_answer_id;
+  @XmlAttribute(name = "Id")
+  int id;
+  @XmlAttribute(name = "FavoriteCount")
+  int favorite_count;
+  @XmlAttribute(name = "AnswerCount")
+  int answer_count;
 
-    public int getId() {
-        return id;
+  public int getId() {
+    return id;
+  }
+
+  public void parseTags() {
+    if (tags != null) {
+      Pattern p = Pattern.compile("\\<(.*?)\\>");
+      Matcher m = p.matcher(tags);
+      while(m.find())
+        tags_arr.add(m.group(1));
     }
+  }
 
-    @XmlAttribute
-    public void setId(int id) {
-        this.id = id;
-    }
+  public String toString() {
+    return "Id: "+id+" Tags: "+tags_arr;
+  }
 
+  public ArrayList<String> getTags() {
+    return tags_arr;
+  }
 }
