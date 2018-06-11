@@ -86,13 +86,15 @@ public class Row {
   int favorite_count;
   @XmlAttribute(name = "AnswerCount")
   int answer_count;
+  ArrayList<String> code;
 
   public int getId() {
     return id;
   }
 
-  public void parseTags() {
+  public void parse() {
     tags_arr = Utils.parse(tags, "<", ">");
+    code = Utils.parse(body, "<code>", "</code>");
   }
 
   public String toString() {
@@ -105,5 +107,13 @@ public class Row {
 
   public String getBody() {
     return body;
+  }
+
+  public int getParentId() {
+    return parent_id;
+  }
+
+  public ArrayList<String> getCode() {
+    return code;
   }
 }
