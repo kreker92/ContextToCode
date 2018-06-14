@@ -22,21 +22,8 @@ public class Analyze {
 
   public static void main(String[] args) throws JsonIOException, JsonSyntaxException, FileNotFoundException {
     Gson gson = new Gson();
-    Type fooType = new TypeToken<HashMap<Integer, ArrayList<Row>>>() {}.getType();    
-
-    int count = 1;
-    File f = new File(Conf.answers_output.replace("?", count+""));
-    while(f.exists() && !f.isDirectory()) { 
-      answers = gson.fromJson(new FileReader(f), fooType);
-
-      for ( Entry<Integer, ArrayList<Row>> r : answers.entrySet())
-        for ( Row p : r.getValue()) {
-          p.parse();
-          if (!p.getCode().isEmpty())
-            System.err.println(count);
-        }
-      count ++; 
-      f = new File(Conf.answers_output.replace("?", count+""));
-    }
+    
+    File f = new File(Conf.answers_output.replace("?", "_all"));
+    answers = gson.fromJson(new FileReader(f), Conf.gson_answers);
   }
 }

@@ -3,6 +3,7 @@ package tmt.snippets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -10,11 +11,15 @@ import javax.xml.bind.Unmarshaller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 
 import tmt.stackoverflow.Row;
 import tmt.utils.Conf;
+import tmt.utils.Utils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -26,10 +31,35 @@ public class SaveToFile {
 
   private static HashSet<Integer> ids = new HashSet<Integer>();
 
-  public SaveToFile() {
+  public static void main(String[] args) throws FileNotFoundException, IOException {
+//    saveToChunks();
+    mergeChunks();
+  }
+  
+  private static void mergeChunks() throws JsonIOException, JsonSyntaxException, IOException {
+    HashMap<Integer, ArrayList<Row>> answers = new HashMap<>();
+    Gson gson = new Gson();
+
+    int count = 1;
+    File f = new File(Conf.answers_output.replace("?", count+""));
+    while(f.exists() && !f.isDirectory()) { 
+      HashMap<Integer, ArrayList<Row>> temp = gson.fromJson(new FileReader(f), Conf.gson_answers);
+      
+      for ( Entry<Integer, ArrayList<Row>> t : temp.entrySet() ) {
+        if (answers.containsKey(t.getKey()))
+          answers.get(t.getKey()).addAll(t.getValue());
+        else
+          answers.put(t.getKey(), t.getValue());
+      }
+
+      count ++; 
+      f = new File(Conf.answers_output.replace("?", count+""));
+    }
+    
+    Utils.save(Conf.answers_output.replace("?", "_all"), answers);
   }
 
-  public static void main(String[] args) throws FileNotFoundException, IOException {
+  public static void saveToChunks() throws FileNotFoundException, IOException {
     try (BufferedReader br = new BufferedReader(new FileReader(Conf.input))) {
       String line;
 
@@ -60,7 +90,7 @@ public class SaveToFile {
           System.err.println("Posts: "+posts+" answers: "+answs);
           
           if ( posts%Conf.chunk == 0 ) {
-            save(posts/Conf.chunk);
+            chunk(posts/Conf.chunk);
             Conf.posts.clear();
             Conf.answers.clear();
           }
@@ -72,16 +102,9 @@ public class SaveToFile {
     }
   }
   
-  private static void save(int i) throws IOException {
-    try (Writer writer = new FileWriter(Conf.posts_output.replace("?", i+""))) {
-      Gson gson = new GsonBuilder().create();
-      gson.toJson(Conf.posts, writer);
-    }
-    
-    try (Writer writer = new FileWriter(Conf.answers_output.replace("?", i+""))) {
-      Gson gson = new GsonBuilder().create();
-      gson.toJson(Conf.answers, writer);
-    }
+  private static void chunk(int i) throws IOException {
+    Utils.save(Conf.posts_output.replace("?", i+""), Conf.posts);
+    Utils.save(Conf.answers_output.replace("?", i+""), Conf.answers);
   }
 }
 
