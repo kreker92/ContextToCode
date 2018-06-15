@@ -37,10 +37,10 @@ public class SaveToFile {
   }
   
   private static void mergeChunks() throws JsonIOException, JsonSyntaxException, IOException {
-    HashMap<Integer, ArrayList<Row>> answers = new HashMap<>();
     Gson gson = new Gson();
-
     int count = 1;
+  /*  HashMap<Integer, ArrayList<Row>> answers = new HashMap<>();
+
     File f = new File(Conf.answers_output.replace("?", count+""));
     while(f.exists() && !f.isDirectory()) { 
       HashMap<Integer, ArrayList<Row>> temp = gson.fromJson(new FileReader(f), Conf.gson_answers);
@@ -56,7 +56,22 @@ public class SaveToFile {
       f = new File(Conf.answers_output.replace("?", count+""));
     }
     
-    Utils.save(Conf.answers_output.replace("?", "_all"), answers);
+    Utils.save(Conf.answers_output.replace("?", "_all"), answers); */
+    ArrayList<Row> posts = new ArrayList<Row>();
+    File f = new File(Conf.posts_output.replace("?", count+""));
+    while(f.exists() && !f.isDirectory()) { 
+      Row[] temp = gson.fromJson(new FileReader(f), Row[].class);
+      
+      for ( Row t : temp ) {
+          posts.add(t);
+      }
+
+      count ++; 
+      f = new File(Conf.posts_output.replace("?", count+""));
+    }
+    
+    Utils.save(Conf.posts_output.replace("?", "_all"), answers);
+
   }
 
   public static void saveToChunks() throws FileNotFoundException, IOException {
