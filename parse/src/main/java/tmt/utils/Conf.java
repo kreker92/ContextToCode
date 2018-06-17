@@ -20,4 +20,6 @@ public class Conf {
   
   public static String posts_output = "/root/stackoverflow/data/posts?.json";
   public static String answers_output = "/root/stackoverflow/data/answers?.json";
+  
+  public static HashMap<Row, ArrayList<Row>> complete;
 }

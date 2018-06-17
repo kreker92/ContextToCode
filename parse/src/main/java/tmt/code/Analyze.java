@@ -19,7 +19,6 @@ import tmt.utils.Utils;
 
 public class Analyze {
   static HashMap<Integer, ArrayList<Row>> answers;
-  static HashMap<Row, ArrayList<Row>> complete;
 
   public static void main(String[] args) throws JsonIOException, JsonSyntaxException, FileNotFoundException {
     Gson gson = new Gson();
@@ -31,6 +30,6 @@ public class Analyze {
             posts = gson.fromJson(new FileReader(f), Row[].class);
 
     for (Row p : posts)
-       complete.put(p., answers.get(p)) 
+       Conf.complete.put(p., answers.get(p)) 
   }
 }
