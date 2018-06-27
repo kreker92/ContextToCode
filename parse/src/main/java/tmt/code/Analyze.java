@@ -1,4 +1,4 @@
-package tmt.snippets;
+package tmt.code;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,23 +13,24 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
-import tmt.stackoverflow.Row;
-import tmt.utils.Conf;
-import tmt.utils.Utils;
+import tmt.code.snippets.stackoverflow.Row;
+import tmt.conf.Conf;
+import tmt.conf.Utils;
 
 public class Analyze {
-  static HashMap<Integer, ArrayList<Row>> answers;
+	public static void main(String[] args) throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+		Gson gson = new Gson();
 
-  public static void main(String[] args) throws JsonIOException, JsonSyntaxException, FileNotFoundException {
-    Gson gson = new Gson();
-    
-    File f = new File(Conf.answers_output.replace("?", "_all"));
-    answers = gson.fromJson(new FileReader(f), Conf.gson_answers);
-        ArrayList<Row> posts = new ArrayList<Row>();
-        f = new File(Conf.posts_output.replace("?", "_all"));
-            posts = gson.fromJson(new FileReader(f), Row[].class);
-
-    for (Row p : posts)
-       Conf.complete.put(p., answers.get(p)) 
-  }
+		File f = new File(Conf.answers_output.replace("?", "_all"));
+		Conf.answers = gson.fromJson(new FileReader(f), Conf.gson_answers);
+		
+		int count = 0;
+		
+		f = new File(Conf.posts_output.replace("?", "_all"));
+		Row[] posts_ = gson.fromJson(new FileReader(f), Row[].class);
+		
+		for ( Entry<Integer, ArrayList<Row>> a : Conf.answers.entrySet() )
+			count += a.getValue().size();
+		System.err.println(posts_.length+" - "+count);
+	}
 }

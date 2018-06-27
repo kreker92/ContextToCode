@@ -1,4 +1,4 @@
-package tmt.utils;
+package tmt.conf;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 import com.google.gson.reflect.TypeToken;
 
-import tmt.stackoverflow.Row;
+import tmt.code.snippets.stackoverflow.Row;
 
 public class Conf {
   public static ArrayList<Row> posts = new ArrayList<Row>();

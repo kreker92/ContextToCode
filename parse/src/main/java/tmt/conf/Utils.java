@@ -1,4 +1,4 @@
-package tmt.utils;
+package tmt.conf;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 
-import tmt.stackoverflow.Row;
+import tmt.code.snippets.stackoverflow.Row;
 
 public class Utils {
 

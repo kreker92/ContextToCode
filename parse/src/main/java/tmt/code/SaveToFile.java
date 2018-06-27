@@ -1,4 +1,4 @@
-package tmt.snippets;
+package tmt.code;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,9 +14,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
-import tmt.stackoverflow.Row;
-import tmt.utils.Conf;
-import tmt.utils.Utils;
+import tmt.code.snippets.stackoverflow.Row;
+import tmt.conf.Conf;
+import tmt.conf.Utils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -70,7 +70,7 @@ public class SaveToFile {
       f = new File(Conf.posts_output.replace("?", count+""));
     }
     
-    Utils.save(Conf.posts_output.replace("?", "_all"), answers);
+    Utils.save(Conf.posts_output.replace("?", "_all"), posts);
 
   }
 

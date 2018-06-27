@@ -1,4 +1,4 @@
-package tmt.stackoverflow;
+package tmt.code.snippets.stackoverflow;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import tmt.utils.Utils;
+import tmt.conf.Utils;
 
 /***
  * @Id:6
