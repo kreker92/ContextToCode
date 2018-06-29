@@ -1,16 +1,12 @@
 package tmt.code.snippets.stackoverflow;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.jsoup.examples.HtmlToPlainText;
 
 import tmt.conf.Utils;
 
@@ -87,6 +83,7 @@ public class Row {
   @XmlAttribute(name = "AnswerCount")
   int answer_count;
   ArrayList<String> code;
+  String stripped;
 
   public int getId() {
     return id;
@@ -95,6 +92,7 @@ public class Row {
   public void parse() {
     tags_arr = Utils.parse(tags, "<", ">");
     code = Utils.parse(body, "<code>", "</code>");
+    stripped = new HtmlToPlainText().getPlainText(Jsoup.parse(body));
   }
 
   public String toString() {
@@ -109,11 +107,23 @@ public class Row {
     return body;
   }
 
+  public String getTitle() {
+    return title;
+  }
+
   public int getParentId() {
     return parent_id;
   }
 
+  public Integer getScore() {
+    return score;
+  }
+
   public ArrayList<String> getCode() {
     return code;
+  }
+  
+  public String getStripped() {
+    return stripped;
   }
 }

@@ -5,10 +5,11 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -35,6 +36,12 @@ public class Utils {
       gson.toJson(what, writer);
     }
   }
+  
+  public static Comparator<Row> comparator_score_desc = new Comparator<Row>() {
+    public int compare(Row o1, Row o2) {
+      return o2.getScore().compareTo(o1.getScore());
+    }
+  };
 //  public static HashMap<Integer, ArrayList<Row>> loadAnswers(HashMap<Integer, ArrayList<LinkedTreeMap<String, String>>> fromJson) {
 //    System.err.println(fromJson.get("796508").get(0).keySet());
 //    return null;
