@@ -96,7 +96,7 @@ public class Row {
   }
 
   public String toString() {
-    return "Id: "+id+" Tags: "+tags_arr;
+    return "Id: "+id+" Tags: "+tags_arr+" Body: "+body+" Title: "+title;
   }
 
   public ArrayList<String> getTags() {
@@ -125,5 +125,13 @@ public class Row {
   
   public String getStripped() {
     return stripped;
+  }
+
+  public void setTags(ArrayList<String> tags_) {
+    tags_arr = tags_;    
+  }
+
+  public void setTitle(String title_) {
+    title = title_;    
   }
 }

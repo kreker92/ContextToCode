@@ -92,7 +92,7 @@ public class SaveToFile {
           row.parse();
 
           if (!row.getTags().isEmpty() && row.getTags().contains("java")){
-            Conf.posts.add(row);
+            Conf.posts.put(row.getId(), row);
             ids.add(row.getId());
           } else if (ids.contains(row.getParentId())) {
             if (!Conf.answers.containsKey(row.getParentId())) {

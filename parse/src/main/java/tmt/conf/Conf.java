@@ -9,7 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import tmt.code.snippets.stackoverflow.Row;
 
 public class Conf {
-  public static ArrayList<Row> posts = new ArrayList<Row>();
+  public static HashMap<Integer, Row> posts = new HashMap<>();
   public static HashMap<Integer, ArrayList<Row>> answers = new HashMap<Integer, ArrayList<Row>>();
   public static Type gson_answers = new TypeToken<HashMap<Integer, ArrayList<Row>>>() {}.getType();    
 

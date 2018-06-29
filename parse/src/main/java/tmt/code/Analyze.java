@@ -28,13 +28,16 @@ public class Analyze {
 
     f = new File(Conf.posts_output.replace("?", "_all"));
     for (Row p : gson.fromJson(new FileReader(f), Row[].class)) {
-      Conf.posts.add(p);
+      Conf.posts.put(p.getId(), p);
     }
 
     for ( Entry<Integer, ArrayList<Row>> a : Conf.answers.entrySet() ) {
       Collections.sort(a.getValue(), Utils.comparator_score_desc);
-      for (Row k : a.getValue())
+      for (Row k : a.getValue()) {
         k.parse();
+        k.setTags(Conf.posts.get(k.getParentId()).getTags());
+        k.setTitle(Conf.posts.get(k.getParentId()).getTitle());
+      }
     }
     
     Dt dt = new Dt();
