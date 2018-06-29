@@ -3,8 +3,8 @@ package tmt.export;
 import tmt.code.snippets.stackoverflow.Row;
 import tmt.conf.Conf;
 
-public class Detectum {
-  public Detectum() {
+public class Dt {
+  public Dt() {
     
   }
   

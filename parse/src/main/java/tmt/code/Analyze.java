@@ -17,7 +17,7 @@ import com.google.gson.reflect.TypeToken;
 import tmt.code.snippets.stackoverflow.Row;
 import tmt.conf.Conf;
 import tmt.conf.Utils;
-import tmt.export.Detectum;
+import tmt.export.Dt;
 
 public class Analyze {
   public static void main(String[] args) throws JsonIOException, JsonSyntaxException, FileNotFoundException {
@@ -37,7 +37,7 @@ public class Analyze {
         k.parse();
     }
     
-    Detectum detectum = new Detectum();
-    detectum.export();
+    Dt dt = new Dt();
+    dt.export();
   }
 }
