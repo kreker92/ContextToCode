@@ -8,8 +8,10 @@ import com.google.gson.Gson;
 
 import tmt.code.snippets.stackoverflow.Row;
 import tmt.conf.Conf;
+import tmt.conf.Utils;
 
 public class Dt {
+  private HashMap<String, String> ids = new HashMap<>();
   public Dt() {
 
   }
@@ -27,19 +29,27 @@ public class Dt {
         }
         if (!temp.isEmpty()) {
           coded_answers.put(p.getId(), temp);
-          count ++;
         }
       }
     }
     
     for (Entry<Integer, ArrayList<Row>> for_export : coded_answers.entrySet()) {
-      dump_file(for_export.getValue());
+    	//if (for_export.getValue().get(0).getId()==42311008) {
+    		String id = dump_file(for_export.getValue());
+    		ids.put(id, id);
+    		count ++;
+    		System.err.println(count+"!!!");
+    	//}
     }
-
-    System.err.println(count+"!!!");
+    try {
+    	Utils.save ("/root/detectum-java/search/moshoztorg/item_id_to_shop_id.json", ids);
+    } catch (Exception e) {
+    	e.printStackTrace();
+    	//throw new RuntimeException(e);
+    }
   }
 
-  private void dump_file(ArrayList<Row> answers) {
+  private String dump_file(ArrayList<Row> answers) {
     Row a = answers.get(0);
     DtJson dtj = new DtJson(a.getId(), a.getStripped().replace("\n", "").replace("\r", "").replace("\t", "")); 
     
@@ -51,8 +61,13 @@ public class Dt {
     for (String t : a.getCode())
       dtj.addParam("code", t);
     
-    System.err.println(new Gson().toJson(dtj)+" - "+a);
-    System.exit(1);
+    try {
+      Utils.save ("/root/detectum-java/search/moshoztorg/articles_new/"+a.getId()+".json", dtj);
+    } catch (Exception e) {
+      e.printStackTrace();
+      //throw new RuntimeException(e);
+    }
+    return a.getId()+"";
   }
 
 }
@@ -65,11 +80,12 @@ class DtJson {
   ArrayList<ArrayList<String>> params = new ArrayList<>();
   String shop_item_id = "";
   String img_url = "";
-  ArrayList<String> categories = new ArrayList<>();
+  ArrayList<Cat> categories = new ArrayList<Cat>();
   
   public DtJson(int id, String stripped) {
     item_id = id;
     descr = stripped;
+    categories.add(new Cat());
   }
 
   public void addParam(String key, String val) {
@@ -78,4 +94,11 @@ class DtJson {
     temp.add(val);
     params.add(temp);
   }
+}
+
+class Cat {
+	int id = 694;
+	String name = "";
+	int level = 1;
+	String shop_category_id = "471";
 }
