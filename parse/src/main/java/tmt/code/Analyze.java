@@ -35,8 +35,7 @@ public class Analyze {
       Collections.sort(a.getValue(), Utils.comparator_score_desc);
       for (Row k : a.getValue()) {
         k.parse();
-        k.setTags(Conf.posts.get(k.getParentId()).getTags());
-        k.setTitle(Conf.posts.get(k.getParentId()).getTitle());
+        k.setPost(Conf.posts.get(k.getParentId()));
       }
     }
     

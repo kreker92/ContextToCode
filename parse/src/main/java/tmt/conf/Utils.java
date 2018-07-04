@@ -29,6 +29,34 @@ public class Utils {
 
     return new ArrayList<String>();
   }
+  
+  /*
+   * Function formatResponse
+   *   Given a Stack Overflow response post, replace all XML escape character codes with the
+   *   characters they represent.
+   *   
+   *   Input: String post - Stack Overflow answer, or block of text with XML escape character codes.
+   *   Returns: String - formatted post with XML escape character codes removed.
+   */
+  public static String formatResponse(String post) {
+      //Fix xml reserved escape chars:
+      post = post.replaceAll("&;quot;", "\"");
+      post = post.replaceAll("&quot;", "\"");
+      post = post.replaceAll("&quot", "\"");
+      post = post.replaceAll("&;apos;", "'");
+      post = post.replaceAll("&apos;", "'");
+      post = post.replaceAll("&apos", "'");
+      post = post.replaceAll("&;lt;","<");
+      post = post.replaceAll("&lt;","<");
+      post = post.replaceAll("&lt", "<");
+      post = post.replaceAll("&;gt;",">");
+      post = post.replaceAll("&gt;", ">");
+      post = post.replaceAll("&gt", ">");
+      post = post.replaceAll("&;amp;", "&");
+      post = post.replaceAll("&amp;", "&");
+      post = post.replaceAll("&amp", "&");
+      return post;
+  }
  
   public static void save (String where, Object what) throws IOException {
     try (Writer writer = new FileWriter(where)) {

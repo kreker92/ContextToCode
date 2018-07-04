@@ -1,7 +1,10 @@
 package tmt.export;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import com.google.gson.Gson;
@@ -20,7 +23,10 @@ public class Dt {
     HashMap<Integer, ArrayList<Row>> coded_answers = new HashMap<Integer, ArrayList<Row>>();
 
     int count = 0;
-    for (Row p : Conf.posts.values()) {
+    ArrayList<Row> best = new ArrayList<Row>(Conf.posts.values());
+    Collections.sort(best, Utils.comparator_score_desc);
+
+    for (Row p : best) {
       if (Conf.answers.containsKey(p.getId())) {
         ArrayList<Row> temp = new ArrayList<Row>();
         for (Row a : Conf.answers.get(p.getId())) {
@@ -28,39 +34,41 @@ public class Dt {
             temp.add(a);
         }
         if (!temp.isEmpty()) {
+          Collections.sort(temp, Utils.comparator_score_desc);
           coded_answers.put(p.getId(), temp);
         }
       }
     }
-    
-    for (Entry<Integer, ArrayList<Row>> for_export : coded_answers.entrySet()) {
-    	//if (for_export.getValue().get(0).getId()==42311008) {
-    		String id = dump_file(for_export.getValue());
-    		ids.put(id, id);
-    		count ++;
-    		System.err.println(count+"!!!");
-    	//}
+
+    for (Row p : best) {
+      if (count > 100000)
+        break;
+      if (coded_answers.containsKey(p.getId())) {
+        String id = dump_file(coded_answers.get(p.getId()).get(0));
+        ids.put(id, id);
+        count ++;
+        System.err.println(count+"!!!");
+      }
     }
     try {
-    	Utils.save ("/root/detectum-java/search/moshoztorg/item_id_to_shop_id.json", ids);
+      Utils.save ("/root/detectum-java/search/moshoztorg/item_id_to_shop_id.json", ids);
     } catch (Exception e) {
-    	e.printStackTrace();
-    	//throw new RuntimeException(e);
+      e.printStackTrace();
+      //throw new RuntimeException(e);
     }
   }
 
-  private String dump_file(ArrayList<Row> answers) {
-    Row a = answers.get(0);
-    DtJson dtj = new DtJson(a.getId(), a.getStripped().replace("\n", "").replace("\r", "").replace("\t", "")); 
-    
-    for (String t : a.getTags())
+  private String dump_file(Row a) {
+    DtJson dtj = new DtJson(a.getId(), a.getPost().getStripped().replace("\n", "").replace("\r", "").replace("\t", "")); 
+
+    for (String t : a.getPost().getTags())
       dtj.addParam("tag", t);
 
-    dtj.addParam("model", a.getTitle());
-    
+    dtj.addParam("model", a.getPost().getTitle());
+
     for (String t : a.getCode())
       dtj.addParam("code", t);
-    
+
     try {
       Utils.save ("/root/detectum-java/search/moshoztorg/articles_new/"+a.getId()+".json", dtj);
     } catch (Exception e) {
@@ -81,7 +89,7 @@ class DtJson {
   String shop_item_id = "";
   String img_url = "";
   ArrayList<Cat> categories = new ArrayList<Cat>();
-  
+
   public DtJson(int id, String stripped) {
     item_id = id;
     descr = stripped;
@@ -97,8 +105,8 @@ class DtJson {
 }
 
 class Cat {
-	int id = 694;
-	String name = "";
-	int level = 1;
-	String shop_category_id = "471";
+  int id = 694;
+  String name = "";
+  int level = 1;
+  String shop_category_id = "471";
 }

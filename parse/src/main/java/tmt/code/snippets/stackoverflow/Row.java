@@ -7,6 +7,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.jsoup.Jsoup;
 import org.jsoup.examples.HtmlToPlainText;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import tmt.conf.Utils;
 
@@ -83,7 +85,7 @@ public class Row {
   @XmlAttribute(name = "AnswerCount")
   int answer_count;
   ArrayList<String> code;
-  String stripped;
+  Row post;
 
   public int getId() {
     return id;
@@ -91,8 +93,25 @@ public class Row {
 
   public void parse() {
     tags_arr = Utils.parse(tags, "<", ">");
-    code = Utils.parse(body, "<code>", "</code>");
-    stripped = new HtmlToPlainText().getPlainText(Jsoup.parse(body));
+    code = new ArrayList<>();
+    parseCode();
+  }
+
+  private ArrayList<String> parseCode() {
+    Document doc = Jsoup.parse(body);
+    Elements pres = doc.getElementsByTag("pre");
+    String code_seg = "";
+
+    // Retreive the text in between the two <code> tags, i.e. the code snippet.
+    for (int i=0; i<pres.size(); i++) {
+      String elem = pres.get(i).toString();
+      if (elem.indexOf("</code>") - elem.indexOf("<code>") - 6 < 0) continue;
+      code_seg = elem.substring(elem.indexOf("<code>")+6,elem.indexOf("</code>"));
+      if (code_seg.equals("")) continue;
+      code_seg = Utils.formatResponse(code_seg);
+      code.add(code_seg);
+    }
+    return null;
   }
 
   public String toString() {
@@ -101,6 +120,10 @@ public class Row {
 
   public ArrayList<String> getTags() {
     return tags_arr;
+  }
+  
+  public Row getPost() {
+    return post;
   }
 
   public String getBody() {
@@ -122,9 +145,9 @@ public class Row {
   public ArrayList<String> getCode() {
     return code;
   }
-  
+
   public String getStripped() {
-    return stripped;
+    return new HtmlToPlainText().getPlainText(Jsoup.parse(body));
   }
 
   public void setTags(ArrayList<String> tags_) {
@@ -133,5 +156,9 @@ public class Row {
 
   public void setTitle(String title_) {
     title = title_;    
+  }
+
+  public void setPost(Row p) {
+    post = p;
   }
 }
