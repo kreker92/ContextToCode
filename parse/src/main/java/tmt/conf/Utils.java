@@ -1,13 +1,21 @@
 package tmt.conf;
 
+import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,6 +38,36 @@ public class Utils {
     return new ArrayList<String>();
   }
   
+  public static String searchGhub(String query) {
+    String str = null;
+    try {
+      str = readStringFromURL("https://api.github.com/search/code?q="+URLEncoder.encode(query, "UTF-8")+"+language:java+user:google&client_id=1d37f4c170ab6b715f4b1d37f4c170ab6b715f4b&client_secret=3b877aec7dd7ba8fe51f2b8d717a074e3b540bf3");
+    } catch (UnsupportedEncodingException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
+    return str;
+  }
+  
+  public static String readStringFromURL(String requestURL) throws IOException
+  {
+    String str = "";
+    System.err.println(requestURL);
+    URL oracle = new URL(requestURL);
+    URLConnection yc = oracle.openConnection();
+    BufferedReader in = new BufferedReader(new InputStreamReader(
+                            yc.getInputStream()));
+    String inputLine;
+    while ((inputLine = in.readLine()) != null) 
+      str += inputLine;
+    in.close();
+    return str;
+  }
+
   /*
    * Function formatResponse
    *   Given a Stack Overflow response post, replace all XML escape character codes with the

@@ -10,6 +10,7 @@ import org.jsoup.examples.HtmlToPlainText;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import tmt.code.validate.Validate;
 import tmt.conf.Utils;
 
 /***
@@ -91,13 +92,16 @@ public class Row {
     return id;
   }
 
-  public void parse() {
+  public void init(Validate v) {
     tags_arr = Utils.parse(tags, "<", ">");
     code = new ArrayList<>();
     parseCode();
+    
+    if (!code.isEmpty() && v != null && id==42251399 )
+      v.validate(code);
   }
 
-  private ArrayList<String> parseCode() {
+  private void parseCode() {
     Document doc = Jsoup.parse(body);
     Elements pres = doc.getElementsByTag("pre");
     String code_seg = "";
@@ -111,7 +115,6 @@ public class Row {
       code_seg = Utils.formatResponse(code_seg);
       code.add(code_seg);
     }
-    return null;
   }
 
   public String toString() {

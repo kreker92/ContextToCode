@@ -15,6 +15,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import tmt.code.snippets.stackoverflow.Row;
+import tmt.code.validate.Validate;
 import tmt.conf.Conf;
 import tmt.conf.Utils;
 import tmt.export.Dt;
@@ -23,10 +24,11 @@ public class Analyze {
   public static void main(String[] args) throws JsonIOException, JsonSyntaxException, FileNotFoundException {
     Gson gson = new Gson();
 
-    File f = new File(Conf.answers_output.replace("?", "_all"));
+    File f = new File(Conf.answers_output.replace("?", "34"));
+    Validate v = new Validate();
     Conf.answers = gson.fromJson(new FileReader(f), Conf.gson_answers);
 
-    f = new File(Conf.posts_output.replace("?", "_all"));
+    f = new File(Conf.posts_output.replace("?", "34"));
     for (Row p : gson.fromJson(new FileReader(f), Row[].class)) {
       Conf.posts.put(p.getId(), p);
     }
@@ -34,7 +36,7 @@ public class Analyze {
     for ( Entry<Integer, ArrayList<Row>> a : Conf.answers.entrySet() ) {
       Collections.sort(a.getValue(), Utils.comparator_score_desc);
       for (Row k : a.getValue()) {
-        k.parse();
+        k.init(v);
         k.setPost(Conf.posts.get(k.getParentId()));
       }
     }

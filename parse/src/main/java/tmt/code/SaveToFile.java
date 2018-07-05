@@ -89,7 +89,7 @@ public class SaveToFile {
           StringReader reader = new StringReader(line);
 
           Row row = (Row) jaxbUnmarshaller.unmarshal(reader);
-          row.parse();
+          row.init(null);
 
           if (!row.getTags().isEmpty() && row.getTags().contains("java")){
             Conf.posts.put(row.getId(), row);
