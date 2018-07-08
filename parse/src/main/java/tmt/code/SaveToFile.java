@@ -70,7 +70,7 @@ public class SaveToFile {
       f = new File(Conf.posts_output.replace("?", count+""));
     }
     
-    Utils.save(Conf.posts_output.replace("?", "_all"), posts);
+    Utils.saveJsonFile(Conf.posts_output.replace("?", "_all"), posts);
 
   }
 
@@ -118,8 +118,8 @@ public class SaveToFile {
   }
   
   private static void chunk(int i) throws IOException {
-    Utils.save(Conf.posts_output.replace("?", i+""), Conf.posts);
-    Utils.save(Conf.answers_output.replace("?", i+""), Conf.answers);
+    Utils.saveJsonFile(Conf.posts_output.replace("?", i+""), Conf.posts);
+    Utils.saveJsonFile(Conf.answers_output.replace("?", i+""), Conf.answers);
   }
 }
 

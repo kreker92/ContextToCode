@@ -1,5 +1,6 @@
 package tmt.code.snippets.stackoverflow;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -98,7 +99,12 @@ public class Row {
     parseCode();
     
     if (!code.isEmpty() && v != null && id==42251399 )
-      v.validate(code);
+      try {
+        v.validate(code);
+      } catch (InterruptedException | IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
   }
 
   private void parseCode() {

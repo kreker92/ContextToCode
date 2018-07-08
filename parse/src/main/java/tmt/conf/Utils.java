@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URL;
@@ -36,21 +37,6 @@ public class Utils {
     }
 
     return new ArrayList<String>();
-  }
-  
-  public static String searchGhub(String query) {
-    String str = null;
-    try {
-      str = readStringFromURL("https://api.github.com/search/code?q="+URLEncoder.encode(query, "UTF-8")+"+language:java+user:google&client_id=1d37f4c170ab6b715f4b1d37f4c170ab6b715f4b&client_secret=3b877aec7dd7ba8fe51f2b8d717a074e3b540bf3");
-    } catch (UnsupportedEncodingException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    
-    return str;
   }
   
   public static String readStringFromURL(String requestURL) throws IOException
@@ -96,11 +82,17 @@ public class Utils {
       return post;
   }
  
-  public static void save (String where, Object what) throws IOException {
+  public static void saveJsonFile (String where, Object what) throws IOException {
     try (Writer writer = new FileWriter(where)) {
       Gson gson = new GsonBuilder().create();
       gson.toJson(what, writer);
     }
+  }
+  
+  public static void savePlainFile (String name, String text) throws IOException {
+	  try (PrintWriter out = new PrintWriter(name)) {
+		  out.println(text);
+	  }
   }
   
   public static Comparator<Row> comparator_score_desc = new Comparator<Row>() {

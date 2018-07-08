@@ -40,7 +40,7 @@ public class Analyze {
         k.setPost(Conf.posts.get(k.getParentId()));
       }
     }
-    
+        System.exit(1);
     Dt dt = new Dt();
     dt.export();
   }

@@ -51,7 +51,7 @@ public class Dt {
       }
     }
     try {
-      Utils.save ("/root/detectum-java/search/moshoztorg/item_id_to_shop_id.json", ids);
+      Utils.saveJsonFile ("/root/detectum-java/search/moshoztorg/item_id_to_shop_id.json", ids);
     } catch (Exception e) {
       e.printStackTrace();
       //throw new RuntimeException(e);
@@ -70,7 +70,7 @@ public class Dt {
       dtj.addParam("code", t);
 
     try {
-      Utils.save ("/root/detectum-java/search/moshoztorg/articles_new/"+a.getId()+".json", dtj);
+      Utils.saveJsonFile ("/root/detectum-java/search/moshoztorg/articles_new/"+a.getId()+".json", dtj);
     } catch (Exception e) {
       e.printStackTrace();
       //throw new RuntimeException(e);
