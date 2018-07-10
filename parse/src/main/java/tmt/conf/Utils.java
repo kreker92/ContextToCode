@@ -1,6 +1,8 @@
 package tmt.conf;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -52,6 +54,25 @@ public class Utils {
       str += inputLine;
     in.close();
     return str;
+  }
+  
+  public static String readFile(String where) throws Exception {
+    String everything = "";
+    BufferedReader br = new BufferedReader(new FileReader(where));
+    try {
+        StringBuilder sb = new StringBuilder();
+        String line = br.readLine();
+
+        while (line != null) {
+            sb.append(line);
+            sb.append(System.lineSeparator());
+            line = br.readLine();
+        }
+        everything = sb.toString();
+    } finally {
+        br.close();
+    }
+    return everything;
   }
 
   /*

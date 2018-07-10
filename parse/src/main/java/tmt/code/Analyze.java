@@ -24,11 +24,11 @@ public class Analyze {
   public static void main(String[] args) throws JsonIOException, JsonSyntaxException, FileNotFoundException {
     Gson gson = new Gson();
 
-    File f = new File(Conf.answers_output.replace("?", "34"));
+    File f = new File(Conf.answers_output.replace("?", "_all"));
     Validate v = new Validate();
     Conf.answers = gson.fromJson(new FileReader(f), Conf.gson_answers);
 
-    f = new File(Conf.posts_output.replace("?", "34"));
+    f = new File(Conf.posts_output.replace("?", "_all"));
     for (Row p : gson.fromJson(new FileReader(f), Row[].class)) {
       Conf.posts.put(p.getId(), p);
     }
@@ -40,7 +40,6 @@ public class Analyze {
         k.setPost(Conf.posts.get(k.getParentId()));
       }
     }
-        System.exit(1);
     Dt dt = new Dt();
     dt.export();
   }

@@ -10,7 +10,7 @@ import tmt.search.github.Github;
 
 public class Validate {
 
-  public void validate(ArrayList<String> code) throws InterruptedException, UnsupportedEncodingException, IOException {
+  public String validate(ArrayList<String> code) throws Exception {
     Github gh = new Github();
     for (String c : code) 
       for (String l : c.split("\\r?\\n")) {
@@ -21,8 +21,8 @@ public class Validate {
       }
     
     gh.merge();
-    gh.countRelevance(code);
-    System.exit(1);
+    System.err.println(gh.countRelevance(code));
+    return gh.countRelevance(code);
   }
 
 }

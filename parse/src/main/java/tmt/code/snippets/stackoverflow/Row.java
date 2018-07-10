@@ -88,6 +88,7 @@ public class Row {
   int answer_count;
   ArrayList<String> code;
   Row post;
+  String func;
 
   public int getId() {
     return id;
@@ -100,8 +101,8 @@ public class Row {
     
     if (!code.isEmpty() && v != null && id==42251399 )
       try {
-        v.validate(code);
-      } catch (InterruptedException | IOException e) {
+        func = v.validate(code);
+      } catch (Exception e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
@@ -153,6 +154,10 @@ public class Row {
 
   public ArrayList<String> getCode() {
     return code;
+  }
+  
+  public String getFunc() {
+    return func;
   }
 
   public String getStripped() {

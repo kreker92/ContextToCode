@@ -52,7 +52,7 @@ public class Github {
 			}
 	}
 
-	public void countRelevance(ArrayList<String> code) {
+	public String countRelevance(ArrayList<String> code) throws Exception {
 		for (Entry<String, Item> i : merged.entrySet()) {
 			HashSet<String> temp = new HashSet<>();
 			HashSet<String> temp1 = new HashSet<>();
@@ -72,7 +72,8 @@ public class Github {
 		}
 		ArrayList<Item> vals = new ArrayList<Item>(merged.values());
 		Collections.sort(vals, comparator_relevance);
-	    System.err.println("!!!"+vals);
+//	    return Utils.readFile("/root/GherkinToCode/output/funcs/"+vals.get(0).sha);
+		return "1";
 	}
 	
 	  public static Comparator<Item> comparator_relevance = new Comparator<Item>() {

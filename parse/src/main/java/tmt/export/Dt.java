@@ -66,8 +66,7 @@ public class Dt {
 
     dtj.addParam("model", a.getPost().getTitle());
 
-    for (String t : a.getCode())
-      dtj.addParam("code", t);
+    dtj.addParam("code", a.getFunc());
 
     try {
       Utils.saveJsonFile ("/root/detectum-java/search/moshoztorg/articles_new/"+a.getId()+".json", dtj);
