@@ -51,12 +51,12 @@ public class Utils {
                             yc.getInputStream()));
     String inputLine;
     while ((inputLine = in.readLine()) != null) 
-      str += inputLine;
+      str += inputLine+"\n";
     in.close();
     return str;
   }
   
-  public static String readFile(String where) throws Exception {
+  public static String readFile(String where) throws IOException {
     String everything = "";
     BufferedReader br = new BufferedReader(new FileReader(where));
     try {
