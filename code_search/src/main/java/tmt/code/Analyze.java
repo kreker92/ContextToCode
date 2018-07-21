@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
+import tmt.code.snippets.Vector;
 import tmt.code.snippets.codesearch.Response;
 import tmt.code.snippets.codesearch.Result;
 import tmt.code.snippets.stackoverflow.Row;
@@ -39,9 +41,10 @@ public class Analyze {
 
   private static void loadCodeSearch() throws JsonSyntaxException, IOException, InterruptedException {
     //      ArrayList<String> code = new ArrayList<String>(Arrays.asList(Utils.readFile("/root/toCode/output/cs/66533677").split("\n")));
-    HashMap<String, Integer> counter = new HashMap<>();
-    ArrayList<String[]> res = new ArrayList<>();
+    ArrayList<Vector[]> res = new ArrayList<>();
     File[] files = new File("/root/toCode/output/cs/").listFiles();
+    HashSet<String> commands = new HashSet<>();
+    HashMap<String, Integer> hot_ecnoding = new HashMap<>();
 
     for (File f : files) {
       String[] code = Utils.readFile(f.getPath()).split("\n");
@@ -49,50 +52,62 @@ public class Analyze {
 
       for (String c : code) {
         if (c.contains("DriverManager.getConnection")) {
-          String[] snip = getSnippet(line, code);
+          Vector[] snip = getSnippet(line, code, commands);
           if (snip.length > 0)
             res.add(snip);
         }
         line ++;
       }
     }
-
-    for (String[] r : res) {
-      if (r.length > 1) {
-        String line = r[r.length-2];
-        int count = 1;
-
-        if (counter.containsKey(line))
-          count = counter.get(line)+1;
-
-        counter.put(line, count);
-      }
-    }
     
-    for (Entry<String, Integer> c : counter.entrySet()) {
-      if (c.getValue() > 10) {
-        System.err.println(c);
+    hotEncode(commands, hot_ecnoding);
+
+    for (Vector[] c : res) {
+      for (Vector v : c) {
+        v.vectorize(hot_ecnoding);
       }
     }
   }
 
-  static String[] getSnippet(int l, String[] code) {
-    ArrayList<String> res = new ArrayList<String>();
+  private static void hotEncode(HashSet<String> commands, HashMap<String, Integer> hot_ecnoding) {
+	  int count = 0;
+	  for (String comm : commands) {
+		  hot_ecnoding.put(comm, count);
+		  count++;
+	  }
+  }
+
+static Vector[] getSnippet(int l, String[] code, HashSet<String> commands) {
+    ArrayList<Vector> res = new ArrayList<Vector>();
+    
     int count = 0;
     for (int i = l; i > 0; i --) {
-      String line = code[i].trim();
+      String line = code[i];
       if (isStart(line) || count > 3)
         break;
-      if (hasSense(line)) {
-        res.add(0, line);
-        count ++;
+      String line_clean = clean(line);
+      if (hasSense(line_clean)) {
+    	Vector v = new Vector(line_clean, commands);
+    	if (!v.isEmpty()) {
+    		res.add(0, v);
+        	count ++;
+    	}
       }
     }
-    return res.toArray(new String[res.size()]);
+    return res.toArray(new Vector[res.size()]);
+  }
+
+  private static String clean(String line_raw) {
+    String line = "";
+    if (line_raw.contains("//"))
+      line = line.split("//")[0];
+    else
+      line = line_raw;
+    return line.trim().replaceAll("\"([^\"]*)\"", " ").replaceAll("(?:--|[\\[\\]{}()+/\\\\])", " ").replace(",", " ").replace(".", " ").replace("=", " ").replace(";", " ");
   }
 
   private static boolean hasSense(String line) {
-    if (line.equals("}") || line.equals("{") || line.isEmpty() || line.contains("//"))
+    if (line.equals("}") || line.equals("{") || line.isEmpty())
       return false;
     else
       return true;
