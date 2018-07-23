@@ -31,6 +31,7 @@ import java.util.Arrays;
 
 public class Analyze {
   static Gson gson;
+  static String key = "DriverManager.getConnection";
 
   public static void main(String[] args) throws JsonSyntaxException, IOException, InterruptedException  {
     gson = new Gson();
@@ -47,53 +48,58 @@ public class Analyze {
     HashMap<String, Integer> hot_ecnoding = new HashMap<>();
 
     for (File f : files) {
+      System.err.println(f.getPath());
       String[] code = Utils.readFile(f.getPath()).split("\n");
-      int line = 0;
 
-      for (String c : code) {
-        if (c.contains("DriverManager.getConnection")) {
-          Vector[] snip = getSnippet(line, code, commands);
+      for (int line = code.length-1; line >= 0; line --) {
+        String c = code[line];
+        if (c.contains(key)) {
+          Vector[] snip = getSnippet(line, code, commands, (f.getPath()+line).hashCode());
           if (snip.length > 0)
             res.add(snip);
         }
-        line ++;
       }
     }
-    
+
     hotEncode(commands, hot_ecnoding);
 
+    ArrayList<Vector> output = new ArrayList<>();
     for (Vector[] c : res) {
       for (Vector v : c) {
         v.vectorize(hot_ecnoding);
+        output.add(v);
       }
     }
+    
+    Utils.saveJsonFile("/root/toCode/output/funcs/vectors", output);
   }
 
   private static void hotEncode(HashSet<String> commands, HashMap<String, Integer> hot_ecnoding) {
-	  int count = 0;
-	  for (String comm : commands) {
-		  hot_ecnoding.put(comm, count);
-		  count++;
-	  }
+    int count = 0;
+    for (String comm : commands) {
+      hot_ecnoding.put(comm, count);
+      count++;
+    }
   }
 
-static Vector[] getSnippet(int l, String[] code, HashSet<String> commands) {
+  static Vector[] getSnippet(int start, String[] code, HashSet<String> commands, int parent_id) {
     ArrayList<Vector> res = new ArrayList<Vector>();
-    
+
     int count = 0;
-    for (int i = l; i > 0; i --) {
+    for (int i = start; i >= 0; i --) {
       String line = code[i];
-      if (isStart(line) || count > 3)
+      if (i != start && (isStart(line) || count > 3))
         break;
       String line_clean = clean(line);
       if (hasSense(line_clean)) {
-    	Vector v = new Vector(line_clean, commands);
-    	if (!v.isEmpty()) {
-    		res.add(0, v);
-        	count ++;
-    	}
+        Vector v = new Vector(line_clean, commands, i, line, i == start, count, parent_id);
+        if (!v.isEmpty()) {
+          res.add(0, v);
+          count ++;
+        }
       }
     }
+
     return res.toArray(new Vector[res.size()]);
   }
 
@@ -114,7 +120,7 @@ static Vector[] getSnippet(int l, String[] code, HashSet<String> commands) {
   }
 
   private static boolean isStart(String string) {
-    if (string.contains("public ") || string.contains("private ") || string.contains("protected "))
+    if (string.contains("public ") || string.contains("private ") || string.contains("protected ") || string.contains(key))
       return true;
     else
       return false;
