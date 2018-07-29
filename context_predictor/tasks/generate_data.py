@@ -71,9 +71,9 @@ def generate_addition( ):
     # members_list = list(members_set)
     # count = 0
     for row_r in parsed:
-        count += 1
         row = collections.OrderedDict(sorted(row_r.items()))
         trace = []
+        count += 1
         for key, values in row.items():
             step = {}
         # count += 1
@@ -95,22 +95,7 @@ def generate_addition( ):
                 if k == 'supervised_env':
                     environment = {}
                     for e_k, e_v in v.items():
-                        if e_k == 'terminate':
-                            environment['terminate'] = e_v.get('value')
-                        elif e_k == 'answer':
-                            environment['answer'] = e_v.get('value')
-                        elif e_k == 'output':
-                            environment['output'] = e_v.get('value')
-                        elif e_k == 'date2':
-                            environment['date2'] = e_v.get('value')
-                        elif e_k == 'date2_diff':
-                            environment['date2_diff'] = e_v.get('value')
-                        elif e_k == 'date1':
-                            environment['date1'] = e_v.get('value')
-                        elif e_k == 'date1_diff':
-                            environment['date1_diff'] = e_v.get('value')
-                        elif e_k == 'client_id':
-                            environment['client_id'] = e_v.get('value')
+                        environment[e_k] = e_v.get('value')
                     step['environment'] = environment
                 elif k == 'argument':
                     args = {}

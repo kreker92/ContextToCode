@@ -79,7 +79,7 @@ def get_env(data):
     env[4][data["date1_diff"]] = 1
     env[5][data["date2_diff"]] = 1
     env[6][data["client_id"]] = 1
-
+    print(env);
     return env.flatten()
 
 

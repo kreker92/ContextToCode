@@ -37,6 +37,8 @@ public class Executor {
   public static final String CHECK        = "3";
   public static final String ALARM        = "4";
   public static final String NO_ALARM     = "5";
+  public static final String CONNECT      = "6";
+  public static final String NOT_CONNECT  = "7";
   
   //traces
   public static final String ENVIRONMENT  = "1";

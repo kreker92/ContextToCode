@@ -67,6 +67,7 @@ def train_addition(epochs, verbose=0):
                 prog_name_out, prog_out_id, arg_out, term_out = y[j]["program"]["program"], y[j]["program"]["id"], y[j]["args"]["id"], y[j]["environment"]["terminate"]
                 # Get Environment, Argument Vectors
                 env_in = [get_env(x[j]["environment"])]
+                print(env_in)
 
                 arg_in, arg_out = [get_args(arg, arg_in=True)], get_args(arg_out, arg_in=False)
                 term_out = [1] if term_out else [0]

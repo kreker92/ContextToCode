@@ -12,6 +12,6 @@ public class Vector {
     public int parent_id;
     
     public String toString() {
-      return "Strings:"+strings+" Vectors:"+vector+" Origin: "+origin+" Level: "+level+" - ";
+      return "Strings:"+strings+" Vectors:"+vector+" Origin: "+origin+" Level: "+level+" Label: "+label;
     }
 }

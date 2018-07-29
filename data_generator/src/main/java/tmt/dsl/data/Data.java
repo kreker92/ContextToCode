@@ -8,8 +8,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import tmt.dsl.executor.info.Step;
 import tmt.dsl.formats.context.ContextDSL;
 import tmt.dsl.formats.context.Vector;
 import tmt.dsl.formats.detection_log.Event;
@@ -85,7 +87,10 @@ public class Data {
         LogDSL log_dsl = new LogDSL(new ArrayList<EventAtMinute>(inputs.values()), outputs, client, command, client_id);
         log_dsl.execute(command);
       } else if (args[0].equals("context")) {
-       
+        int max = 0;
+
+        ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
+        
         HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
         BufferedReader br = new BufferedReader(new FileReader("/root/ContextToCode/output/funcs/vectors"));
         for(String line; (line = br.readLine()) != null; ) {
@@ -95,12 +100,24 @@ public class Data {
               sequences.put(v.parent_id, tmp);
             }
             
+            for (Integer n : v.vector)
+              if (n > max)
+                max = n;
+            
             sequences.get(v.parent_id).add(v);
           }
         }
+        ContextDSL cntx_dsl = null;
         br.close();
-        
-        System.err.println(sequences.get(1760679694));
+        System.err.println("*"+max);
+        for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
+          cntx_dsl = new ContextDSL(s.getValue());  
+          cntx_dsl.execute();
+          for (HashMap<Integer, Step> v : cntx_dsl.getData()){
+            count += v.keySet().size();
+          }
+          output.addAll(cntx_dsl.getData());
+        }
         
         /*HashMap<EventAtMinute, EventAtMinute> inputs = new HashMap<EventAtMinute, EventAtMinute>();
         
@@ -113,9 +130,9 @@ public class Data {
         }*/
 
 //        ArrayList<Integer> outputs = null;
-//                
-        ContextDSL cntx_dsl = new ContextDSL(new ArrayList<EventAtMinute>(inputs.values()), outputs, client, command, client_id);
-        cntx_dsl.execute(command);
+//         
+        cntx_dsl.send(new Gson().toJson(output), "");
+        System.err.println(output.size()+" * "+          count);
       }
     } catch (Exception e) {
       e.printStackTrace();

@@ -43,9 +43,10 @@ public class Analyze {
   private static void loadCodeSearch() throws JsonSyntaxException, IOException, InterruptedException {
     //      ArrayList<String> code = new ArrayList<String>(Arrays.asList(Utils.readFile("/root/toCode/output/cs/66533677").split("\n")));
     ArrayList<Vector[]> res = new ArrayList<>();
-    File[] files = new File("/root/toCode/output/cs/").listFiles();
+    File[] files = new File("/root/ContextToCode/output/cs/").listFiles();
     HashSet<String> commands = new HashSet<>();
     HashMap<String, Integer> hot_ecnoding = new HashMap<>();
+    int count = 0;
 
     for (File f : files) {
       System.err.println(f.getPath());
@@ -54,6 +55,7 @@ public class Analyze {
       for (int line = code.length-1; line >= 0; line --) {
         String c = code[line];
         if (c.contains(key)) {
+            count ++;
           Vector[] snip = getSnippet(line, code, commands, (f.getPath()+line).hashCode());
           if (snip.length > 0)
             res.add(snip);
@@ -70,8 +72,8 @@ public class Analyze {
         output.add(v);
       }
     }
-    
-    Utils.saveJsonFile("/root/toCode/output/funcs/vectors", output);
+    System.err.println(count);
+   // Utils.saveJsonFile("/root/toCode/output/funcs/vectors", output);
   }
 
   private static void hotEncode(HashSet<String> commands, HashMap<String, Integer> hot_ecnoding) {
