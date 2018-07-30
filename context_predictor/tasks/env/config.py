@@ -16,15 +16,15 @@ DSL_DATA_PATH = "dsl/data/data_buffer.json"
 CONFIG = {
     "ENVIRONMENT_ROW": 9,         # Input 1, Input 2, Carry, Output
     "ENVIRONMENT_COL": 9,         # 10-Digit Maximum for Addition Task
-    "ENVIRONMENT_DEPTH": 101,      # Size of each element vector => One-Hot, Options: 0-9
+    "ENVIRONMENT_DEPTH": 3000,      # Size of each element vector => One-Hot, Options: 0-9
 
     "ARGUMENT_NUM": 1,            # Maximum Number of Program Arguments
     "ARGUMENT_DEPTH": 75,         # Size of Argument Vector => One-Hot, Options 0-9, Default (10)
     "DEFAULT_ARG_VALUE": 74,      # Default Argument Value
 
-    "PROGRAM_NUM": 7,             # Maximum Number of Subroutines
-    "PROGRAM_KEY_SIZE": 7,        # Size of the Program Keys
-    "PROGRAM_EMBEDDING_SIZE": 10  # Size of the Program Embeddings
+    "PROGRAM_NUM": 10,             # Maximum Number of Subroutines
+    "PROGRAM_KEY_SIZE": 10,        # Size of the Program Keys
+    "PROGRAM_EMBEDDING_SIZE": 13  # Size of the Program Embeddings
 }
 
 PROGRAM_SET = [
@@ -72,14 +72,10 @@ def get_env(data):
     env = np.zeros((CONFIG["ENVIRONMENT_ROW"], CONFIG["ENVIRONMENT_DEPTH"]), dtype=np.int32)
 
     # print(data)
-    env[0][data["answer"]] = 1
-    env[1][data["output"]] = 1
-    env[2][data["date1"]] = 1
-    env[3][data["date2"]] = 1
-    env[4][data["date1_diff"]] = 1
-    env[5][data["date2_diff"]] = 1
-    env[6][data["client_id"]] = 1
-    print(env);
+    for i in range(30):
+        if "param_"+str(i) in data:
+            env[0][data["param_"+str(i)]] = 1
+    
     return env.flatten()
 
 

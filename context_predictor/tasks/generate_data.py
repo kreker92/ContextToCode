@@ -95,13 +95,14 @@ def generate_addition( ):
                 if k == 'supervised_env':
                     environment = {}
                     for e_k, e_v in v.items():
-                        environment[e_k] = e_v.get('value')
+                        environment[e_k] = int(e_v.get('value'))
+                    environment['terminate'] = "false"
                     step['environment'] = environment
                 elif k == 'argument':
                     args = {}
-                    for e_k, e_v in v.items():
-                        if e_k == 'id':
-                            args['id'] = e_v.get('value')
+                    #for e_k, e_v in v.items():
+                    #   if e_k == 'id':
+                    args['id'] = '1'
                     step['args'] = args
                 elif k == 'program':
                     program = {}
