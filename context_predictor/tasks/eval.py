@@ -43,10 +43,17 @@ def evaluate_addition():
         # print("map variables")
 
         # Run REPL
-        for x in range(0, 20):
+
+        predict = {};
+        predict["ncw"] = 0;
+        predict["ncr"] = 0;
+        predict["cw"] = 0;
+        predict["cr"] = 0;
+
+        for x in range(0, 200):
             res = ""
             # try:
-            repl(sess, npi, data, x)
+            repl(sess, npi, data, x, predict)
             # except:
             print ("--------------------------")
             # if res:
@@ -55,7 +62,7 @@ def evaluate_addition():
             #    not_eq+=1
         # repeat()
 
-def repl(session, npi, data, pos):
+def repl(session, npi, data, pos, predict):
         steps = data[pos]
         f = open('log/numbers.txt', 'r+')
         f.truncate()
@@ -77,50 +84,63 @@ def repl(session, npi, data, pos):
 
         x, y = steps[:-1], steps[1:]
 
-        for j in range(len(x)):
-            if count == 0:
-                print ('y = Prog_id: %s, Terminate: %d' % (x[j]["program"]["id"], x[j]["environment"]["terminate"]))
-                print ('y` = Prog_id: %s, Terminate: %d' % (x[j]["program"]["id"], x[j]["environment"]["terminate"]))
+        if len(x) > 0:
+            for j in range(len(x)):
+                #if count == 0:
+                 #   print ('y = Prog_id: %s' % (x[j]["program"]["id"]))
+                  #  print ('y` = Prog_id: %s' % (x[j]["program"]["id"]))
 
-            prog_in, arg_in = [[x[j]["program"]["id"]]],  [get_args(x[j]["args"]["id"], arg_in=True)]
-            prog_out, terminate_out = y[j]["program"]["id"],  y[j]["environment"]["terminate"]
-            env_in = [get_env(x[j]["environment"])]
+                prog_in, arg_in = [[x[j]["program"]["id"]]],  [get_args(x[j]["args"]["id"], arg_in=True)]
+                prog_out, terminate_out = y[j]["program"]["id"],  y[j]["environment"]["terminate"]
+                env_in = [get_env(x[j]["environment"])]
 
-            # print (env_in, arg, prog_in)
-            t, n_p = session.run([npi.terminate, npi.program_distribution],
-                                         feed_dict={npi.env_in: env_in, npi.arg_in:arg_in, npi.prg_in: prog_in})
+                # print (env_in, arg, prog_in)
+                t, n_p = session.run([npi.terminate, npi.program_distribution],
+                                             feed_dict={npi.env_in: env_in, npi.arg_in:arg_in, npi.prg_in: prog_in})
 
-            prog_id = np.argmax(n_p)
+                prog_id = np.argmax(n_p)
 
-            print ('y= Prog_id: %s, Terminate: %d' % (prog_id, np.argmax(t)))
-            print ('y` = Prog_id: %s, Terminate: %d' % (prog_out, terminate_out))
+                if int(prog_out) == 6:
+                    if int(prog_out) == int(prog_id):
+                        predict["cr"] += 1;
+                    else:
+                        predict["cw"] += 1;
+                else:
+                    if int(prog_out) == int(prog_id):
+                        predict["ncr"] += 1;
+                    else:
+                        predict["ncw"] += 1;
 
-            count += 1
+                print ('y= Prog_id: %s, Terminate: %s' % (prog_id, np.argmax(t)))
+                print ('y` = Prog_id: %s, Terminate: %s' % (prog_out, terminate_out))
 
-            # Next step
-            if np.argmax(t) == 1:
-                # print 'Step: %s, Arguments: %s, Terminate: %s' % (prog_name, a_str, str(True))
-                # print 'IN 1: %s, IN 2: %s, CARRY: %s, OUT: %s' % (scratch.in1_ptr[1],
-                #                                                   scratch.in2_ptr[1],
-                #                                                   scratch.carry_ptr[1],
-                #                                                   scratch.out_ptr[1])
-                # Update Environment if MOVE or WRITE
-                # if prog_id == MOVE_PID or prog_id == WRITE_PID:
-                #     scratch.execute(prog_id, arg)
+                count += 1
 
-                # print ("Input:  %s, %s, Output:  %s, %s" % (str(x), str(y), str(output), scratch.true_ans))
-                with open("log/"+str(count)+"prog_produced.txt", "a") as myfile:
-                    myfile.write(str(prog_id) + ", terminate: true\n")
-                return True
+                # Next step
+                if np.argmax(t) == 1:
+                    # print 'Step: %s, Arguments: %s, Terminate: %s' % (prog_name, a_str, str(True))
+                    # print 'IN 1: %s, IN 2: %s, CARRY: %s, OUT: %s' % (scratch.in1_ptr[1],
+                    #                                                   scratch.in2_ptr[1],
+                    #                                                   scratch.carry_ptr[1],
+                    #                                                   scratch.out_ptr[1])
+                    # Update Environment if MOVE or WRITE
+                    # if prog_id == MOVE_PID or prog_id == WRITE_PID:
+                    #     scratch.execute(prog_id, arg)
 
-            else:
-                # prog_name = PROGRAM_SET[prog_id][0]
+                    # print ("Input:  %s, %s, Output:  %s, %s" % (str(x), str(y), str(output), scratch.true_ans))
+                    with open("log/"+str(count)+"prog_produced.txt", "a") as myfile:
+                        myfile.write(str(prog_id) + ", terminate: true\n")
+                    return True
 
-                # print([np.argmax(n_p), PROGRAM_SET[prog_id][0]], [np.argmax(n_args[0]), np.argmax(n_args[1])])
-                with open("log/"+str(count)+"prog_produced.txt", "a") as myfile:
-                    myfile.write(str(prog_id) + ","+str(np.argmax(t))+"\n")
+                else:
+                    # prog_name = PROGRAM_SET[prog_id][0]
 
-            # cont = raw_input('Continue? ')
+                    # print([np.argmax(n_p), PROGRAM_SET[prog_id][0]], [np.argmax(n_args[0]), np.argmax(n_args[1])])
+                    with open("log/"+str(count)+"prog_produced.txt", "a") as myfile:
+                        myfile.write(str(prog_id) + ","+str(np.argmax(t))+"\n")
+
+                # cont = raw_input('Continue? ')
+        print("predict_connect_right " + str(predict["cr"]) + " predict_connect_wrong " + str(predict["cw"]) + " predict_not_connect_right " + str(predict["ncr"]) + " predict_not_connect_wrong " + str(predict["ncw"]))
 
 def repeat():
         lines = [line.rstrip('\n') for line in open("log/prog.txt")]
