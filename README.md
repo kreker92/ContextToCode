@@ -7,7 +7,12 @@ Data-driven program synthesis in Java that lets you turn your Gherkin specs into
 
 ## Pattern recognition in dataset, network training
 
+![enter image description here](https://raw.githubusercontent.com/nayname/ThousandMonkeysTypewriter.github.io/master/learn.jpg)
+
 ## Network deployment, recognition in IDE
+
+![enter image description here](https://raw.githubusercontent.com/nayname/ThousandMonkeysTypewriter.github.io/master/deploy.jpg)
+
 
 
 
