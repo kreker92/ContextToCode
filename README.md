@@ -1,5 +1,5 @@
 # ContextToCode
-Data-driven program synthesis in Java that lets you turn your Gherkin specs into the code
+Context based technology that suggest you code completions inj natural language ("Open DB connection").
 
 ## Description, snippet mining
 
