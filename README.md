@@ -1,5 +1,5 @@
 # ContextToCode
-Context based technology that suggest you code completions inj natural language ("Open DB connection").
+Context based technology that suggest you code completions in natural language ("Open DB connection").
 
 ## Description, snippet mining
 
