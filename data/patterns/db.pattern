@@ -4,6 +4,6 @@ fill properties (Properties props = new Properties();	props.put("user", "formret
 
 open connection (DriverManager.getConnection)
 
-execute query (conn.prepareStatement(query);  ResultSet rs=statement.executeQuery();)
+execute query (conn.prepareStatement(query);  ResultSet rs=statement.executeQuery();) ( ResultSet rs; String query = "SELECT a_date, count(1) FROM atable WHERE organization_id='" + tenantId + "' group by a_date";)
 
 clode connection (conn.close();)
