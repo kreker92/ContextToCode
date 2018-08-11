@@ -1,0 +1,9 @@
+get driver (Class.forName(embeddedDriver).newInstance();)
+
+fill properties (Properties props = new Properties();	props.put("user", "formreturn");)
+
+open connection (DriverManager.getConnection)
+
+execute query (conn.prepareStatement(query);  ResultSet rs=statement.executeQuery();)
+
+clode connection (conn.close();)
