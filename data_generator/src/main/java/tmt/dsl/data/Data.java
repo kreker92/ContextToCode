@@ -2,11 +2,15 @@ package tmt.dsl.data;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -23,6 +27,7 @@ import tmt.dsl.formats.redirect.RedirectUtils;
 import tmt.dsl.formats.redirect.RedirectsJson;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class Data {
 
@@ -133,6 +138,22 @@ public class Data {
 //         
         cntx_dsl.send(new Gson().toJson(output), "");
         System.err.println(output.size()+" * "+          count);
+      } else if (args[0].equals("titles")) {
+        HashSet<String> t = new HashSet<>();
+        BufferedReader br = new BufferedReader(new FileReader("/root/NLP2Code/data/title,id.txt"));
+        for(String line; (line = br.readLine()) != null; ) {
+          t.add(line.split(",")[0].trim());
+        }
+        br = new BufferedReader(new FileReader("/root/NLP2Code/data/task,id.txt"));
+        for(String line; (line = br.readLine()) != null; ) {
+          t.add(line.split(",")[0].trim());
+        }
+        List<String> list = new ArrayList<>(t);
+        Set<String> subSet = new LinkedHashSet<>(list.subList(0, 10000));
+        try (Writer writer = new FileWriter("/root/NLP2Code/data/title_small.txt")) {
+          Gson gson = new GsonBuilder().create();
+          gson.toJson(subSet, writer);
+        }
       }
     } catch (Exception e) {
       e.printStackTrace();
