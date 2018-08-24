@@ -1,4 +1,8 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.diff.impl.patch.apply.GenericPatchApplier;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.codeInsight.intention.IntentionAction;
@@ -13,6 +17,8 @@ import com.intellij.psi.PsiFileFactory;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.fileTypes.FileType;
 
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,6 +33,7 @@ import com.google.common.collect.Sets;
 import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
+import org.mozilla.javascript.ast.AstNode;
 
 import javax.swing.*;
 
@@ -60,18 +67,37 @@ public class HelloAction extends AnAction {
 
         File[] myFiles = myTargetDir.listFiles();
         for (File file : myFiles) {
-            System.err.println(file.getAbsolutePath());
             String text = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
+            String word = "\n";
+            ArrayList<Integer> ends = new ArrayList<>();
 
             final String s = "*.java";
             FileType fileType = FileTypeManager.getInstance().getFileTypeByFileName("*.java"); // RegExp plugin is not installed
 
-            final PsiFile psf = PsiFileFactory.getInstance(project).createFileFromText("text.java", fileType, text, -1, true);
+            final PsiFile psf = PsiFileFactory.getInstance(project).createFileFromText(file.getName(), fileType, text, -1, true);
 
             SelectionContextExtractor contextExtractor = new SelectionContextExtractor(psf);
-            SelectionContext context = contextExtractor.extractContext();
-            SelectionContextQueryBuilder queryBuilder = new SelectionContextQueryBuilder(context);
-            queryBuilder.buildQuery();
+
+            for (int i = -1; (i = text.indexOf(word, i + 1)) != -1; i++) {
+                ends.add(i);
+            }
+
+            int previous = 0;
+            int line = 0;
+            ArrayList<ElementInfo> output_elements = new ArrayList<>();
+
+            for (int e : ends) {
+                SelectionContext context = contextExtractor.extractContext(previous, e+1);
+                SelectionContextQueryBuilder queryBuilder = new SelectionContextQueryBuilder(context);
+                queryBuilder.buildQuery(output_elements, line);
+                previous = e+1;
+                line ++;
+            }
+
+            try (Writer writer = new FileWriter("C:\\Users\\user\\Documents\\backup\\output.json")) {
+                Gson gson = new GsonBuilder().create();
+                gson.toJson(output_elements, writer);
+            }
         }
     }
 }
@@ -94,32 +120,26 @@ class SelectionContextExtractor {
 
         private final PsiFile psiFile;
 
-        private final int selectionStartOffset;
-
-        private final int selectionEndOffset;
-
         public SelectionContextExtractor(PsiFile psiFile) {
 //            this.selectionStartOffset = editor.getSelectionModel().getSelectionStart();
 //            this.selectionEndOffset = editor.getSelectionModel().getSelectionEnd();
-            this.selectionStartOffset = 881;
-            this.selectionEndOffset = 984;
             this.psiFile = psiFile;
         }
 
-        public SelectionContext extractContext() {
+        public SelectionContext extractContext(int selectionStartOffset, int selectionEndOffset) {
             List<PsiElement> psiElements = new ArrayList<>();
-            traversePsiElement(psiFile, psiElements);
+            traversePsiElement(psiFile, psiElements, selectionStartOffset, selectionEndOffset);
             return new SelectionContext(psiElements);
         }
 
-        private void traversePsiElement(PsiElement element, List<PsiElement> selectedElements) {
+        private void traversePsiElement(PsiElement element, List<PsiElement> selectedElements, int selectionStartOffset, int selectionEndOffset) {
             int elementStart = element.getTextOffset();
             int elementEnd = elementStart + element.getTextLength();
             if (selectionStartOffset <= elementStart && elementEnd <= selectionEndOffset) {
                 selectedElements.add(element);
             }
             for (PsiElement childElement : element.getChildren()) {
-                traversePsiElement(childElement, selectedElements);
+                traversePsiElement(childElement, selectedElements, selectionStartOffset, selectionEndOffset);
             }
         }
     }
@@ -194,10 +214,9 @@ class SelectionContextExtractor {
             this.context = context;
         }
 
-        public void buildQuery() {
+        public void buildQuery(ArrayList<ElementInfo> output_elements, int line) {
             List<PsiElement> psiElements = context.getPsiElements();
 
-            Map<String, Integer> wordCountMap = new HashMap<>();
             for (PsiElement psiElement : psiElements) {
                 if (meaninglessForContextTokenTypes.contains(psiElement.getNode().getElementType())) {
                     continue;
@@ -212,12 +231,9 @@ class SelectionContextExtractor {
                     // REFERENCE_PARAMETER_LIST is present in PSI trie but its text may be empty.
                     continue;
                 }
-                System.err.println(psiElement.getContext().getText()+" ^ "+psiElement.getText());
-                String elementText = psiElement.getText();
-                int counter = wordCountMap.getOrDefault(elementText, 0);
-                wordCountMap.put(elementText, counter + 1);
+
+                output_elements.add(new ElementInfo(psiElement, line));
             }
-            System.err.println(wordCountMap);
 //            List<WordInfo> words =
 //                    wordCountMap.entrySet()
 //                            .stream()
@@ -230,28 +246,41 @@ class SelectionContextExtractor {
 //                    .collect(Collectors.joining(" "));
         }
 
-        private class WordInfo {
-            final Comparator<? super WordInfo> COMPARATOR_BY_TIMES_ENCOUNTERED =
-                    Comparator.comparing(WordInfo::getTimesEncountered).reversed();
+//        private class WordInfo {
+//            final Comparator<? super WordInfo> COMPARATOR_BY_TIMES_ENCOUNTERED =
+//                    Comparator.comparing(WordInfo::getTimesEncountered).reversed();
+//
+//            private String text;
+//
+//            private int timesEncountered;
+//
+//            WordInfo(String text, int timesEncountered) {
+//                this.text = text;
+//                this.timesEncountered = timesEncountered;
+//            }
+//
+//            String getText() {
+//                return text;
+//            }
+//
+//            int getTimesEncountered() {
+//                return timesEncountered;
+//            }
+//        }
 
-            private String text;
-
-            private int timesEncountered;
-
-            WordInfo(String text, int timesEncountered) {
-                this.text = text;
-                this.timesEncountered = timesEncountered;
-            }
-
-            String getText() {
-                return text;
-            }
-
-            int getTimesEncountered() {
-                return timesEncountered;
-            }
-        }
     }
+
+class ElementInfo {
+    private String node;
+    private String text;
+    int line;
+
+    public ElementInfo(PsiElement psiElement, int line_) {
+        text = psiElement.getText();
+        node = psiElement.getNode().toString();
+        line = line_;
+    }
+}
 
 //class NullShaderFileType extends LanguageFileType {
 //
