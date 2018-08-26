@@ -25,6 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -35,23 +36,35 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class Utils {
 
-  public static String readFile(String filename) throws IOException{
-    FileReader files = null;
-    String txt = "";
+  public static String readFile(String where) throws IOException {
+    String everything = "";
+    BufferedReader br = new BufferedReader(new FileReader(where));
     try {
-      files = new FileReader(filename);
-      txt += new Scanner(files).nextLine();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-    finally {
-      if (files!=null) 
-        files.close(); 
-    }
+        StringBuilder sb = new StringBuilder();
+        String line = br.readLine();
 
-    return txt;
+        while (line != null) {
+            sb.append(line);
+            sb.append(System.lineSeparator());
+            line = br.readLine();
+        }
+        everything = sb.toString();
+    } finally {
+        br.close();
+    }
+    return everything;
+  }
+  
+  public static void saveJsonFile (String where, Object what) throws IOException {
+    try (Writer writer = new FileWriter(where)) {
+      Gson gson = new GsonBuilder().create();
+      gson.toJson(what, writer);
+    }
   }
   
   public static int get_percent_diff(double now, double ago) {

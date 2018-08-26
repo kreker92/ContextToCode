@@ -109,6 +109,12 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.8.0-beta0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.intellij/openapi -->
+		<dependency>
+			<groupId>com.intellij</groupId>
+			<artifactId>openapi</artifactId>
+			<version>6.0.5</version>
+		</dependency>
 	    <!--<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>

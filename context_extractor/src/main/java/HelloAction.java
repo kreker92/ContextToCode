@@ -20,12 +20,10 @@ import com.intellij.openapi.fileTypes.FileType;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,12 +31,9 @@ import com.google.common.collect.Sets;
 import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import org.mozilla.javascript.ast.AstNode;
 
-import javax.swing.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import tmt.dsl.formats.context.in.InnerContext;
+import tmt.dsl.formats.context.in.ElementInfo;
 
 public class HelloAction extends AnAction {
     private List<PsiFile> myPsiFiles = new ArrayList<>();
@@ -61,7 +56,7 @@ public class HelloAction extends AnAction {
     }
 
     private void setUp() throws Exception {
-        File myTargetDir = new File("C:\\Users\\user\\Documents\\backup\\iris\\");
+        File myTargetDir = new File("C:\\Users\\user\\Documents\\backup\\data\\raw\\");
         System.err.println(myTargetDir);
         if (!myTargetDir.isDirectory()) throw new Exception(myTargetDir + " is not a directory");
 
@@ -84,17 +79,18 @@ public class HelloAction extends AnAction {
 
             int previous = 0;
             int line = 0;
-            ArrayList<ElementInfo> output_elements = new ArrayList<>();
+            ArrayList<InnerContext> output_elements = new ArrayList<>();
 
             for (int e : ends) {
-                SelectionContext context = contextExtractor.extractContext(previous, e+1);
+                SelectionContext context = contextExtractor.extractContext(previous, e+1, line, text.substring(previous, e+1));
                 SelectionContextQueryBuilder queryBuilder = new SelectionContextQueryBuilder(context);
-                queryBuilder.buildQuery(output_elements, line);
+                queryBuilder.buildQuery();
                 previous = e+1;
                 line ++;
+                output_elements.add(context.ic);
             }
 
-            try (Writer writer = new FileWriter("C:\\Users\\user\\Documents\\backup\\output.json")) {
+            try (Writer writer = new FileWriter("C:\\Users\\user\\Documents\\backup\\data\\parsed\\"+file.getName()+".json")) {
                 Gson gson = new GsonBuilder().create();
                 gson.toJson(output_elements, writer);
             }
@@ -105,10 +101,14 @@ public class HelloAction extends AnAction {
     class SelectionContext {
 
         private final List<PsiElement> psiElements;
+        public InnerContext ic = new InnerContext();
 
-        SelectionContext(List<PsiElement> psiElements) {
+        SelectionContext(List<PsiElement> psiElements, int selectionStartOffset, int selectionEndOffset, int line, String text) {
             this.psiElements = psiElements;
-
+            ic.line_num = line;
+            ic.start = selectionStartOffset;
+            ic.end = selectionEndOffset;
+            ic.line_text = text;
         }
 
         List<PsiElement> getPsiElements() {
@@ -116,7 +116,7 @@ public class HelloAction extends AnAction {
         }
     }
 
-class SelectionContextExtractor {
+    class SelectionContextExtractor {
 
         private final PsiFile psiFile;
 
@@ -126,10 +126,10 @@ class SelectionContextExtractor {
             this.psiFile = psiFile;
         }
 
-        public SelectionContext extractContext(int selectionStartOffset, int selectionEndOffset) {
+        public SelectionContext extractContext(int selectionStartOffset, int selectionEndOffset, int line, String text) {
             List<PsiElement> psiElements = new ArrayList<>();
             traversePsiElement(psiFile, psiElements, selectionStartOffset, selectionEndOffset);
-            return new SelectionContext(psiElements);
+            return new SelectionContext(psiElements, selectionStartOffset, selectionEndOffset, line, text);
         }
 
         private void traversePsiElement(PsiElement element, List<PsiElement> selectedElements, int selectionStartOffset, int selectionEndOffset) {
@@ -214,7 +214,7 @@ class SelectionContextExtractor {
             this.context = context;
         }
 
-        public void buildQuery(ArrayList<ElementInfo> output_elements, int line) {
+        public void buildQuery() {
             List<PsiElement> psiElements = context.getPsiElements();
 
             for (PsiElement psiElement : psiElements) {
@@ -232,7 +232,7 @@ class SelectionContextExtractor {
                     continue;
                 }
 
-                output_elements.add(new ElementInfo(psiElement, line));
+                context.ic.elements.add(new ElementInfo(psiElement, context.ic.line_num));
             }
 //            List<WordInfo> words =
 //                    wordCountMap.entrySet()
@@ -269,18 +269,6 @@ class SelectionContextExtractor {
 //        }
 
     }
-
-class ElementInfo {
-    private String node;
-    private String text;
-    int line;
-
-    public ElementInfo(PsiElement psiElement, int line_) {
-        text = psiElement.getText();
-        node = psiElement.getNode().toString();
-        line = line_;
-    }
-}
 
 //class NullShaderFileType extends LanguageFileType {
 //
