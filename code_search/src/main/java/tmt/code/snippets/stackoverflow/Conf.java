@@ -1,12 +1,10 @@
-package tmt.conf;
+package tmt.code.snippets.stackoverflow;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.google.gson.reflect.TypeToken;
-
-import tmt.code.snippets.stackoverflow.Row;
 
 public class Conf {
   public static HashMap<Integer, Row> posts = new HashMap<>();

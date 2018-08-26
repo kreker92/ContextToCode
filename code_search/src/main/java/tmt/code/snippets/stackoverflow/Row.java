@@ -11,7 +11,6 @@ import org.jsoup.examples.HtmlToPlainText;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import tmt.code.validate.Validate;
 import tmt.conf.Utils;
 
 /***

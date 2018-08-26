@@ -1,4 +1,4 @@
-package tmt.code.validate;
+package tmt.code.snippets.stackoverflow;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

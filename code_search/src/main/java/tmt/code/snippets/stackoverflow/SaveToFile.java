@@ -1,4 +1,4 @@
-package tmt.code;
+package tmt.code.snippets.stackoverflow;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,8 +14,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
-import tmt.code.snippets.stackoverflow.Row;
-import tmt.conf.Conf;
 import tmt.conf.Utils;
 
 import java.io.BufferedReader;
