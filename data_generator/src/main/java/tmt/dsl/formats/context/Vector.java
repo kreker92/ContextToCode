@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import tmt.dsl.formats.context.in.ElementInfo;
+import tmt.dsl.formats.context.in.InnerContext;
+
 public class Vector {
   public ArrayList<Integer> vector = new ArrayList<>();
   private ArrayList<String> strings = new ArrayList<>();
@@ -23,6 +26,26 @@ public class Vector {
       if (!s.trim().isEmpty()) {
         strings.add(s.trim());
         commands.add(s.trim());
+      }
+    row = i;
+    level = level_;
+    parent_id = parent_id_;
+  }
+  
+  public Vector(InnerContext c, HashSet<String> commands, int i, String line, boolean b, int level_, int parent_id_, ArrayList<String> goodTypes, ArrayList<String> badTypes) {
+    origin = line;
+
+    if (b)
+      label = 1;
+
+    for ( ElementInfo s : c.elements )
+//      if (!goodTypes.contains(s.node) && !badTypes.contains(s.node)) {
+//        System.err.println(s.node);
+//        System.exit(1);
+//      }
+      if (goodTypes.contains(s.node)) {
+        strings.add(s.text.trim());
+        commands.add(s.text.trim());
       }
     row = i;
     level = level_;

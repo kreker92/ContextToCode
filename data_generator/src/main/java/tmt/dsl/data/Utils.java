@@ -45,32 +45,32 @@ public class Utils {
     String everything = "";
     BufferedReader br = new BufferedReader(new FileReader(where));
     try {
-        StringBuilder sb = new StringBuilder();
-        String line = br.readLine();
+      StringBuilder sb = new StringBuilder();
+      String line = br.readLine();
 
-        while (line != null) {
-            sb.append(line);
-            sb.append(System.lineSeparator());
-            line = br.readLine();
-        }
-        everything = sb.toString();
+      while (line != null) {
+        sb.append(line);
+        sb.append(System.lineSeparator());
+        line = br.readLine();
+      }
+      everything = sb.toString();
     } finally {
-        br.close();
+      br.close();
     }
     return everything;
   }
-  
+
   public static void saveJsonFile (String where, Object what) throws IOException {
     try (Writer writer = new FileWriter(where)) {
       Gson gson = new GsonBuilder().create();
       gson.toJson(what, writer);
     }
   }
-  
+
   public static int get_percent_diff(double now, double ago) {
     double min;
     double max;
-    
+
     if (now > ago) {
       min = ago;
       max = now;
@@ -78,13 +78,13 @@ public class Utils {
       min = now;
       max = ago;      
     }
-    
+
     if ( (max - min) > min )
-        return 100;
+      return 100;
     else
-        return (int)((max - min) / (min / 100));
+      return (int)((max - min) / (min / 100));
   }
-  
+
   public static void writeFile(List<String> lines, String filename, boolean append) throws IOException {
     Path file = Paths.get(filename);
     if (append)
@@ -92,29 +92,29 @@ public class Utils {
     else
       Files.write(file, lines, Charset.forName("UTF-8"));
   }
-  
+
   public static void writeFile1(String lines, String filename, boolean append) throws IOException {
     File file = new File("/root/javaDataGenerator/data/0.json");
     FileWriter fr = null;
     BufferedWriter br = null;
     String dataWithNewLine=lines+System.getProperty("line.separator");
     try{
-        fr = new FileWriter(file);
-        br = new BufferedWriter(fr);
-        for(int i = 1; i>0; i--){
-            br.write(dataWithNewLine);
-        }
+      fr = new FileWriter(file);
+      br = new BufferedWriter(fr);
+      for(int i = 1; i>0; i--){
+        br.write(dataWithNewLine);
+      }
     } catch (IOException e) {
-        e.printStackTrace();
+      e.printStackTrace();
     }finally{
-        try {
-            br.close();
-            fr.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+      try {
+        br.close();
+        fr.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
-   }
+  }
 
   public static String readUrl(String urlString) throws Exception {
     BufferedReader reader = null;

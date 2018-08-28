@@ -5,13 +5,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
+
 import tmt.dsl.executor.info.Step;
 import tmt.dsl.formats.context.ContextDSL;
-import tmt.dsl.formats.context.DefaultParser;
+import tmt.dsl.formats.context.Parser;
 import tmt.dsl.formats.context.Vector;
+import tmt.dsl.formats.context.in.InnerContext;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -71,18 +75,26 @@ import com.google.gson.JsonSyntaxException;
 //log_dsl.execute(command);
 //} else if (args[0].equals("context")) {
 
-public class Generator {
+public class Generator  {
 
   public static final int limit = 15000;
+  
   private static String dsl_buffer = "/root/data/dsl_buffer/";
-  static Gson gson;
-  static String key = "DriverManager";
+  static Gson gson  = new Gson();
+  static String key = "DriverManager.getConnection";
   static String query = "DriverManager%20getConnection%20query";
-  static String root_key = "cs/DriverManager_getConnection_Query";
+  static String root_key = "cs/parsed";
   static String root = "/root/ContextToCode/output/";
+  
+  public static ArrayList<String> good_types;
+  public static ArrayList<String> bad_types;
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception{
     int count = 0;
+    
+    good_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("/root/ContextToCode/output/conf/good_types"), String[].class)) );
+    bad_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("/root/ContextToCode/output/conf/bad_types"), String[].class)) );
+    
     try {
       int max = 0;
       loadCodeSearch();
@@ -107,7 +119,7 @@ public class Generator {
       }
       ContextDSL cntx_dsl = null;
       br.close();
-      System.err.println("*"+max);
+      
       for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
         cntx_dsl = new ContextDSL(s.getValue());  
         cntx_dsl.execute();
@@ -118,7 +130,7 @@ public class Generator {
       }
 
       cntx_dsl.send(new Gson().toJson(output), "");
-      System.err.println(output.size()+" * "+          count);
+      System.err.println("max:"+max+" * "+output.size()+" * "+          count);
     } catch (Exception e) {
       e.printStackTrace();
     } 
@@ -132,13 +144,10 @@ public class Generator {
     HashMap<String, Integer> hot_ecnoding = new HashMap<>();
 
     for (File f : files) {
-      System.err.println(f.getPath());
-      String[] code = Utils.readFile(f.getPath()).split("\n");
-
+      InnerContext[] code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
       for (int line = code.length-1; line >= 0; line --) {
-        String c = code[line];
-        if (c.contains(key)) {
-          Vector[] snip = DefaultParser.getSnippet(line, code, commands, (f.getPath()+line).hashCode(), key);
+        if (code[line].line_text.contains(key)) {
+          Vector[] snip = Parser.getSnippet(line, code, commands, (f.getPath()+line).hashCode(), key, good_types, bad_types);
           if (snip.length > 0)
             res.add(snip);
         }
@@ -154,8 +163,9 @@ public class Generator {
         output.add(v);
       }
     }
+    
+//    System.err.println(output);
     Utils.saveJsonFile(root+"funcs/vectors", output);
-    System.exit(1);
   }
 
   private static void hotEncode(HashSet<String> commands, HashMap<String, Integer> hot_ecnoding) {

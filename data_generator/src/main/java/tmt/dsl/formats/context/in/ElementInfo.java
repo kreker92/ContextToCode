@@ -3,8 +3,8 @@ package tmt.dsl.formats.context.in;
 import com.intellij.psi.PsiElement;
 
 public class ElementInfo {
-  private String node;
-  private String text;
+  public String node;
+  public String text;
   int line;
 
   public ElementInfo(PsiElement psiElement, int line_) {

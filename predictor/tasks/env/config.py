@@ -16,7 +16,7 @@ DSL_DATA_PATH = "dsl/data/data_buffer.json"
 CONFIG = {
     "ENVIRONMENT_ROW": 9,         # Input 1, Input 2, Carry, Output
     "ENVIRONMENT_COL": 9,         # 10-Digit Maximum for Addition Task
-    "ENVIRONMENT_DEPTH": 3000,      # Size of each element vector => One-Hot, Options: 0-9
+    "ENVIRONMENT_DEPTH": 3118,      # Size of each element vector => One-Hot, Options: 0-9
 
     "ARGUMENT_NUM": 1,            # Maximum Number of Program Arguments
     "ARGUMENT_DEPTH": 75,         # Size of Argument Vector => One-Hot, Options 0-9, Default (10)
