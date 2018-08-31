@@ -9,3 +9,9 @@
 обучаемся на датасете распознавать вставку кода (изолированно для каждого куска?)
 
 выкладываем модель
+
+
+Current eval:
+
+predict_connect_right 18 predict_connect_wrong 9 predict_not_connect_right 127 predict_not_connect_wrong 13
+
