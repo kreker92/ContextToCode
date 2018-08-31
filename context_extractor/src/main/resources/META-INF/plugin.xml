@@ -1,12 +1,20 @@
 <idea-plugin>
-    <id>com.tmt.ContextAnalyzer</id>
-    <name>Plugin display name here</name>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <id>org.jetbrains</id>
+    <name>my_plugin</name>
+    <version>0.0.1</version>
+    <vendor email="dummy" url="dummy">dummy</vendor>
 
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+      Sample plugin.<br>
     ]]></description>
+
+    <change-notes><![CDATA[
+      Release 0.0.1: Initial release.<br>
+    ]]>
+    </change-notes>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="162"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -14,14 +22,36 @@
     <depends>com.intellij.modules.lang</depends>
     -->
 
-    <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
-    </extensions>
+    <depends>com.intellij.modules.java</depends>
+
+    <project-components>
+        <component>
+            <implementation-class>HelloAction</implementation-class>
+            <!-- TODO(niksaz): Implement saving the plugin's state. -->
+            <!--option name="workspace" value="true"/-->
+        </component>
+    </project-components>
+
+    <!--<extensions defaultExtensionNs="com.intellij">-->
+    <!--<intentionAction>-->
+    <!--<className>ru.spb.se.contexthelper.SelectionContextHelpIntention</className>-->
+    <!--<category>Context Helper</category>-->
+    <!--<descriptionDirectoryName>SelectionContextHelpIntention</descriptionDirectoryName>-->
+    <!--</intentionAction>-->
+    <!--</extensions>-->
 
     <actions>
-        <group id="MyPlugin.SampleMenu" text="Greeting" description="Greeting menu">
-            <add-to-group group-id="MainMenu" anchor="last"/>
-            <action id="Myplugin.Textboxes" class="HelloAction" text="Hello" description="Says hello"/>
-        </group>
+        <action id="DeclarationsContextHelpAction"
+                class="HelloAction"
+                text="Suggest help based on the available declarations"
+                description="Suggest help based on the available declarations">
+            <keyboard-shortcut first-keystroke="shift alt H" keymap="$default"/>
+        </action>
+
+        <!--<action id="TestContextsAction"-->
+        <!--class="ru.spb.se.contexthelper.testing.TestContextsAction"-->
+        <!--text="Runs the test for accessing the quality"-->
+        <!--description="Runs the planned tests for accessing the method's quality"/>-->
     </actions>
+
 </idea-plugin>

@@ -15,6 +15,7 @@ import tmt.dsl.formats.context.ContextDSL;
 import tmt.dsl.formats.context.Parser;
 import tmt.dsl.formats.context.Vector;
 import tmt.dsl.formats.context.in.InnerContext;
+import tmt.dsl.tensorflow.TF;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -77,23 +78,22 @@ import com.google.gson.JsonSyntaxException;
 
 public class Generator  {
 
-  public static final int limit = 15000;
+  public static int limit;
   
-  private static String dsl_buffer = "/root/data/dsl_buffer/";
-  static Gson gson  = new Gson();
-  static String key = "DriverManager.getConnection";
-  static String query = "DriverManager%20getConnection%20query";
-  static String root_key = "cs/parsed";
-  static String root = "/root/ContextToCode/output/";
+  public static String dsl_buffer;
+  public static Gson gson;
+  public static String key;
+  public static String query;
+  public static String root_key;
+  public static String root;
+  public static String vectors;
+  public static String model;
   
   public static ArrayList<String> good_types;
   public static ArrayList<String> bad_types;
 
-  public static void main(String[] args) throws Exception{
+  public static void setTrainAndTest() throws Exception{
     int count = 0;
-    
-    good_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("/root/ContextToCode/output/conf/good_types"), String[].class)) );
-    bad_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("/root/ContextToCode/output/conf/bad_types"), String[].class)) );
     
     try {
       int max = 0;
@@ -102,7 +102,7 @@ public class Generator  {
       ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
 
       HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
-      BufferedReader br = new BufferedReader(new FileReader("/root/ContextToCode/output/funcs/vectors"));
+      BufferedReader br = new BufferedReader(new FileReader(vectors));
       for(String line; (line = br.readLine()) != null; ) {
         for (Vector v : new Gson().fromJson(line, Vector[].class)) {
           if (!sequences.containsKey(v.parent_id)) {
@@ -136,6 +136,36 @@ public class Generator  {
     } 
   }
 
+  public int eval() throws Exception {
+    loadCodeSearch();
+
+    ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
+
+    HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
+    BufferedReader br = new BufferedReader(new FileReader(vectors));
+    for(String line; (line = br.readLine()) != null; ) {
+      for (Vector v : new Gson().fromJson(line, Vector[].class)) {
+        if (!sequences.containsKey(v.parent_id)) {
+          ArrayList<Vector> tmp = new ArrayList<>();
+          sequences.put(v.parent_id, tmp);
+        }
+
+        sequences.get(v.parent_id).add(v);
+      }
+    }
+    ContextDSL cntx_dsl = null;
+    br.close();
+    
+    for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
+      cntx_dsl = new ContextDSL(s.getValue());  
+      cntx_dsl.execute();
+      output.addAll(cntx_dsl.getData());
+    }
+
+    TF tf = new TF(output, model);
+    return tf.eval();
+  }
+
   private static void loadCodeSearch() throws JsonSyntaxException, IOException, InterruptedException {
     //      ArrayList<String> code = new ArrayList<String>(Arrays.asList(Utils.readFile("/root/toCode/output/cs/66533677").split("\n")));
     ArrayList<Vector[]> res = new ArrayList<>();
@@ -146,7 +176,7 @@ public class Generator  {
     for (File f : files) {
       InnerContext[] code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
       for (int line = code.length-1; line >= 0; line --) {
-        if (code[line].line_text.contains(key)) {
+        if (/*TRIN*/code[line].line_text.contains(key) || /*EVAL*/ key == null && line == code.length-1) {
           Vector[] snip = Parser.getSnippet(line, code, commands, (f.getPath()+line).hashCode(), key, good_types, bad_types);
           if (snip.length > 0)
             res.add(snip);
@@ -165,7 +195,7 @@ public class Generator  {
     }
     
 //    System.err.println(output);
-    Utils.saveJsonFile(root+"funcs/vectors", output);
+    Utils.saveJsonFile(vectors, output);
   }
 
   private static void hotEncode(HashSet<String> commands, HashMap<String, Integer> hot_ecnoding) {

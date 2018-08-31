@@ -32,8 +32,6 @@ import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 
-import tmt.dsl.formats.context.in.InnerContext;
-import tmt.dsl.formats.context.in.ElementInfo;
 
 public class HelloAction extends AnAction {
     private List<PsiFile> myPsiFiles = new ArrayList<>();
@@ -48,7 +46,10 @@ public class HelloAction extends AnAction {
         project = event.getProject();
         try {
             factory = PsiFileFactory.getInstance(project);
-            setUp();
+         //   setUp();
+            System.err.print(Eval.sendGet("телефон"));
+
+            
         } catch (Exception e) {
             Messages.showMessageDialog(project, e.getMessage(), "Greeting", Messages.getInformationIcon());
             e.printStackTrace();
