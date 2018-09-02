@@ -1,18 +1,16 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.intellij.lang.ASTNode;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.diff.impl.patch.apply.GenericPatchApplier;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.codeInsight.intention.IntentionAction;
 //import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
+import com.intellij.openapi.command.CommandProcessor;
+
 
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.fileTypes.FileType;
@@ -32,11 +30,11 @@ import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 
-
 public class HelloAction extends AnAction {
     private List<PsiFile> myPsiFiles = new ArrayList<>();
     private PsiFileFactory factory;
     private Project project;
+    private Editor ed;
 
     public HelloAction() {
         super("Hello");
@@ -44,16 +42,72 @@ public class HelloAction extends AnAction {
 
     public void actionPerformed(AnActionEvent event) {
         project = event.getProject();
-        try {
-            factory = PsiFileFactory.getInstance(project);
-         //   setUp();
-            System.err.print(Eval.sendGet("телефон"));
+        factory = PsiFileFactory.getInstance(project);
+        System.err.print("!1");
 
-            
+        try {
+         // case 1:
+         //   setUp();
+         // case 2:
+            ed = event.getData(PlatformDataKeys.EDITOR);
+            PsiFile fi = event.getData(LangDataKeys.PSI_FILE);
+
+            ArrayList<InnerContext> output_elements = new ArrayList<>();
+            parseFile(fi, output_elements, fi.getText(), ed.getSelectionModel().getSelectionEnd());
+
+            String request = new Gson().toJson(output_elements);
+//            System.err.print();
+//            System.err.print(Eval.sendGet("телефон"));
+
+            ContextHelperPanel helperComponent = new ContextHelperPanel(project, this);
+
+            helperComponent.setQueryingStatus(request);
+
+//            CommandProcessor.getInstance().executeCommand(project, () -> getApplication().runWriteAction(() -> {
+//                Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+//                if (editor != null) {
+//                    int offset = editor.getCaretModel().getOffset();
+//                    Document document = editor.getDocument();
+//                    String key = isXmlFile ?
+//                            "@" + element.getTag() + "/" + element.getName()
+//                            : "R." + element.getTag() + "." + element.getName();
+//                    if (key != null) {
+//                        document.insertString(offset, key);
+//                        editor.getCaretModel().moveToOffset(offset + key.length());
+//                    }
+//                }
+//            }), "InsertResultToEditor", "", UndoConfirmationPolicy.DO_NOT_REQUEST_CONFIRMATION);
+
+
+
+//            helperComponent.process("{psiElement.text} {elementLanguage.displayName.toLowerCase()}");
+
         } catch (Exception e) {
             Messages.showMessageDialog(project, e.getMessage(), "Greeting", Messages.getInformationIcon());
             e.printStackTrace();
         }
+    }
+
+    public void insert (String q) {
+        int cursorOffset = ed.getCaretModel().getOffset();
+        Document document = ed.getDocument();
+
+        CommandProcessor.getInstance().executeCommand(null, new Runnable() {
+            @Override
+            public void run() {
+                Document document = ed.getDocument();
+                String templateText = document.getText();
+                document.replaceString(0, document.getTextLength(), templateText);document.insertString(cursorOffset, "\n     ToolWindowManager toolWindowMgr = ToolWindowManager.getInstance(project);\n" +
+               /*         "    ToolWindow tw = toolWindowMgr.getToolWindow(TOOL_WINDOW_ID);\n" +
+                        "    if (tw == null)\n" +
+                        "    {\n" +
+                        "        tw = toolWindowMgr.registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.BOTTOM, true);\n" +
+                        "    }\n" +
+                        "    final ToolWindow toolWindow = tw;\n" +
+                        "    toolWindow.activate(() -> updateContent(toolWindow, project.getName()), true);")*/
+               q);
+            }
+        }, null, null);
     }
 
     private void setUp() throws Exception {
@@ -64,37 +118,42 @@ public class HelloAction extends AnAction {
         File[] myFiles = myTargetDir.listFiles();
         for (File file : myFiles) {
             String text = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
-            String word = "\n";
-            ArrayList<Integer> ends = new ArrayList<>();
+            ArrayList<InnerContext> output_elements = new ArrayList<>();
 
             final String s = "*.java";
             FileType fileType = FileTypeManager.getInstance().getFileTypeByFileName("*.java"); // RegExp plugin is not installed
 
             final PsiFile psf = PsiFileFactory.getInstance(project).createFileFromText(file.getName(), fileType, text, -1, true);
 
-            SelectionContextExtractor contextExtractor = new SelectionContextExtractor(psf);
-
-            for (int i = -1; (i = text.indexOf(word, i + 1)) != -1; i++) {
-                ends.add(i);
-            }
-
-            int previous = 0;
-            int line = 0;
-            ArrayList<InnerContext> output_elements = new ArrayList<>();
-
-            for (int e : ends) {
-                SelectionContext context = contextExtractor.extractContext(previous, e+1, line, text.substring(previous, e+1));
-                SelectionContextQueryBuilder queryBuilder = new SelectionContextQueryBuilder(context);
-                queryBuilder.buildQuery();
-                previous = e+1;
-                line ++;
-                output_elements.add(context.ic);
-            }
+            parseFile(psf, output_elements, text, null);
 
             try (Writer writer = new FileWriter("C:\\Users\\user\\Documents\\backup\\data\\parsed\\"+file.getName()+".json")) {
                 Gson gson = new GsonBuilder().create();
                 gson.toJson(output_elements, writer);
             }
+        }
+    }
+
+    private void parseFile(PsiFile psf, ArrayList<InnerContext> output_elements, String text, Integer end) {
+        SelectionContextExtractor contextExtractor = new SelectionContextExtractor(psf);
+        String word = "\n";
+        ArrayList<Integer> ends = new ArrayList<>();
+
+        for (int i = -1; (i = text.indexOf(word, i + 1)) != -1; i++) {
+            if (end == null || i <= end)
+                ends.add(i);
+        }
+
+        int previous = 0;
+        int line = 0;
+
+        for (int e : ends) {
+            SelectionContext context = contextExtractor.extractContext(previous, e+1, line, text.substring(previous, e+1));
+            SelectionContextQueryBuilder queryBuilder = new SelectionContextQueryBuilder(context);
+            queryBuilder.buildQuery();
+            previous = e+1;
+            line ++;
+            output_elements.add(context.ic);
         }
     }
 }
