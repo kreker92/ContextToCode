@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.Sets;
 import com.intellij.psi.JavaTokenType;
@@ -51,17 +52,22 @@ public class HelloAction extends AnAction {
          // case 2:
             ed = event.getData(PlatformDataKeys.EDITOR);
             PsiFile fi = event.getData(LangDataKeys.PSI_FILE);
+            Actions act = new Actions(ed);
 
             ArrayList<InnerContext> output_elements = new ArrayList<>();
             parseFile(fi, output_elements, fi.getText(), ed.getSelectionModel().getSelectionEnd());
 
             String request = new Gson().toJson(output_elements);
-//            System.err.print();
+            System.err.print(request);
 //            System.err.print(Eval.sendGet("телефон"));
 
-            ContextHelperPanel helperComponent = new ContextHelperPanel(project, this);
+            ContextHelperPanel helperComponent = new ContextHelperPanel(project, act);
 
-            helperComponent.setQueryingStatus(request);
+//            act.insert("\n\n ");
+
+//            TimeUnit.SECONDS.sleep(1);
+
+            helperComponent.setQueryingStatus(act.send(request));
 
 //            CommandProcessor.getInstance().executeCommand(project, () -> getApplication().runWriteAction(() -> {
 //                Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
@@ -86,28 +92,6 @@ public class HelloAction extends AnAction {
             Messages.showMessageDialog(project, e.getMessage(), "Greeting", Messages.getInformationIcon());
             e.printStackTrace();
         }
-    }
-
-    public void insert (String q) {
-        int cursorOffset = ed.getCaretModel().getOffset();
-        Document document = ed.getDocument();
-
-        CommandProcessor.getInstance().executeCommand(null, new Runnable() {
-            @Override
-            public void run() {
-                Document document = ed.getDocument();
-                String templateText = document.getText();
-                document.replaceString(0, document.getTextLength(), templateText);document.insertString(cursorOffset, "\n     ToolWindowManager toolWindowMgr = ToolWindowManager.getInstance(project);\n" +
-               /*         "    ToolWindow tw = toolWindowMgr.getToolWindow(TOOL_WINDOW_ID);\n" +
-                        "    if (tw == null)\n" +
-                        "    {\n" +
-                        "        tw = toolWindowMgr.registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.BOTTOM, true);\n" +
-                        "    }\n" +
-                        "    final ToolWindow toolWindow = tw;\n" +
-                        "    toolWindow.activate(() -> updateContent(toolWindow, project.getName()), true);")*/
-               q);
-            }
-        }, null, null);
     }
 
     private void setUp() throws Exception {

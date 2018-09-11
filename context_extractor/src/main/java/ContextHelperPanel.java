@@ -60,11 +60,11 @@ public class ContextHelperPanel extends JPanel implements Runnable {
 
     private ToolWindow toolWindow;
 
-    private HelloAction action;
+    private Actions action;
     private String query;
 
 
-    public ContextHelperPanel(Project pr, HelloAction act_) {
+    public ContextHelperPanel(Project pr, Actions act_) {
         project = pr;
 
         action = act_;
@@ -92,7 +92,7 @@ public class ContextHelperPanel extends JPanel implements Runnable {
      * Configures the panel's UI.
      */
     private void configureGui() {
-        PromptSupport.setPrompt("Enter your query", queryJTextField);
+        PromptSupport.setPrompt("", queryJTextField);
 
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new VerticalLayout());
@@ -144,7 +144,7 @@ public class ContextHelperPanel extends JPanel implements Runnable {
 //    bottomPanel.add(checkBox, BorderLayout.PAGE_START);
         bottomPanel.add(jfxPanel, BorderLayout.CENTER);
         queryJTextField.addActionListener(actionEvent -> {
-            action.insert(query);
+            action.insert(queryJTextField.getText());
         });
 //        @SuppressWarnings("SuspiciousNameCombination")
 //        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, treeScrollPane, bottomPanel);

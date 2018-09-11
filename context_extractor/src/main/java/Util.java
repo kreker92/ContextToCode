@@ -5,11 +5,11 @@ import java.util.*;
 
 import com.google.gson.Gson;
 
-public class Eval {
+public class Util {
 
     public static String sendGet(String string) throws Exception {
 
-        URL url = new URL("http://example.com");
+        URL url = new URL("");
 
         Map<String,Object> params = new LinkedHashMap<>();
         params.put("text",  string);
