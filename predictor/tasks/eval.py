@@ -50,6 +50,12 @@ def evaluate_addition():
         predict["cw"] = 0;
         predict["cr"] = 0;
 
+        f = open('log/prog_produced.txt', 'r+')
+        f.truncate()
+
+        f = open('log/prog_orig.txt', 'r+')
+        f.truncate()
+
         for x in range(0, 200):
             res = ""
             # try:
@@ -69,9 +75,6 @@ def repl(session, npi, data, pos, predict):
 
         # f = open('log/prog_orig.txt', 'r+')
         # f.truncate()
-
-        f = open('log/prog_produced.txt', 'r+')
-        f.truncate()
 
         with open("log/prog_orig.txt", "a") as myfile:
             for s in steps:
@@ -111,13 +114,13 @@ def repl(session, npi, data, pos, predict):
                     else:
                         predict["ncw"] += 1;
 
-                print ('y= Prog_id: %s, Terminate: %s' % (prog_id, np.argmax(t)))
-                print ('y` = Prog_id: %s, Terminate: %s' % (prog_out, terminate_out))
+                print ('%s y= Prog_id: %s, Terminate: %s' % (count, prog_id, np.argmax(t)))
+                print ('%s y` = Prog_id: %s, Terminate: %s' % (count, prog_out, terminate_out))
 
                 count += 1
 
                 # Next step
-                if np.argmax(t) == 1:
+               # if np.argmax(t) == 1:
                     # print 'Step: %s, Arguments: %s, Terminate: %s' % (prog_name, a_str, str(True))
                     # print 'IN 1: %s, IN 2: %s, CARRY: %s, OUT: %s' % (scratch.in1_ptr[1],
                     #                                                   scratch.in2_ptr[1],
@@ -128,16 +131,16 @@ def repl(session, npi, data, pos, predict):
                     #     scratch.execute(prog_id, arg)
 
                     # print ("Input:  %s, %s, Output:  %s, %s" % (str(x), str(y), str(output), scratch.true_ans))
-                    with open("log/"+str(count)+"prog_produced.txt", "a") as myfile:
-                        myfile.write(str(prog_id) + ", terminate: true\n")
-                    return True
+                #    with open("log/"+str(count)+"prog_produced.txt", "a") as myfile:
+                #        myfile.write(str(prog_id) + ", terminate: true\n")
+                #    return True
 
-                else:
+                #else:
                     # prog_name = PROGRAM_SET[prog_id][0]
 
                     # print([np.argmax(n_p), PROGRAM_SET[prog_id][0]], [np.argmax(n_args[0]), np.argmax(n_args[1])])
-                    with open("log/"+str(count)+"prog_produced.txt", "a") as myfile:
-                        myfile.write(str(prog_id) + ","+str(np.argmax(t))+"\n")
+                with open("log/prog_produced.txt", "a") as myfile:
+                    myfile.write(str(y[j]) + ":"+str(prog_id)+"\n")
 
                 # cont = raw_input('Continue? ')
         print("predict_connect_right " + str(predict["cr"]) + " predict_connect_wrong " + str(predict["cw"]) + " predict_not_connect_right " + str(predict["ncr"]) + " predict_not_connect_wrong " + str(predict["ncw"]))

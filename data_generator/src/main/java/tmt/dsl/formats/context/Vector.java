@@ -9,7 +9,7 @@ import tmt.dsl.formats.context.in.InnerContext;
 
 public class Vector {
   public ArrayList<Integer> vector = new ArrayList<>();
-  private ArrayList<String> strings = new ArrayList<>();
+  public ArrayList<String> strings = new ArrayList<>();
   private Integer row = null;
   public Integer level = null;
   private String origin;

@@ -162,8 +162,9 @@ public class Generator  {
       output.addAll(cntx_dsl.getData());
     }
 
-    TF tf = new TF(output, model);
-    return tf.eval();
+//    TF tf = new TF(output, model);
+//    return tf.eval();
+    return 0;
   }
 
   private static void loadCodeSearch() throws JsonSyntaxException, IOException, InterruptedException {

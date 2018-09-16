@@ -61,7 +61,11 @@ public class ExecData {
   }
 
   public void toEnvironment(String k, String v, boolean visible) {
-    buffer.get(carrier).supervised_env.put(k, new Element(k, v, Executor.ENVIRONMENT, visible));
+	  buffer.get(carrier).supervised_env.put(k, new Element(k, v, Executor.ENVIRONMENT, visible));
+  }
+  
+  public void toAddInfo(String k, String v) {
+	  buffer.get(carrier).additional_info.put(k, v);
   }
   
   public void toProgram(String k, String v) {

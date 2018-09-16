@@ -113,6 +113,8 @@ def generate_addition( ):
                             program['id'] = e_v.get('value')
 
                     step['program'] = program
+                elif k == 'additional_info':
+                    step['addinfo'] = v
             trace.append(step)
         print(trace)
                     # ({"command": "MOVE_PTR", "id": P["MOVE_PTR"], "arg": [OUT_PTR, LEFT], "terminate": False})

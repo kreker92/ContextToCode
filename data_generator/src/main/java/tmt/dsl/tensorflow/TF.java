@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import org.tensorflow.SavedModelBundle;
-import org.tensorflow.Session;
-import org.tensorflow.Tensor;
+//import org.tensorflow.SavedModelBundle;
+//import org.tensorflow.Session;
+//import org.tensorflow.Tensor;
 
 public class TF {
 
-  private SavedModelBundle model;
+ /* private SavedModelBundle model;
 
   public TF(ArrayList<HashMap<Integer, Step>> output, String model_path) {
     model = SavedModelBundle.load(model_path, "serve");
@@ -103,5 +103,5 @@ public class TF {
 //    trace.append(step)
 //print(trace)
 //}
-
+*/
 }

@@ -15,6 +15,7 @@
  */
 package tmt.dsl.executor.info;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,6 +26,8 @@ public class Step {
   public HashMap<String, Element> unsupervised_env = new HashMap<String, Element>();
   public HashMap<String, Element> program = new HashMap<String, Element>();
   public HashMap<String, Element> argument = new HashMap<String, Element>();
+  public HashMap<String, String> additional_info = new HashMap<String, String>();
+
   
   public void fill_defaults(Step st) {
     copy_from(supervised_env, st.supervised_env);
