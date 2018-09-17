@@ -12,6 +12,7 @@ DATA_PATH_TEST = "tasks/env/data/test.pik"
 LOG_PATH = "log/"
 CKPT_PATH = "log/model.ckpt"
 DSL_DATA_PATH = "dsl/data/data_buffer.json"
+TEST_CHUNK_PATH = "dsl/data/test.json"
 
 CONFIG = {
     "ENVIRONMENT_ROW": 9,         # Input 1, Input 2, Carry, Output

@@ -4,16 +4,15 @@ eval.py
 Loads in an Addition NPI, and starts a REPL for interactive addition.
 """
 from model.npi import NPI
+from tasks.generate_data import transform
 from tasks.env.addition import AdditionCore
-from tasks.env.config import CONFIG, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH
+from tasks.env.config import CONFIG, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH, TEST_CHUNK_PATH
 from tasks.env.config import get_env
 import numpy as np
 import pickle
 import tensorflow as tf
 from tensorflow.python.platform import gfile
-
-MOVE_PID, WRITE_PID = 0, 1
-R_L = {0: "LEFT", 1: "RIGHT"}
+import json
 
 
 def evaluate_addition():
@@ -56,7 +55,10 @@ def evaluate_addition():
         f = open('log/prog_orig.txt', 'r+')
         f.truncate()
 
-        for x in range(0, 200):
+        f = open('log/numbers.txt', 'r+')
+        f.truncate()
+
+        for x in range(2, 40):
             res = ""
             # try:
             repl(sess, npi, data, x, predict)
@@ -68,17 +70,48 @@ def evaluate_addition():
             #    not_eq+=1
         # repeat()
 
+def inference():
+    with tf.Session() as sess:
+        # Load Data
+        dataset = []
+
+        data = json.loads('[{"0":{"supervised_env":{"param_2":{"key":"param_2","value":"2453","type":"","visible":true},"param_3":{"key":"param_3","value":"117","type":"","visible":true},"param_0":{"key":"param_0","value":"36","type":"","visible":true},"param_1":{"key":"param_1","value":"1105","type":"","visible":true}},"unsupervised_env":{},"program":{"id":{"key":"id","value":"7","type":"","visible":true},"program":{"key":"program","value":"not_connect","type":"","visible":true}},"argument":{},"additional_info":{"1105":"statement","36":"SelectStatement","2453":"parser","117":"parseQuery","label":"-93234165"}},"1":{"supervised_env":{"param_2":{"key":"param_2","value":"1005","type":"","visible":true},"param_3":{"key":"param_3","value":"2647","type":"","visible":true},"param_0":{"key":"param_0","value":"2647","type":"","visible":true},"param_1":{"key":"param_1","value":"663","type":"","visible":true}},"unsupervised_env":{},"program":{"id":{"key":"id","value":"7","type":"","visible":true},"program":{"key":"program","value":"not_connect","type":"","visible":true}},"argument":{},"additional_info":{"2647":"Scan","663":"scan","1005":"new","label":"-93234165"}},"2":{"supervised_env":{"param_2":{"key":"param_2","value":"658","type":"","visible":true},"param_3":{"key":"param_3","value":"2819","type":"","visible":true},"param_4":{"key":"param_4","value":"1730","type":"","visible":true},"param_0":{"key":"param_0","value":"460","type":"","visible":true},"param_1":{"key":"param_1","value":"324","type":"","visible":true}},"unsupervised_env":{},"program":{"id":{"key":"id","value":"7","type":"","visible":true},"program":{"key":"program","value":"not_connect","type":"","visible":true}},"argument":{},"additional_info":{"1730":"emptyList","324":"Object","658":"binds","2819":"Collections","label":"-93234165","460":"List"}}}]')
+        transform(data[0], dataset)
+        # Initialize Addition Core
+        core = AdditionCore()
+
+        # Initialize NPI Model
+        npi = NPI(core, CONFIG, LOG_PATH)
+
+        # Restore from Checkpoint
+        saver = tf.train.Saver()
+        saver.restore(sess, CKPT_PATH)
+
+        # Run REPL
+
+        predict = {};
+        predict["ncw"] = 0;
+        predict["ncr"] = 0;
+        predict["cw"] = 0;
+        predict["cr"] = 0;
+
+        f = open('log/prog_produced.txt', 'r+')
+        f.truncate()
+
+        f = open('log/prog_orig.txt', 'r+')
+        f.truncate()
+
+        repl(sess, npi, dataset, 0, predict)
+
 def repl(session, npi, data, pos, predict):
         steps = data[pos]
-        f = open('log/numbers.txt', 'r+')
-        f.truncate()
 
         # f = open('log/prog_orig.txt', 'r+')
         # f.truncate()
 
         with open("log/prog_orig.txt", "a") as myfile:
             for s in steps:
-                myfile.write(str(s)+"\n")
+                myfile.write(str(data)+"\n")
 
         # Reset NPI States
         npi.reset_state()
@@ -140,7 +173,7 @@ def repl(session, npi, data, pos, predict):
 
                     # print([np.argmax(n_p), PROGRAM_SET[prog_id][0]], [np.argmax(n_args[0]), np.argmax(n_args[1])])
                 with open("log/prog_produced.txt", "a") as myfile:
-                    myfile.write(str(y[j]) + ":"+str(prog_id)+"\n")
+                    myfile.write(str(x[j]) + ":"+str(prog_id)+"\n")
 
                 # cont = raw_input('Continue? ')
         print("predict_connect_right " + str(predict["cr"]) + " predict_connect_wrong " + str(predict["cw"]) + " predict_not_connect_right " + str(predict["ncr"]) + " predict_not_connect_wrong " + str(predict["ncw"]))

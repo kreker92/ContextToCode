@@ -5,7 +5,7 @@ import tensorflow as tf
 # from tasks.env.config
 
 from tasks.generate_data import generate_addition
-from tasks.eval import evaluate_addition
+from tasks.eval import evaluate_addition, inference
 from tasks.train import train_addition
 from tasks.env.config import CONFIG
 
@@ -19,6 +19,7 @@ tf.app.flags.DEFINE_integer("num_test", 600, "Number of test examples to generat
 
 tf.app.flags.DEFINE_boolean("do_train", False, "Boolean whether to continue training model.")
 tf.app.flags.DEFINE_boolean("do_eval", False, "Boolean whether to perform model evaluation.")
+tf.app.flags.DEFINE_boolean("do_inference", False, "Boolean whether to perform model evaluation.")
 tf.app.flags.DEFINE_integer("num_epochs", 1, "Number of training epochs to perform.")
 
 # def split( ):
@@ -62,6 +63,8 @@ def main(_):
         if FLAGS.do_eval:
             evaluate_addition()
 
+        if FLAGS.do_inference:
+            inference()
 
 if __name__ == "__main__":
     tf.app.run()

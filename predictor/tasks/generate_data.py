@@ -71,11 +71,26 @@ def generate_addition( ):
     # members_list = list(members_set)
     # count = 0
     for row_r in parsed:
-        row = collections.OrderedDict(sorted(row_r.items()))
-        trace = []
         count += 1
-        for key, values in row.items():
-            step = {}
+
+        if (count % 5 == 0):
+            transform(row_r, test_data)
+        else:
+            transform(row_r, train_data)
+
+    with open('tasks/env/data/test.pik', 'wb') as f:
+        pickle.dump(test_data, f)
+    with open('tasks/env/data/train.pik', 'wb') as f:
+        pickle.dump(train_data, f)
+    # with open('tasks/env/data/train.pik1', 'a') as f:
+    #     for c in train_data:
+    #         f.write(str(c))
+
+def transform(row_r, dataset):
+    row = collections.OrderedDict(sorted(row_r.items()))
+    trace = []
+    for key, values in row.items():
+        step = {}
         # count += 1
         # key_list = []
         # value_list = []
@@ -91,41 +106,31 @@ def generate_addition( ):
         #     print(trace)
         #     if (k == "terminate"):
         #     print(key)
-            for k, v in values.items():
-                if k == 'supervised_env':
-                    environment = {}
-                    for e_k, e_v in v.items():
-                        environment[e_k] = int(e_v.get('value'))
-                    environment['terminate'] = "false"
-                    step['environment'] = environment
-                elif k == 'argument':
-                    args = {}
-                    #for e_k, e_v in v.items():
-                    #   if e_k == 'id':
-                    args['id'] = '1'
-                    step['args'] = args
-                elif k == 'program':
-                    program = {}
-                    for e_k, e_v in v.items():
-                        if e_k == 'program':
-                            program['program'] = e_v.get('value')
-                        if e_k == 'id':
-                            program['id'] = e_v.get('value')
+        for k, v in values.items():
+            if k == 'supervised_env':
+                environment = {}
+                for e_k, e_v in v.items():
+                    environment[e_k] = int(e_v.get('value'))
+                environment['terminate'] = "false"
+                step['environment'] = environment
+            elif k == 'argument':
+                args = {}
+                # for e_k, e_v in v.items():
+                #   if e_k == 'id':
+                args['id'] = '1'
+                step['args'] = args
+            elif k == 'program':
+                program = {}
+                for e_k, e_v in v.items():
+                    if e_k == 'program':
+                        program['program'] = e_v.get('value')
+                    if e_k == 'id':
+                        program['id'] = e_v.get('value')
 
-                    step['program'] = program
-                elif k == 'additional_info':
-                    step['addinfo'] = v
-            trace.append(step)
-        print(trace)
-                    # ({"command": "MOVE_PTR", "id": P["MOVE_PTR"], "arg": [OUT_PTR, LEFT], "terminate": False})
-        if (count % 5==0):
-            test_data.append(trace)
-        else:
-            train_data.append(trace)
-    with open('tasks/env/data/test.pik', 'wb') as f:
-        pickle.dump(test_data, f)
-    with open('tasks/env/data/train.pik', 'wb') as f:
-        pickle.dump(train_data, f)
-    # with open('tasks/env/data/train.pik1', 'a') as f:
-    #     for c in train_data:
-    #         f.write(str(c))
+                step['program'] = program
+            elif k == 'additional_info':
+                step['addinfo'] = v
+        trace.append(step)
+    print(trace)
+    # ({"command": "MOVE_PTR", "id": P["MOVE_PTR"], "arg": [OUT_PTR, LEFT], "terminate": False})
+    dataset.append(trace)
