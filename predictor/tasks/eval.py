@@ -75,7 +75,8 @@ def inference():
         # Load Data
         dataset = []
 
-        data = json.loads('[{"0":{"supervised_env":{"param_2":{"key":"param_2","value":"2453","type":"","visible":true},"param_3":{"key":"param_3","value":"117","type":"","visible":true},"param_0":{"key":"param_0","value":"36","type":"","visible":true},"param_1":{"key":"param_1","value":"1105","type":"","visible":true}},"unsupervised_env":{},"program":{"id":{"key":"id","value":"7","type":"","visible":true},"program":{"key":"program","value":"not_connect","type":"","visible":true}},"argument":{},"additional_info":{"1105":"statement","36":"SelectStatement","2453":"parser","117":"parseQuery","label":"-93234165"}},"1":{"supervised_env":{"param_2":{"key":"param_2","value":"1005","type":"","visible":true},"param_3":{"key":"param_3","value":"2647","type":"","visible":true},"param_0":{"key":"param_0","value":"2647","type":"","visible":true},"param_1":{"key":"param_1","value":"663","type":"","visible":true}},"unsupervised_env":{},"program":{"id":{"key":"id","value":"7","type":"","visible":true},"program":{"key":"program","value":"not_connect","type":"","visible":true}},"argument":{},"additional_info":{"2647":"Scan","663":"scan","1005":"new","label":"-93234165"}},"2":{"supervised_env":{"param_2":{"key":"param_2","value":"658","type":"","visible":true},"param_3":{"key":"param_3","value":"2819","type":"","visible":true},"param_4":{"key":"param_4","value":"1730","type":"","visible":true},"param_0":{"key":"param_0","value":"460","type":"","visible":true},"param_1":{"key":"param_1","value":"324","type":"","visible":true}},"unsupervised_env":{},"program":{"id":{"key":"id","value":"7","type":"","visible":true},"program":{"key":"program","value":"not_connect","type":"","visible":true}},"argument":{},"additional_info":{"1730":"emptyList","324":"Object","658":"binds","2819":"Collections","label":"-93234165","460":"List"}}}]')
+        with open("/root/ContextToCode/output/buffer/test/context.json", 'r') as handle:
+          data = json.load(handle)
         transform(data[0], dataset)
         # Initialize Addition Core
         core = AdditionCore()
@@ -147,8 +148,8 @@ def repl(session, npi, data, pos, predict):
                     else:
                         predict["ncw"] += 1;
 
-                print ('%s y= Prog_id: %s, Terminate: %s' % (count, prog_id, np.argmax(t)))
-                print ('%s y` = Prog_id: %s, Terminate: %s' % (count, prog_out, terminate_out))
+                print ('%s y= Prog_id: %s, add_info: %s' % (count, prog_id, x[j]["addinfo"]))
+                print ('%s y` = Prog_id: %s, add_info: %s' % (count, prog_out, y[j]["addinfo"]))
 
                 count += 1
 

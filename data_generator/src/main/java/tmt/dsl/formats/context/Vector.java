@@ -15,6 +15,8 @@ public class Vector {
   private String origin;
   private int label = 0;
   public int parent_id;
+  public String path;
+  public int line_num;
 
   public Vector(String o, HashSet<String> commands, int i, String line, boolean b, int level_, int parent_id_) {
     origin = line;
@@ -32,8 +34,10 @@ public class Vector {
     parent_id = parent_id_;
   }
   
-  public Vector(InnerContext c, HashSet<String> commands, int i, String line, boolean b, int level_, int parent_id_, ArrayList<String> goodTypes, ArrayList<String> badTypes) {
+  public Vector(InnerContext c, HashSet<String> commands, int i, String line, boolean b, int level_, String path_, int line_num_, ArrayList<String> goodTypes, ArrayList<String> badTypes) {
     origin = line;
+    line_num = line_num_;
+    path = path_;
 
     if (b)
       label = 1;
@@ -49,7 +53,7 @@ public class Vector {
       }
     row = i;
     level = level_;
-    parent_id = parent_id_;
+    parent_id = (path+line_num_).hashCode();
   }
 
   public boolean isEmpty() {

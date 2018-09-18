@@ -16,8 +16,8 @@ public class ContextDSL extends DSL {
   ArrayList<ExecData> data = new ArrayList<ExecData>();
   Executor exec = new Executor();
 
-  public ContextDSL(ArrayList<Vector> inputs) {
-    super("context");
+  public ContextDSL(ArrayList<Vector> inputs, String path) {
+    super("context", path);
     ExecData d = new ExecData();
 
     int commands = 0;
@@ -37,6 +37,8 @@ public class ContextDSL extends DSL {
     	  d.toAddInfo(v.vector.get(i)+"", v.strings.get(i));
       }
 	  d.toAddInfo("label", inputs.hashCode()+"");
+	  d.toAddInfo("path", v.path);
+	  d.toAddInfo("line", v.line_num+"");
       
       if (v.level==0) {
         d.toProgram("id", Executor.CONNECT);

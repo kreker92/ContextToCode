@@ -37,9 +37,8 @@ public class DSL {
   protected ArrayList<HashMap<Integer, Step>> out = new ArrayList<HashMap<Integer, Step>>();
   protected String filename;
   protected String log;
-  protected String root = "/root/GeneratedScripts/db/tmt";
 
-  public DSL (String filename_) {
+  public DSL (String filename_, String root) {
     exec = new Executor();
     data = new ArrayList<ExecData>();
 

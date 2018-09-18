@@ -121,7 +121,7 @@ public class Generator  {
       br.close();
       
       for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
-        cntx_dsl = new ContextDSL(s.getValue());  
+        cntx_dsl = new ContextDSL(s.getValue(), root+root_key);  
         cntx_dsl.execute();
         for (HashMap<Integer, Step> v : cntx_dsl.getData()){
           count += v.keySet().size();
@@ -157,7 +157,7 @@ public class Generator  {
     br.close();
     
     for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
-      cntx_dsl = new ContextDSL(s.getValue());  
+      cntx_dsl = new ContextDSL(s.getValue(), root+root_key);  
       cntx_dsl.execute();
       output.addAll(cntx_dsl.getData());
     }
@@ -170,22 +170,30 @@ public class Generator  {
   private static void loadCodeSearch() throws JsonSyntaxException, IOException, InterruptedException {
     //      ArrayList<String> code = new ArrayList<String>(Arrays.asList(Utils.readFile("/root/toCode/output/cs/66533677").split("\n")));
     ArrayList<Vector[]> res = new ArrayList<>();
-    File[] files = new File(root+root_key).listFiles();
     HashSet<String> commands = new HashSet<>();
     HashMap<String, Integer> hot_ecnoding = new HashMap<>();
 
+    System.err.println("!"+root+root_key);
+    File file = new File(root+root_key+"/context.json"); 
+    file.delete();
+    file = new File(root+root_key+"/log.json"); 
+    file.delete();
+
+    File[] files = new File(root+root_key).listFiles();
     for (File f : files) {
-      InnerContext[] code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
-      for (int line = code.length-1; line >= 0; line --) {
-        if (/*TRIN*/code[line].line_text.contains(key) || /*EVAL*/ key == null && line == code.length-1) {
-          Vector[] snip = Parser.getSnippet(line, code, commands, (f.getPath()+line).hashCode(), key, good_types, bad_types);
-          if (snip.length > 0)
-            res.add(snip);
+      if (f.getPath().contains("psi") || key != null) {
+        InnerContext[] code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
+        for (int line = code.length-1; line >= 0; line --) {
+          if (key == null && line == code.length-1 || /*TRIN*/key != null  && code[line].line_text.contains(key) ) {
+            Vector[] snip = Parser.getSnippet(line, code, commands, f.getPath(), line, key, good_types, bad_types);
+            if (snip.length > 0)
+              res.add(snip);
+          }
         }
       }
     }
     
-    hotEncode(commands, hot_ecnoding);
+    hot_ecnoding = hotEncode(commands);
 
     ArrayList<Vector> output = new ArrayList<>();
     for (Vector[] c : res) {
@@ -195,15 +203,25 @@ public class Generator  {
       }
     }
     
-//    System.err.println(output);
+    System.err.println(commands+" ^ "+hot_ecnoding);
     Utils.saveJsonFile(vectors, output);
   }
 
-  private static void hotEncode(HashSet<String> commands, HashMap<String, Integer> hot_ecnoding) {
+  private static HashMap<String, Integer> hotEncode(HashSet<String> commands) throws IOException {
+    HashMap<String, Integer> hot_ecnoding = new HashMap<>();
+
     int count = 0;
-    for (String comm : commands) {
-      hot_ecnoding.put(comm, count);
-      count++;
+    File f = new File("/root/ContextToCode/output/buffer/hots");
+    if(f.exists() && !f.isDirectory()) { 
+        return new Gson().fromJson(new FileReader("/root/ContextToCode/output/buffer/hots"), HashMap.class);
+    }
+    else {
+        for (String comm : commands) {
+          hot_ecnoding.put(comm, count);
+          count++;
+        }
+        Utils.saveJsonFile("/root/ContextToCode/output/buffer/hots", hot_ecnoding);
+        return hot_ecnoding;
     }
   }
 }

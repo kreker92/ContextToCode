@@ -29,17 +29,18 @@ public class Parser {
     return res.toArray(new Vector[res.size()]);
   }
   
-  public static Vector[] getSnippet(int start, InnerContext[] code, HashSet<String> commands, int parent_id, String key, ArrayList<String> goodTypes, ArrayList<String> badTypes) {
+  public static Vector[] getSnippet(int start, InnerContext[] code, HashSet<String> commands, String path, int line_num, String key, ArrayList<String> goodTypes, ArrayList<String> badTypes) {
     ArrayList<Vector> res = new ArrayList<Vector>();
 
     int count = 0;
     for (int i = start; i >= 0; i --) {
       String line = code[i].line_text;
+
       if (i != start && (isStart(line, key) || count > 3))
         break;
       String line_clean = clean(line);
       if (hasSense(line_clean)) {
-        Vector v = new Vector(code[i], commands, i, line, i == start, count, parent_id, goodTypes, badTypes);
+        Vector v = new Vector(code[i], commands, i, line, i == start, count, path, line_num, goodTypes, badTypes);
         if (!v.isEmpty()) {
           res.add(0, v);
           count ++;
@@ -67,7 +68,7 @@ public class Parser {
   }
 
   private static boolean isStart(String string, String key) {
-    if (string.contains("public ") || string.contains("private ") || string.contains("protected ") || string.contains(key))
+    if (string.contains("public ") || string.contains("private ") || string.contains("protected ") || key != null && string.contains(key))
       return true;
     else
       return false;

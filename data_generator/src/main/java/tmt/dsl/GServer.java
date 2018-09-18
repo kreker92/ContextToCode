@@ -1,6 +1,7 @@
 package tmt.dsl;
 
 import java.io.FileReader;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -12,12 +13,15 @@ public class GServer {
 
   public static final int LEARN = 1;
   public static final int EVAL  = 2;
+  public static final int INFERENCE  = 3;
   
   public static void main(String[] args) throws Exception{
     if (args[0].equals("learn")) 
       router(LEARN);
     else if (args[0].equals("eval"))
       router(EVAL);
+    else if (args[0].equals("inference"))
+      router(INFERENCE);
   }
   
   public static int router(int swtch) throws Exception {
@@ -50,6 +54,17 @@ public class GServer {
       g.model = "";
       
       res = g.eval();
+    }
+    else if (swtch == INFERENCE) {
+//      g.root_key = "/"+new Timestamp(System.currentTimeMillis())+"/";
+      g.root_key = "/test/";
+      g.root = "/root/ContextToCode/output/buffer";
+      g.vectors = g.root+g.root_key+"/vectors";
+      
+      g.key = null;
+      g.model = "";
+      
+      g.setTrainAndTest();
     }
     
     return res;

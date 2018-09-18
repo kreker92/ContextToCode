@@ -63,7 +63,7 @@ def train_addition(epochs, verbose=0):
             if len(x) > 0:
                 for j in range(len(x)):
                     # {'program': {'program': 'check'}, 'environment': {'terminate': False, 'answer': 1, 'is_redirect': 2},'args': {'id': 0}}
-                    print(x[j]['addinfo'])
+                    #print(x[j]['addinfo'])
                     prog_name, prog_in_id, arg, term = x[j]["program"]["program"], x[j]["program"]["id"], x[j]["args"]["id"], x[j]["environment"]["terminate"]
                     prog_name_out, prog_out_id, arg_out, term_out = y[j]["program"]["program"], y[j]["program"]["id"], y[j]["args"]["id"], y[j]["environment"]["terminate"]
                     # Get Environment, Argument Vectors
