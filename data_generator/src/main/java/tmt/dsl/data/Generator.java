@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -92,8 +94,9 @@ public class Generator  {
   public static ArrayList<String> good_types;
   public static ArrayList<String> bad_types;
 
-  public static void setTrainAndTest() throws Exception{
+  public static int setTrainAndTest() throws Exception{
     int count = 0;
+    int res = 0;
     
     try {
       int max = 0;
@@ -130,10 +133,30 @@ public class Generator  {
       }
 
       cntx_dsl.send(new Gson().toJson(output), "");
-      System.err.println("max:"+max+" * "+output.size()+" * "+          count);
+      
+      long start = System.currentTimeMillis();
+      
+      StringBuffer sb = new StringBuffer();
+      
+      Process p = Runtime.getRuntime().exec("python3 /root/ContextToCode/predictor/main.py --do_inference");
+      p.waitFor();
+
+      BufferedReader reader = 
+           new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+      String line = "";           
+      while ((line = reader.readLine())!= null) {
+        sb.append(line+"\n");
+      }
+
+      String str = sb.toString();
+      res = Integer.parseInt(str.substring(str.indexOf(":#") + 2, str.indexOf("# ")));
+      System.err.println("max:"+res+" time:"+(System.currentTimeMillis() - start));
     } catch (Exception e) {
       e.printStackTrace();
     } 
+    
+    return res;
   }
 
   public int eval() throws Exception {

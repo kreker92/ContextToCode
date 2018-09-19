@@ -7,12 +7,12 @@ Embedding Information, etc.
 import numpy as np
 import tensorflow as tf
 
-DATA_PATH_TRAIN = "tasks/env/data/train.pik"
-DATA_PATH_TEST = "tasks/env/data/test.pik"
-LOG_PATH = "log/"
-CKPT_PATH = "log/model.ckpt"
-DSL_DATA_PATH = "dsl/data/data_buffer.json"
-TEST_CHUNK_PATH = "dsl/data/test.json"
+DATA_PATH_TRAIN = "/root/ContextToCode/predictor/tasks/env/data/train.pik"
+DATA_PATH_TEST = "/root/ContextToCode/predictor/tasks/env/data/test.pik"
+LOG_PATH = "/root/ContextToCode/predictor/log/"
+CKPT_PATH = "/root/ContextToCode/predictor/log/model.ckpt"
+DSL_DATA_PATH = "/root/ContextToCode/predictor/dsl/data/data_buffer.json"
+TEST_CHUNK_PATH = "/root/ContextToCode/predictor/dsl/data/test.json"
 
 CONFIG = {
     "ENVIRONMENT_ROW": 9,         # Input 1, Input 2, Carry, Output

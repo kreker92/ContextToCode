@@ -64,7 +64,7 @@ public class GServer {
       g.key = null;
       g.model = "";
       
-      g.setTrainAndTest();
+      res = g.setTrainAndTest();
     }
     
     return res;

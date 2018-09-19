@@ -96,10 +96,10 @@ def inference():
         predict["cw"] = 0;
         predict["cr"] = 0;
 
-        f = open('log/prog_produced.txt', 'r+')
+        f = open('/root/ContextToCode/predictor/log/prog_produced.txt', 'r+')
         f.truncate()
 
-        f = open('log/prog_orig.txt', 'r+')
+        f = open('/root/ContextToCode/predictor/log/prog_orig.txt', 'r+')
         f.truncate()
 
         repl(sess, npi, dataset, 0, predict)
@@ -110,7 +110,7 @@ def repl(session, npi, data, pos, predict):
         # f = open('log/prog_orig.txt', 'r+')
         # f.truncate()
 
-        with open("log/prog_orig.txt", "a") as myfile:
+        with open("/root/ContextToCode/predictor/log/prog_orig.txt", "a") as myfile:
             for s in steps:
                 myfile.write(str(data)+"\n")
 
@@ -118,6 +118,8 @@ def repl(session, npi, data, pos, predict):
         npi.reset_state()
 
         count = 0
+
+        output = 0
 
         x, y = steps[:-1], steps[1:]
 
@@ -148,8 +150,8 @@ def repl(session, npi, data, pos, predict):
                     else:
                         predict["ncw"] += 1;
 
-                print ('%s y= Prog_id: %s, add_info: %s' % (count, prog_id, x[j]["addinfo"]))
-                print ('%s y` = Prog_id: %s, add_info: %s' % (count, prog_out, y[j]["addinfo"]))
+                #print ('%s y= Prog_id: %s, Terminate: %s' % (count, prog_id, np.argmax(t)))
+                #print ('%s y` = Prog_id: %s, Terminate: %s' % (count, prog_out, terminate_out))
 
                 count += 1
 
@@ -173,11 +175,13 @@ def repl(session, npi, data, pos, predict):
                     # prog_name = PROGRAM_SET[prog_id][0]
 
                     # print([np.argmax(n_p), PROGRAM_SET[prog_id][0]], [np.argmax(n_args[0]), np.argmax(n_args[1])])
-                with open("log/prog_produced.txt", "a") as myfile:
+                with open("/root/ContextToCode/predictor/log/prog_produced.txt", "a") as myfile:
                     myfile.write(str(x[j]) + ":"+str(prog_id)+"\n")
 
+                output = prog_id
+
                 # cont = raw_input('Continue? ')
-        print("predict_connect_right " + str(predict["cr"]) + " predict_connect_wrong " + str(predict["cw"]) + " predict_not_connect_right " + str(predict["ncr"]) + " predict_not_connect_wrong " + str(predict["ncw"]))
+        print("predict:#"+str(output)+"# predict_connect_right " + str(predict["cr"]) + " predict_connect_wrong " + str(predict["cw"]) + " predict_not_connect_right " + str(predict["ncr"]) + " predict_not_connect_wrong " + str(predict["ncw"]))
 
 def repeat():
         lines = [line.rstrip('\n') for line in open("log/prog.txt")]
