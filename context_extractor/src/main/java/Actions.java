@@ -21,18 +21,6 @@ public class Actions {
                 String templateText = document.getText();
                 document.replaceString(0, document.getTextLength(), templateText);
                 document.insertString(cursorOffset, q);
-                                           /*"\n \n" +
-                    "            Connection conn = DriverManager.getConnection(\"jdbc:sqlite:\" + tmpFile.getAbsolutePath(), prop);\n" +
-                    "\n" +
-                    "            try {\n" +
-                    "                ResultSet rs;\n" +
-                    "                String query = \"\";\n" +
-                    "                Statement stat = conn.createStatement();\n" +
-                    "                \n" +
-                    "                rs = stat.executeQuery(query);\n" +
-                    "            } finally {\n" +
-                    "                conn.close();\n" +
-                    "            }");*/
             }
         }, null, null);
     }

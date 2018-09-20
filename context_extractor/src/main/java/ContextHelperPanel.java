@@ -144,7 +144,18 @@ public class ContextHelperPanel extends JPanel implements Runnable {
 //    bottomPanel.add(checkBox, BorderLayout.PAGE_START);
         bottomPanel.add(jfxPanel, BorderLayout.CENTER);
         queryJTextField.addActionListener(actionEvent -> {
-            action.insert(queryJTextField.getText());
+            action.insert("\n \n" +
+                    "            Connection conn = DriverManager.getConnection(\"jdbc:sqlite:\" + tmpFile.getAbsolutePath(), prop);\n" +
+                    "\n" +
+                    "            try {\n" +
+                    "                ResultSet rs;\n" +
+                    "                String query = \"\";\n" +
+                    "                Statement stat = conn.createStatement();\n" +
+                    "                \n" +
+                    "                rs = stat.executeQuery(query);\n" +
+                    "            } finally {\n" +
+                    "                conn.close();\n" +
+                    "            }");
         });
 //        @SuppressWarnings("SuspiciousNameCombination")
 //        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, treeScrollPane, bottomPanel);

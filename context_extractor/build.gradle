@@ -1,9 +1,9 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.3.6'
+    id 'org.jetbrains.intellij' version '0.3.7'
 }
 
-group 'com.tmt'
+group 'tmt'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
@@ -23,4 +23,9 @@ patchPluginXml {
     changeNotes """
       Add change notes here.<br>
       <em>most HTML tags may be used</em>"""
+}
+
+publishPlugin {
+    username intellijPublishUsername
+    password intellijPublishPassword
 }

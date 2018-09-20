@@ -52,8 +52,6 @@ public class HelloAction extends AnAction {
 
         ContextHelperPanel helperComponent = new ContextHelperPanel(project, act);
 
-        helperComponent.setQueryingStatus("0");
-
         try {
          // case 1:
          //   setUp();
