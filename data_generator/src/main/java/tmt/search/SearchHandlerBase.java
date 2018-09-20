@@ -1,5 +1,6 @@
 package tmt.search;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
@@ -12,17 +13,29 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import tmt.dsl.GServer;
+import tmt.dsl.data.Utils;
+import tmt.dsl.formats.context.in.InnerContext;
 
 import com.google.gson.Gson;
 
 import fi.iki.elonen.NanoHTTPD;
+import fi.iki.elonen.NanoHTTPD.ResponseException;
 import fi.iki.elonen.router.RouterNanoHTTPD.UriResource;
 
 public abstract class SearchHandlerBase extends HandlerBase {
-  public NanoHTTPD.Response get(UriResource uriResource, Map<String, String> urlParams, NanoHTTPD.IHTTPSession session) {
+  public NanoHTTPD.Response post(UriResource uriResource, Map<String, String> urlParams, NanoHTTPD.IHTTPSession session) {
     byte[] response = null;
+    Map<String, String> files = new HashMap<String, String>();
+
     try {
-      response = (GServer.router(GServer.INFERENCE)+"").getBytes();
+      session.parseBody(files);
+    } catch (IOException ioe) {
+    } catch (ResponseException re) {
+    }
+
+    try {
+      response = (GServer.router(GServer.INFERENCE, files.get("postData"))+"").getBytes();
+
     } catch (Exception e) {
       
     }

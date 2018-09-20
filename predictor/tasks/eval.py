@@ -182,6 +182,7 @@ def repl(session, npi, data, pos, predict):
 
                 # cont = raw_input('Continue? ')
         print("predict:#"+str(output)+"# predict_connect_right " + str(predict["cr"]) + " predict_connect_wrong " + str(predict["cw"]) + " predict_not_connect_right " + str(predict["ncr"]) + " predict_not_connect_wrong " + str(predict["ncw"]))
+        return bytes(str(output), 'UTF-8')
 
 def repeat():
         lines = [line.rstrip('\n') for line in open("log/prog.txt")]

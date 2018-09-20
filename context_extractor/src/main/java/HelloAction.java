@@ -46,22 +46,25 @@ public class HelloAction extends AnAction {
         factory = PsiFileFactory.getInstance(project);
         System.err.print("!1");
 
+        ed = event.getData(PlatformDataKeys.EDITOR);
+        PsiFile fi = event.getData(LangDataKeys.PSI_FILE);
+        Actions act = new Actions(ed);
+
+        ContextHelperPanel helperComponent = new ContextHelperPanel(project, act);
+
+        helperComponent.setQueryingStatus("0");
+
         try {
          // case 1:
          //   setUp();
          // case 2:
-            ed = event.getData(PlatformDataKeys.EDITOR);
-            PsiFile fi = event.getData(LangDataKeys.PSI_FILE);
-            Actions act = new Actions(ed);
 
             ArrayList<InnerContext> output_elements = new ArrayList<>();
             parseFile(fi, output_elements, fi.getText(), ed.getSelectionModel().getSelectionEnd());
 
             String request = new Gson().toJson(output_elements);
-            System.err.print(request);
-//            System.err.print(Eval.sendGet("телефон"));
-
-            ContextHelperPanel helperComponent = new ContextHelperPanel(project, act);
+            System.err.println(request);
+//            System.err.print(Eval.sendGet("телефон"))
 
 //            act.insert("\n\n ");
 

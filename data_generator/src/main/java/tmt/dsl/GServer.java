@@ -8,6 +8,8 @@ import java.util.Arrays;
 import com.google.gson.Gson;
 
 import tmt.dsl.data.Generator;
+import tmt.dsl.data.Utils;
+import tmt.dsl.formats.context.in.InnerContext;
 
 public class GServer {
 
@@ -17,14 +19,14 @@ public class GServer {
   
   public static void main(String[] args) throws Exception{
     if (args[0].equals("learn")) 
-      router(LEARN);
+      router(LEARN, "");
     else if (args[0].equals("eval"))
-      router(EVAL);
+      router(EVAL, "");
     else if (args[0].equals("inference"))
-      router(INFERENCE);
+      router(INFERENCE, "");
   }
   
-  public static int router(int swtch) throws Exception {
+  public static int router(int swtch, String data) throws Exception {
     int res = 0;
     
     Generator g = new Generator(); 
@@ -44,7 +46,7 @@ public class GServer {
       g.root_key = "cs/parsed";
       g.vectors = "/root/ContextToCode/output/funcs/vectors";
       
-      g.setTrainAndTest();
+      g.setTrainAndTest(null);
     }
     else if (swtch == EVAL) {
       g.root_key = "cs/parsed";
@@ -64,7 +66,12 @@ public class GServer {
       g.key = null;
       g.model = "";
       
-      res = g.setTrainAndTest();
+      InnerContext[] code = null;
+      if (data != null) {
+        code = new Gson().fromJson(data, InnerContext[].class);
+      }
+      
+      res = g.setTrainAndTest(code);
     }
     
     return res;

@@ -236,8 +236,19 @@ public class ContextHelperPanel extends JPanel implements Runnable {
         toolWindow.getContentManager().addContent(content);
     }
 
+    public void clearPanel() {
+        Content content = ContentFactory.SERVICE.getInstance().createContent(this, "", false);
+        toolWindow.getContentManager().removeAllContents(true);
+        toolWindow.getContentManager().addContent(content);
+      }
+
     public void setQueryingStatus(String q_) {
-        queryJTextField.setText(q_);
+        if (q_.trim().equals("6"))
+            queryJTextField.setText("Open DB connection");
+        else if (q_.trim().equals("7"))
+            queryJTextField.setText("None");
+        else if (q_.trim().equals("0"))
+            queryJTextField.setText("Loading...");
         showPanel();
 //        if (isQuerying) {
 //            progressBar.setIndeterminate(true);

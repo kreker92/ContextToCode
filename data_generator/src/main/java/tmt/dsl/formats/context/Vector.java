@@ -60,9 +60,12 @@ public class Vector {
     return strings.isEmpty();
   }
 
-  public void vectorize(HashMap<String, Integer> hot_ecnoding) {
+  public void vectorize(HashMap<String, Double> hot_ecnoding) {
     for (String s : strings) {
-      vector.add(hot_ecnoding.get(s));
+	  int val = -1;
+	  if (hot_ecnoding.containsKey(s))
+		val = ((Double)hot_ecnoding.get(s)).intValue();
+      vector.add(val);
     }
   }
 

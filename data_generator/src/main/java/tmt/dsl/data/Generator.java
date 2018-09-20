@@ -94,20 +94,23 @@ public class Generator  {
   public static ArrayList<String> good_types;
   public static ArrayList<String> bad_types;
 
-  public static int setTrainAndTest() throws Exception{
+  public static int setTrainAndTest(InnerContext[] data) throws Exception{
     int count = 0;
     int res = 0;
     
     try {
+		      long start1 = System.currentTimeMillis();
+
       int max = 0;
-      loadCodeSearch();
+      ArrayList<Vector> vs = loadCodeSearch(data);
 
       ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
 
       HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
       BufferedReader br = new BufferedReader(new FileReader(vectors));
-      for(String line; (line = br.readLine()) != null; ) {
-        for (Vector v : new Gson().fromJson(line, Vector[].class)) {
+    //  for(String line; (line = br.readLine()) != null; ) {
+    //    for (Vector v : new Gson().fromJson(line, Vector[].class)) {
+		for (Vector v : vs) {
           if (!sequences.containsKey(v.parent_id)) {
             ArrayList<Vector> tmp = new ArrayList<>();
             sequences.put(v.parent_id, tmp);
@@ -119,7 +122,7 @@ public class Generator  {
 
           sequences.get(v.parent_id).add(v);
         }
-      }
+    //  }
       ContextDSL cntx_dsl = null;
       br.close();
       
@@ -134,9 +137,10 @@ public class Generator  {
 
       cntx_dsl.send(new Gson().toJson(output), "");
       
+	  System.err.println(" time:"+(System.currentTimeMillis() - start1));
       long start = System.currentTimeMillis();
       
-      StringBuffer sb = new StringBuffer();
+      /*StringBuffer sb = new StringBuffer();
       
       Process p = Runtime.getRuntime().exec("python3 /root/ContextToCode/predictor/main.py --do_inference");
       p.waitFor();
@@ -149,8 +153,9 @@ public class Generator  {
         sb.append(line+"\n");
       }
 
-      String str = sb.toString();
-      res = Integer.parseInt(str.substring(str.indexOf(":#") + 2, str.indexOf("# ")));
+      String str = sb.toString();*/
+      
+      res = Integer.parseInt(Utils.readUrl("http://78.46.103.68:8081/"));
       System.err.println("max:"+res+" time:"+(System.currentTimeMillis() - start));
     } catch (Exception e) {
       e.printStackTrace();
@@ -160,7 +165,7 @@ public class Generator  {
   }
 
   public int eval() throws Exception {
-    loadCodeSearch();
+    loadCodeSearch(null);
 
     ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
 
@@ -190,11 +195,11 @@ public class Generator  {
     return 0;
   }
 
-  private static void loadCodeSearch() throws JsonSyntaxException, IOException, InterruptedException {
+  private static ArrayList<Vector> loadCodeSearch(InnerContext[] data) throws JsonSyntaxException, IOException, InterruptedException {
     //      ArrayList<String> code = new ArrayList<String>(Arrays.asList(Utils.readFile("/root/toCode/output/cs/66533677").split("\n")));
     ArrayList<Vector[]> res = new ArrayList<>();
     HashSet<String> commands = new HashSet<>();
-    HashMap<String, Integer> hot_ecnoding = new HashMap<>();
+    HashMap<String, Double> hot_ecnoding = new HashMap<>();
 
     System.err.println("!"+root+root_key);
     File file = new File(root+root_key+"/context.json"); 
@@ -205,7 +210,14 @@ public class Generator  {
     File[] files = new File(root+root_key).listFiles();
     for (File f : files) {
       if (f.getPath().contains("psi") || key != null) {
-        InnerContext[] code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
+        
+        InnerContext[] code;
+        System.err.println(data);
+        if (data == null)
+          code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
+        else
+          code = data;
+          
         for (int line = code.length-1; line >= 0; line --) {
           if (key == null && line == code.length-1 || /*TRIN*/key != null  && code[line].line_text.contains(key) ) {
             Vector[] snip = Parser.getSnippet(line, code, commands, f.getPath(), line, key, good_types, bad_types);
@@ -226,14 +238,15 @@ public class Generator  {
       }
     }
     
-    System.err.println(commands+" ^ "+hot_ecnoding);
-    Utils.saveJsonFile(vectors, output);
+//    System.err.println(commands+" ^ "+hot_ecnoding);
+    //Utils.saveJsonFile(vectors, output);
+	return output;
   }
 
-  private static HashMap<String, Integer> hotEncode(HashSet<String> commands) throws IOException {
-    HashMap<String, Integer> hot_ecnoding = new HashMap<>();
+  private static HashMap<String, Double> hotEncode(HashSet<String> commands) throws IOException {
+    HashMap<String, Double> hot_ecnoding = new HashMap<>();
 
-    int count = 0;
+    Double count = 0.0;
     File f = new File("/root/ContextToCode/output/buffer/hots");
     if(f.exists() && !f.isDirectory()) { 
         return new Gson().fromJson(new FileReader("/root/ContextToCode/output/buffer/hots"), HashMap.class);
