@@ -5,7 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
@@ -30,8 +32,8 @@ public class LoadDataFromSearch {
 
   public static void main(String[] args) throws JsonSyntaxException, IOException, InterruptedException  {
     gson = new Gson();
-    //		createBaseFromSO();
-    dataFromCodeSearch();
+    createBaseFromSO();
+    //      dataFromCodeSearch();
     //      loadCodeSearch();
   }
 
@@ -55,24 +57,33 @@ public class LoadDataFromSearch {
     }
   }
 
-  public static void createBaseFromSO() throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+  public static void createBaseFromSO() throws JsonIOException, JsonSyntaxException, IOException {
     File f = new File(Conf.answers_output.replace("?", "_all"));
     Validate v = new Validate();
-    Conf.answers = gson.fromJson(new FileReader(f), Conf.gson_answers);
+//    Conf.answers = gson.fromJson(new FileReader(f), Conf.gson_answers);
 
     f = new File(Conf.posts_output.replace("?", "_all"));
-    for (Row p : gson.fromJson(new FileReader(f), Row[].class)) {
-      Conf.posts.put(p.getId(), p);
-    }
+    ArrayList<Row> posts_arr = new ArrayList<Row>(Arrays.asList(gson.fromJson(new FileReader(f), Row[].class)));
+//    for (Row p : gson.fromJson(new FileReader(f), Row[].class)) {
+//      Conf.posts.put(p.getScore(), p);
+//    }
 
-    for ( Entry<Integer, ArrayList<Row>> a : Conf.answers.entrySet() ) {
-      Collections.sort(a.getValue(), Utils.comparator_score_desc);
-      for (Row k : a.getValue()) {
-        k.init(v);
-        k.setPost(Conf.posts.get(k.getParentId()));
-      }
-    }
-    Dt dt = new Dt();
-    dt.export();
+//    for ( Entry<Integer, ArrayList<Row>> a : Conf.answers.entrySet() ) {
+//      Collections.sort(a.getValue(), Utils.comparator_score_desc);
+//      for (Row k : a.getValue()) {
+//        k.init(v);
+//        k.setPost(Conf.posts.get(k.getParentId()));
+//      }
+//    }
+    Collections.sort(posts_arr, cmpr);
+    Utils.saveJsonFile(Conf.posts_output.replace("?", "_all"), posts_arr);
+//    Dt dt = new Dt();
+//    dt.export();
   }
+  
+  public static Comparator<Row> cmpr = new Comparator<Row>() {
+    public int compare(Row o1, Row o2) {
+      return o2.getScore().compareTo(o1.getScore()); 
+    }
+  };
 }

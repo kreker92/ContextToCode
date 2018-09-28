@@ -59,10 +59,10 @@ public class Dt {
   private String dump_file(Row a) {
     DtJson dtj = new DtJson(a.getId(), a.getPost().getStripped().replace("\n", "").replace("\r", "").replace("\t", "")); 
 
-    for (String t : a.getPost().getTags())
+    for (String t : a.getPost().getTagsArr())
       dtj.addParam("tag", t);
 
-    dtj.addParam("model", a.getPost().getTitle());
+//    dtj.addParam("model", a.getPost().getTitle());
 
     dtj.addParam("code", a.getFunc());
 

@@ -124,10 +124,10 @@ public class Row {
   }
 
   public String toString() {
-    return "Id: "+id+" Tags: "+tags_arr+" Body: "+body+" Title: "+title;
+    return "Id: "+id+" Tags: "+tags_arr+" Score: "+score+" Title: "+title;
   }
 
-  public ArrayList<String> getTags() {
+  public ArrayList<String> getTagsArr() {
     return tags_arr;
   }
   
@@ -139,7 +139,7 @@ public class Row {
     return body;
   }
 
-  public String getTitle() {
+  public String getTitleName() {
     return title;
   }
 

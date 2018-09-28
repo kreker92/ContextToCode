@@ -30,7 +30,7 @@ public class SaveToFile {
   private static HashSet<Integer> ids = new HashSet<Integer>();
 
   public static void main(String[] args) throws FileNotFoundException, IOException {
-//    saveToChunks();
+    saveToChunks();
     mergeChunks();
   }
   
@@ -89,7 +89,8 @@ public class SaveToFile {
           Row row = (Row) jaxbUnmarshaller.unmarshal(reader);
           row.init(null);
 
-          if (!row.getTags().isEmpty() && row.getTags().contains("java")){
+          if (!row.getTagsArr().isEmpty() && (row.getTagsArr().contains("android"))) {
+            System.err.println(row);
             Conf.posts.put(row.getId(), row);
             ids.add(row.getId());
           } else if (ids.contains(row.getParentId())) {
@@ -116,8 +117,8 @@ public class SaveToFile {
   }
   
   private static void chunk(int i) throws IOException {
-    Utils.saveJsonFile(Conf.posts_output.replace("?", i+""), Conf.posts);
-    Utils.saveJsonFile(Conf.answers_output.replace("?", i+""), Conf.answers);
+    Utils.saveJsonFile(Conf.posts_output.replace("?", i+""), Conf.posts.values());
+    Utils.saveJsonFile(Conf.answers_output.replace("?", i+""), Conf.answers.values());
   }
 }
 
