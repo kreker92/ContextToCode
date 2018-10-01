@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,31 +27,27 @@ import tmt.conf.Utils;
 
 public class LoadDataFromSearch {
   static Gson gson;
-  static String key = "Class.forName";
-  static String query = "DriverManager%20getConnection%20query";
-  static String root_key = "cs/DriverManager_getConnection_Query";
-  static String root = "/root/ContextToCode/output/";
 
-  public static void main(String[] args) throws JsonSyntaxException, IOException, InterruptedException  {
+  public static void main(String[] args) throws JsonSyntaxException, IOException, InterruptedException, KeyManagementException, NoSuchAlgorithmException  {
     gson = new Gson();
-    createBaseFromSO();
-    //      dataFromCodeSearch();
-    //      loadCodeSearch();
+    //createBaseFromSO();
+    dataFromCodeSearch();
+//          loadCodeSearch();
   }
 
-  private static void dataFromCodeSearch() throws JsonSyntaxException, IOException, InterruptedException {
-    File file = new File(root+root_key);        
+  private static void dataFromCodeSearch() throws JsonSyntaxException, IOException, InterruptedException, KeyManagementException, NoSuchAlgorithmException {
+    File file = new File(Conf.root+Conf.root_key);        
     if(!file.exists()){
       file.mkdir();
     }
     Integer nextpage = 0;
     while (nextpage != null) {
-      Response resp = new Gson().fromJson(Utils.readStringFromURL("https://searchcode.com/api/codesearch_I/?q="+query+"&lan=23&&p="+nextpage),
+      Response resp = new Gson().fromJson(Utils.readStringFromURL("https://searchcode.com/api/codesearch_I/?q="+Conf.query+"&lan=23&&p="+nextpage),
           Response.class);	
       for ( Result r : resp.getResults()) {
         r.url = r.url.replace("view", "raw");
         String str = Utils.readStringFromURL(r.url);
-        Utils.savePlainFile(root+root_key+"/"+r.id, str);
+        Utils.savePlainFile(Conf.root+Conf.root_key+"/"+r.id, str);
         TimeUnit.SECONDS.sleep(1);
       }
       

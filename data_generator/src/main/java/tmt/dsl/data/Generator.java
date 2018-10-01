@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -137,7 +138,7 @@ public class Generator  {
 
       cntx_dsl.send(new Gson().toJson(output), "");
       
-	  System.err.println(" time:"+(System.currentTimeMillis() - start1));
+	  System.out.println(" time:"+(System.currentTimeMillis() - start1)+" timestamp: "+new Timestamp(System.currentTimeMillis()));
       long start = System.currentTimeMillis();
       
       /*StringBuffer sb = new StringBuffer();
@@ -156,7 +157,7 @@ public class Generator  {
       String str = sb.toString();*/
       
       res = Integer.parseInt(Utils.readUrl("http://78.46.103.68:8081/"));
-      System.err.println("max:"+res+" time:"+(System.currentTimeMillis() - start));
+      System.out.println("max:"+res+" time:"+(System.currentTimeMillis() - start));
     } catch (Exception e) {
       e.printStackTrace();
     } 

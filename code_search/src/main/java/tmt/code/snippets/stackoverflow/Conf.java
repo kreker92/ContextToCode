@@ -18,6 +18,12 @@ public class Conf {
   
   public static String posts_output = "../data/snippets/posts?.json";
   public static String answers_output = "../data/snippets/answers?.json";
+  public static String root = "../data/datasets/";
+  
+  public static String key = "Class.forName";
+  public static String query = "android";
+  public static String root_key = "/android/cs/";
+
   
   public static HashMap<Row, ArrayList<Row>> complete;
 }

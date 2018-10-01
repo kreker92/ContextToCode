@@ -3,6 +3,8 @@ package tmt.search.github;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,6 +19,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import tmt.code.snippets.stackoverflow.Row;
 import tmt.conf.Utils;
@@ -32,8 +35,19 @@ public class Github {
 	}
 
 	public void addResp(String query, String user) throws UnsupportedEncodingException, IOException {
-		resp.add(new Gson().fromJson(Utils.readStringFromURL("https://api.github.com/search/code?q="+URLEncoder.encode(query, "UTF-8")+"+language:java+user:"+user+"&client_id=1d37f4c170ab6b715f4b1d37f4c170ab6b715f4b&client_secret=3b877aec7dd7ba8fe51f2b8d717a074e3b540bf3"),
-				Response.class));
+		try {
+      resp.add(new Gson().fromJson(Utils.readStringFromURL("https://api.github.com/search/code?q="+URLEncoder.encode(query, "UTF-8")+"+language:java+user:"+user+"&client_id=1d37f4c170ab6b715f4b1d37f4c170ab6b715f4b&client_secret=3b877aec7dd7ba8fe51f2b8d717a074e3b540bf3"),
+      		Response.class));
+    } catch (JsonSyntaxException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (KeyManagementException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (NoSuchAlgorithmException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 	}
 
 	//  public String getItemsPath() {
@@ -111,7 +125,15 @@ class Item {
 	HashSet<String> intersect;
 
 	public void getRawHTML() throws IOException {
-		raw_html = Utils.readStringFromURL(html_url.replace("github.com", "raw.githubusercontent.com").replace("blob/", ""));
+		try {
+      raw_html = Utils.readStringFromURL(html_url.replace("github.com", "raw.githubusercontent.com").replace("blob/", ""));
+    } catch (KeyManagementException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (NoSuchAlgorithmException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 		//    System.err.println(raw_html);
 		//System.exit(1);
 	}

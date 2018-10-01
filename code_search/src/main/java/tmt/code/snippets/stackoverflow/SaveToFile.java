@@ -90,7 +90,6 @@ public class SaveToFile {
           row.init(null);
 
           if (!row.getTagsArr().isEmpty() && (row.getTagsArr().contains("android"))) {
-            System.err.println(row);
             Conf.posts.put(row.getId(), row);
             ids.add(row.getId());
           } else if (ids.contains(row.getParentId())) {

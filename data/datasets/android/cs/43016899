@@ -1,0 +1,318 @@
+/*
+ * Android Project Away SMS
+ * Author: Gustavo Pacheco
+ * Loyola University Chicago COMP 312 Open Source Computing
+ * Date: 12/3/2012
+ * 
+ * This application is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    
+    This application is also under the Creative Commons Attribution-ShareAlike 3.0 
+    Unported (CC BY-SA 3.0).
+    
+    You are free:
+
+	to Share  to copy, distribute and transmit the work
+	to Remix  to adapt the work
+	to make commercial use of the work
+	
+	Under the following conditions:
+
+	Attribution  You must attribute the work in the manner specified by the author or licensor 
+	(but not in any way that suggests that they endorse you or your use of the work).
+	
+	Share Alike  If you alter, transform, or build upon this work, you may distribute the 
+	resulting work only under the same or similar license to this one.
+ */
+
+
+package com.pacheco.away.sms;
+
+import java.util.Locale;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.PhoneLookup;
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
+import android.telephony.SmsManager;
+import android.telephony.SmsMessage;
+import android.text.Editable;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
+import android.widget.ToggleButton;
+
+public class MainActivity extends Activity implements OnInitListener {
+	public static final String PREFS_NAME = "MyPrefsFile";
+	public static final String SMS_RECEIVED_ACTION =
+            "android.provider.Telephony.SMS_RECEIVED";
+	private EditText sms;
+	private String save;
+	private SmsManager m;
+	private PendingIntent pi;
+	private TextToSpeech tts;
+	private String number;
+	private String name;
+	private boolean talk;
+	private boolean send;
+	private ContentResolver cr;
+	
+	//Receiver for incoming SMS messages, most of the app is located here.
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent)
+		{
+			SmsMessage[] messages;
+			String address = "";
+			String body = "";
+			Bundle bdl = intent.getExtras();
+			if(bdl != null)
+			{
+				Object[] pdus = (Object[]) bdl.get("pdus");
+				messages = new SmsMessage[pdus.length];
+				for (int i=0; i<messages.length; i++) 
+				{
+           			messages[i] = SmsMessage.createFromPdu((byte[])pdus[i]);                
+            		address = messages[i].getOriginatingAddress();
+            		number = address;
+            		body = messages[i].getMessageBody();
+        		}
+				
+				/*
+				 * Sets up searching for the contact on your phone based on the incoming phone number,
+				 * Creates a Uri to specify lookup by number, a cursor as that's what's returned, 
+				 * and a call to get the string since its a DISPLAY_NAME, resulting in the name
+				 * of the incoming text messenger if found in contacts.
+				 */
+				Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+				Cursor cur = cr.query(uri, new String[]{PhoneLookup.DISPLAY_NAME}, null, null, null);
+				if(cur.getCount()>0)
+				{
+					cur.moveToNext();
+					name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+				}
+				else {name="";};
+				
+				//If toggle to Auto Send is on (on by default) then will send a message to incoming message sender.				
+				if(send==true)
+				{
+					m.sendTextMessage(address, null, save, pi, null);
+				}
+				
+				/*
+				 * If toggle to Speech is on (on by default) then the tts will speak aloud the 
+				 * sender's contact (if located in contacts) and the body of the message. If not in 
+				 * contacts, app will speak the phone number.
+				 */
+				if(talk==true && name.length()>0) 
+				{
+					tts.speak("Message from ", TextToSpeech.QUEUE_FLUSH, null);
+					tts.playSilence(600, TextToSpeech.QUEUE_ADD, null);
+					tts.speak(name, TextToSpeech.QUEUE_ADD, null);
+					tts.playSilence(600, TextToSpeech.QUEUE_ADD, null);
+					tts.speak(body, TextToSpeech.QUEUE_ADD, null);
+					
+				}
+				else if(talk==true)
+				{
+					tts.speak("Message from ", TextToSpeech.QUEUE_FLUSH, null);
+					tts.playSilence(600, TextToSpeech.QUEUE_ADD, null);
+					tts.speak(number, TextToSpeech.QUEUE_ADD, null);
+					tts.playSilence(600, TextToSpeech.QUEUE_ADD, null);
+					tts.speak(body, TextToSpeech.QUEUE_ADD, null);
+				}
+								
+				pi.cancel();
+			}
+									
+		}
+	};
+	
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        
+        m = SmsManager.getDefault();
+		pi = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0); 
+		registerReceiver(receiver, new IntentFilter(SMS_RECEIVED_ACTION));
+		
+		talk = true;
+		send=true;
+		cr = getContentResolver();
+		
+        
+        /*
+         * The following code is to save a message in the text field and save
+         * it for the next creation. Example found on Android Develops store data tutorial.
+         */
+        sms = (EditText) findViewById(R.id.editText1); //get text field
+        // Restore preferences
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        String message = settings.getString("message", "None");
+        
+        if(message.equals("None"))
+        {
+        	Toast.makeText(this, "No message is saved.", Toast.LENGTH_LONG).show();
+        	save = String.valueOf(sms.getText());
+
+        }
+        else {sms.setText(message); save = message;}
+        
+    }
+    /*
+     * 
+     
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main, menu);
+        return true;
+    }
+    */
+    /*
+     * To clean up a few things before onDestroy. 
+     */
+    @Override
+	protected void onDestroy() 
+    {
+    	Toast.makeText(this, "App is closed.", Toast.LENGTH_SHORT).show();
+    	unregisterReceiver(receiver);
+    	tts.shutdown();
+		super.onDestroy();
+	}
+    
+    @Override
+    protected void onPause()
+    {
+    	//Must show that app is still running. Use back key or close app button.
+    	Toast.makeText(this, "App is in backround.", Toast.LENGTH_SHORT).show();
+    	tts.shutdown();
+    	tts = new TextToSpeech(this, this);
+    	super.onPause();
+    }
+    @Override
+    protected void onResume()
+    {
+    	if (tts!=null){tts.shutdown();}
+    	tts = new TextToSpeech(this, this);
+    	super.onResume();
+    }
+    @Override
+    public void onStop()
+    {
+    	
+    	super.onStop();
+    	
+    	//Saving the text message on close after the save button saves the message inside the app.
+    	// We need an Editor object to make preference changes.
+        // All objects are from android.context.Context
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("message", save);
+
+        // Commit the edits!
+        editor.commit();
+    }
+    
+   
+    //To save message in EditText field for present and future use.
+    public void clickSave(View view)
+    {
+    	
+    	Editable s = sms.getText();
+    	save = s.toString();
+    	Toast.makeText(this, "Message has been saved.", Toast.LENGTH_LONG).show();
+    }
+
+    //Needed to be implemented to use TTS
+	public void onInit(int status) 
+	{
+		{
+		    if (status == TextToSpeech.SUCCESS) 
+		    {
+		        tts.setLanguage(Locale.US);
+		    }
+		    else if (status == TextToSpeech.ERROR) {
+		        Toast.makeText(this, "Sorry! Text To Speech failed...", Toast.LENGTH_LONG).show();
+		    }
+		}
+	}
+	
+	//Quick FAQ screen
+	public void clickAbout(MenuItem item)
+	{
+		Intent nextScreen = new Intent(getApplicationContext(), AboutActivity.class);
+		startActivity(nextScreen);
+	}
+	
+	//Toggle to enable and disable Speech on Receive. On by default.
+	public void toggleTalk(View view)
+	{
+		// Is the toggle on?
+	    boolean on = ((ToggleButton) view).isChecked();
+	    
+	    if (on) 
+	    {
+	        talk = true;
+	    } 
+	    else 
+	    {
+	        talk = false;
+	    }
+	}
+	
+	public void toggleSend(View view)
+	{
+		// Is the toggle on?
+	    boolean on = ((ToggleButton) view).isChecked();
+	    
+	    if (on) 
+	    {
+	        send = true;
+	    } 
+	    else 
+	    {
+	        send = false;
+	    }
+	}
+	
+	//Button to properly close app for user. 
+	public void closeApp(View view)
+	{
+		finish();
+	}
+	
+	//Quick shortcut to messages.
+	public void launchSMS(View view)
+    {
+    	Intent next = new Intent(Intent.ACTION_MAIN);
+    	next.addCategory(Intent.CATEGORY_LAUNCHER);
+    	next.setClassName("com.android.mms" , "com.android.mms.ui.ConversationList");
+    	
+    	startActivity(next);
+    }
+	
+}
+

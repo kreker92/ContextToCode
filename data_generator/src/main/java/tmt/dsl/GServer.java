@@ -1,6 +1,7 @@
 package tmt.dsl;
 
 import java.io.FileReader;
+import java.io.PrintStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +31,9 @@ public class GServer {
     int res = 0;
     
     Generator g = new Generator(); 
+    
+    PrintStream fileStream = new PrintStream("../log/log.txt");
+    System.setOut(fileStream);
     
     g.limit = 15000;
     g.dsl_buffer = "/root/data/dsl_buffer/";
