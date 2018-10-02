@@ -138,7 +138,7 @@ public class Generator  {
 
       cntx_dsl.send(new Gson().toJson(output), "");
       
-	  System.out.println(" time:"+(System.currentTimeMillis() - start1)+" timestamp: "+new Timestamp(System.currentTimeMillis()));
+	  System.out.println("time: "+(System.currentTimeMillis() - start1)+" timestamp: "+new Timestamp(System.currentTimeMillis()));
       long start = System.currentTimeMillis();
       
       /*StringBuffer sb = new StringBuffer();

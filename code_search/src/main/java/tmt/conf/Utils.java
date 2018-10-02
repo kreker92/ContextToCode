@@ -152,6 +152,12 @@ public class Utils {
       return o2.getScore().compareTo(o1.getScore());
     }
   };
+  
+  public static Comparator<Row> cmpr = new Comparator<Row>() {
+    public int compare(Row o1, Row o2) {
+      return o2.getScore().compareTo(o1.getScore()); 
+    }
+  };
 //  public static HashMap<Integer, ArrayList<Row>> loadAnswers(HashMap<Integer, ArrayList<LinkedTreeMap<String, String>>> fromJson) {
 //    System.err.println(fromJson.get("796508").get(0).keySet());
 //    return null;

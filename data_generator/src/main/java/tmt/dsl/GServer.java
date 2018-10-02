@@ -1,5 +1,6 @@
 package tmt.dsl;
 
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.PrintStream;
 import java.sql.Timestamp;
@@ -32,7 +33,8 @@ public class GServer {
     
     Generator g = new Generator(); 
     
-    PrintStream fileStream = new PrintStream("../log/log.txt");
+    PrintStream fileStream = new PrintStream(
+        new FileOutputStream("../log/log.txt", true)); 
     System.setOut(fileStream);
     
     g.limit = 15000;

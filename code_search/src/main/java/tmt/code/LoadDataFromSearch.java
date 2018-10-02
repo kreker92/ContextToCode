@@ -73,15 +73,10 @@ public class LoadDataFromSearch {
 //        k.setPost(Conf.posts.get(k.getParentId()));
 //      }
 //    }
-    Collections.sort(posts_arr, cmpr);
+    Collections.sort(posts_arr, Utils.cmpr);
     Utils.saveJsonFile(Conf.posts_output.replace("?", "_all"), posts_arr);
 //    Dt dt = new Dt();
 //    dt.export();
   }
   
-  public static Comparator<Row> cmpr = new Comparator<Row>() {
-    public int compare(Row o1, Row o2) {
-      return o2.getScore().compareTo(o1.getScore()); 
-    }
-  };
 }

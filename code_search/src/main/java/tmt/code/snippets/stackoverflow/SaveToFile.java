@@ -1,6 +1,7 @@
 package tmt.code.snippets.stackoverflow;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -30,7 +31,7 @@ public class SaveToFile {
   private static HashSet<Integer> ids = new HashSet<Integer>();
 
   public static void main(String[] args) throws FileNotFoundException, IOException {
-    saveToChunks();
+    //saveToChunks();
     mergeChunks();
   }
   
@@ -68,7 +69,8 @@ public class SaveToFile {
       f = new File(Conf.posts_output.replace("?", count+""));
     }
     
-    Utils.saveJsonFile(Conf.posts_output.replace("?", "_all"), posts);
+    Collections.sort(posts, Utils.cmpr);
+    Utils.saveJsonFile(Conf.posts_output.replace("?", "_all"), posts.subList(0, 100));
 
   }
 
