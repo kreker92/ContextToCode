@@ -256,10 +256,10 @@ public class ContextHelperPanel extends JPanel implements Runnable {
     public void setQueryingStatus(String q_) {
         if (q_.trim().equals("6"))
             queryJTextField.setText("Open DB connection");
-        else if (q_.trim().equals("7"))
+        else // if (q_.trim().equals("7"))
             queryJTextField.setText("None");
-        else if (q_.trim().equals("0"))
-            queryJTextField.setText("Loading...");
+//        else if ()
+//            queryJTextField.setText("Loading...");
         showPanel();
 //        if (isQuerying) {
 //            progressBar.setIndeterminate(true);

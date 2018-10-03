@@ -2,6 +2,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 //import com.intellij.lang.java.JavaLanguage;
@@ -54,21 +55,26 @@ public class HelloAction extends AnAction {
 
         try {
          // case 1:
-         //   setUp();
-         // case 2:
+            if (true) {
+                setUp();
+            } else {
+                // case 2:
 
-            ArrayList<InnerContext> output_elements = new ArrayList<>();
-            parseFile(fi, output_elements, fi.getText(), ed.getSelectionModel().getSelectionEnd());
+                ArrayList<InnerContext> output_elements = new ArrayList<>();
 
-            String request = new Gson().toJson(output_elements);
-            System.err.println(request);
+                ed.getCaretModel().moveToLogicalPosition(new LogicalPosition(ed.getCaretModel().getLogicalPosition().line, 400));
+
+                parseFile(fi, output_elements, fi.getText(), ed.getSelectionModel().getSelectionEnd());
+
+                String request = new Gson().toJson(output_elements);
+                System.err.println(request);
 //            System.err.print(Eval.sendGet("телефон"))
 
 //            act.insert("\n\n ");
 
 //            TimeUnit.SECONDS.sleep(1);
 
-            helperComponent.setQueryingStatus(act.send(request));
+                helperComponent.setQueryingStatus(act.send(request));
 
 //            CommandProcessor.getInstance().executeCommand(project, () -> getApplication().runWriteAction(() -> {
 //                Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
@@ -86,8 +92,8 @@ public class HelloAction extends AnAction {
 //            }), "InsertResultToEditor", "", UndoConfirmationPolicy.DO_NOT_REQUEST_CONFIRMATION);
 
 
-
 //            helperComponent.process("{psiElement.text} {elementLanguage.displayName.toLowerCase()}");
+            }
 
         } catch (Exception e) {
             Messages.showMessageDialog(project, e.getMessage(), "Greeting", Messages.getInformationIcon());
@@ -100,21 +106,32 @@ public class HelloAction extends AnAction {
         System.err.println(myTargetDir);
         if (!myTargetDir.isDirectory()) throw new Exception(myTargetDir + " is not a directory");
 
+        File checkDir = new File("C:\\Users\\user\\Documents\\backup\\data\\parsed\\");
+        System.err.println(checkDir);
+        if (!myTargetDir.isDirectory()) throw new Exception(myTargetDir + " is not a directory");
+
+        ArrayList<String> checkFiles = new ArrayList<>();
+        for ( File f : checkDir.listFiles()) {
+            checkFiles.add(f.getName());
+        }
+
         File[] myFiles = myTargetDir.listFiles();
         for (File file : myFiles) {
-            String text = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
-            ArrayList<InnerContext> output_elements = new ArrayList<>();
+            if (!checkFiles.contains(file.getName()+".json")) {
+                String text = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
+                ArrayList<InnerContext> output_elements = new ArrayList<>();
 
-            final String s = "*.java";
-            FileType fileType = FileTypeManager.getInstance().getFileTypeByFileName("*.java"); // RegExp plugin is not installed
+                final String s = "*.java";
+                FileType fileType = FileTypeManager.getInstance().getFileTypeByFileName("*.java"); // RegExp plugin is not installed
 
-            final PsiFile psf = PsiFileFactory.getInstance(project).createFileFromText(file.getName(), fileType, text, -1, true);
+                final PsiFile psf = PsiFileFactory.getInstance(project).createFileFromText(file.getName(), fileType, text, -1, true);
 
-            parseFile(psf, output_elements, text, null);
+                parseFile(psf, output_elements, text, null);
 
-            try (Writer writer = new FileWriter("C:\\Users\\user\\Documents\\backup\\data\\parsed\\"+file.getName()+".json")) {
-                Gson gson = new GsonBuilder().create();
-                gson.toJson(output_elements, writer);
+                try (Writer writer = new FileWriter("C:\\Users\\user\\Documents\\backup\\data\\parsed\\" + file.getName() + ".json")) {
+                    Gson gson = new GsonBuilder().create();
+                    gson.toJson(output_elements, writer);
+                }
             }
         }
     }
