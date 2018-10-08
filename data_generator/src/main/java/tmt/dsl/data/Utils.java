@@ -94,7 +94,7 @@ public class Utils {
   }
 
   public static void writeFile1(String lines, String filename, boolean append) throws IOException {
-    File file = new File("/root/javaDataGenerator/data/0.json");
+    File file = new File(filename);
     FileWriter fr = null;
     BufferedWriter br = null;
     String dataWithNewLine=lines+System.getProperty("line.separator");

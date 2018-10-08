@@ -18,7 +18,8 @@ public class GServer {
   public static final int LEARN = 1;
   public static final int EVAL  = 2;
   public static final int INFERENCE  = 3;
-  
+  public static final int PATTERN  = 4;
+
   public static void main(String[] args) throws Exception{
     if (args[0].equals("learn")) 
       router(LEARN, "");
@@ -26,32 +27,34 @@ public class GServer {
       router(EVAL, "");
     else if (args[0].equals("inference"))
       router(INFERENCE, "");
+    else if (args[0].equals("pattern"))
+      router(PATTERN, "");
   }
-  
+
   public static int router(int swtch, String data) throws Exception {
     int res = 0;
-    
+
     Generator g = new Generator(); 
-    
+
     PrintStream fileStream = new PrintStream(
         new FileOutputStream("../log/log.txt", true)); 
     System.setOut(fileStream);
-    
+
     g.limit = 15000;
     g.dsl_buffer = "/root/data/dsl_buffer/";
     g.gson  = new Gson();
     g.good_types = new ArrayList( Arrays.asList( g.gson.fromJson(new FileReader("/root/ContextToCode/output/conf/good_types"), String[].class)) );
     g.bad_types = new ArrayList( Arrays.asList( g.gson.fromJson(new FileReader("/root/ContextToCode/output/conf/bad_types"), String[].class)) );
-    
-    
+
+
     if (swtch == LEARN) {
       g.key = "DriverManager.getConnection";
       g.query = "DriverManager%20getConnection%20query";
-      
+
       g.root = "/root/ContextToCode/output/";
       g.root_key = "cs/parsed";
       g.vectors = "/root/ContextToCode/output/funcs/vectors";
-      
+
       g.setTrainAndTest(null);
     }
     else if (swtch == EVAL) {
@@ -60,26 +63,34 @@ public class GServer {
 
       g.key = null;
       g.model = "";
-      
+
       res = g.eval();
     }
+    else if (swtch == PATTERN) {
+      //    g.root_key = "/"+new Timestamp(System.currentTimeMillis())+"/";
+      g.root_key = "";
+      g.root = "../data/datasets/android/ast/";
+      g.vectors = g.root+g.root_key+"/vectors";
+
+      res = g.getPattern(null);
+    }
     else if (swtch == INFERENCE) {
-//      g.root_key = "/"+new Timestamp(System.currentTimeMillis())+"/";
+      //      g.root_key = "/"+new Timestamp(System.currentTimeMillis())+"/";
       g.root_key = "/test/";
       g.root = "/root/ContextToCode/output/buffer";
       g.vectors = g.root+g.root_key+"/vectors";
-      
+
       g.key = null;
       g.model = "";
-      
+
       InnerContext[] code = null;
       if (data != null) {
         code = new Gson().fromJson(data, InnerContext[].class);
       }
-      
+
       res = g.setTrainAndTest(code);
     }
-    
+
     return res;
   }
 }

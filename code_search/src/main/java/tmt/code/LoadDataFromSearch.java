@@ -2,8 +2,11 @@ package tmt.code;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -40,18 +43,39 @@ public class LoadDataFromSearch {
     if(!file.exists()){
       file.mkdir();
     }
-    Integer nextpage = 0;
-    while (nextpage != null) {
-      Response resp = new Gson().fromJson(Utils.readStringFromURL("https://searchcode.com/api/codesearch_I/?q="+Conf.query+"&lan=23&&p="+nextpage),
-          Response.class);	
-      for ( Result r : resp.getResults()) {
-        r.url = r.url.replace("view", "raw");
-        String str = Utils.readStringFromURL(r.url);
-        Utils.savePlainFile(Conf.root+Conf.root_key+"/"+r.id, str);
-        TimeUnit.SECONDS.sleep(1);
+
+    
+    String[] queries_raw = Utils.readFile("/root/ContextToCode/data/datasets/android/cs/1515272").split(";");
+    String check = Utils.readFile("../log/queries.txt");
+    
+    PrintStream fileStream = new PrintStream(
+        new FileOutputStream("../log/queries.txt", true)); 
+    System.setOut(fileStream);
+    
+    ArrayList<String> queries = new ArrayList<String>();
+    for (String q : queries_raw) {
+      if (q.contains("import android.")) {
+        queries.add(q.replace("import ", "").replace(",", ""));
       }
+    }
+    for (String q : queries) {
+      Integer nextpage = 0;
       
-      nextpage = resp.nextpage;
+      if (!check.contains(q)) {
+        System.out.println(q+"!");
+        while (nextpage != null) {
+          Response resp = new Gson().fromJson(Utils.readStringFromURL("https://searchcode.com/api/codesearch_I/?q="+URLEncoder.encode(q, "UTF-8")+"&lan=23&&p="+nextpage),
+              Response.class);	
+          for ( Result r : resp.getResults()) {
+            r.url = r.url.replace("view", "raw");
+            String str = Utils.readStringFromURL(r.url);
+            Utils.savePlainFile(Conf.root+Conf.root_key+"/"+r.id, str);
+            TimeUnit.SECONDS.sleep(1);
+          }
+
+          nextpage = resp.nextpage;
+        }
+      }
     }
   }
 

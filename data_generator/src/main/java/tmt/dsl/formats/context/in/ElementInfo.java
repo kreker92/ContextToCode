@@ -6,10 +6,15 @@ public class ElementInfo {
   public String node;
   public String text;
   int line;
-
-  public ElementInfo(PsiElement psiElement, int line_) {
-      text = psiElement.getText();
-      node = psiElement.getNode().toString().split(":")[0];
-      line = line_;
-  }
+  public String type;
+  public String parent;
+  public String child;
+//
+//
+//  public ElementInfo(PsiElement psiElement, int line_) {
+//      text = psiElement.getText().trim();
+//      node = psiElement.getNode().toString();
+//      parent = psiElement.getNode().toString();
+//      line = line_;
+//  }
 }

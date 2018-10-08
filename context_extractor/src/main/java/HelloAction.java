@@ -18,6 +18,8 @@ import com.intellij.openapi.fileTypes.FileType;
 
 import java.io.FileWriter;
 import java.io.Writer;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.*;
 
 import java.io.File;
@@ -118,8 +120,20 @@ public class HelloAction extends AnAction {
         File[] myFiles = myTargetDir.listFiles();
         for (File file : myFiles) {
             if (!checkFiles.contains(file.getName()+".json")) {
-                String text = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
+                String text_ = "";
+                try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        if (!line.contains("//"))
+                            text_ += line;
+                    }
+                }
+                String text = text_.replaceAll("(//)[^&]*("+System.getProperty("line.separator")+")", "")
+                        .replace("\n", "").replace(";", ";\n")
+                        .replace("{", "{\n").replace("}", "}\n")
+                        .replace("*/", "*/\n");
                 ArrayList<InnerContext> output_elements = new ArrayList<>();
+                Long  start = System.currentTimeMillis();
 
                 final String s = "*.java";
                 FileType fileType = FileTypeManager.getInstance().getFileTypeByFileName("*.java"); // RegExp plugin is not installed
@@ -128,6 +142,7 @@ public class HelloAction extends AnAction {
 
                 parseFile(psf, output_elements, text, null);
 
+                System.err.println(file.getName()+"*"+((System.currentTimeMillis() - start)/1000));
                 try (Writer writer = new FileWriter("C:\\Users\\user\\Documents\\backup\\data\\parsed\\" + file.getName() + ".json")) {
                     Gson gson = new GsonBuilder().create();
                     gson.toJson(output_elements, writer);
@@ -278,8 +293,21 @@ public class HelloAction extends AnAction {
 
         public void buildQuery() {
             List<PsiElement> psiElements = context.getPsiElements();
+            ArrayList<String> bad_types = new ArrayList<String>();
+
+            bad_types.add("PsiJavaToken");
+            bad_types.add("PsiDocToken");
+            bad_types.add("PsiElement(BAD_CHARACTER)");
+            bad_types.add("PsiLiteralExpression");
+            bad_types.add("PsiModifierList");
+            bad_types.add("PsiField");
+            bad_types.add("PsiTypeElement");
+//            bad_types.add("PsiReferenceExpression");
+            bad_types.add("PsiParameter");
 
             for (PsiElement psiElement : psiElements) {
+                ElementInfo el = new ElementInfo(psiElement, context.ic.line_num);
+
                 if (meaninglessForContextTokenTypes.contains(psiElement.getNode().getElementType())) {
                     continue;
                 }
@@ -294,7 +322,9 @@ public class HelloAction extends AnAction {
                     continue;
                 }
 
-                context.ic.elements.add(new ElementInfo(psiElement, context.ic.line_num));
+                context.ic.elements.add(el);
+                if (!bad_types.contains(el.parent))
+                    context.ic.clean_line_text += psiElement.getText().toLowerCase()+" ";
             }
 //            List<WordInfo> words =
 //                    wordCountMap.entrySet()

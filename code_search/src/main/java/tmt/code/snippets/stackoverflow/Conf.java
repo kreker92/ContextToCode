@@ -21,7 +21,7 @@ public class Conf {
   public static String root = "../data/datasets/";
   
   public static String key = "Class.forName";
-  public static String query = "android";
+  public static String query = "android.app.AlertDialog";
   public static String root_key = "/android/cs/";
 
   

@@ -42,15 +42,17 @@ public class Vector {
     if (b)
       label = 1;
 
-    for ( ElementInfo s : c.elements )
+    for ( ElementInfo s : c.elements ) {
 //      if (!goodTypes.contains(s.node) && !badTypes.contains(s.node)) {
 //        System.err.println(s.node);
 //        System.exit(1);
 //      }
-      if (goodTypes.contains(s.node)) {
-        strings.add(s.text.trim());
-        commands.add(s.text.trim());
-      }
+      String cell = s.node+" * "+s.parent+" * "+s.text.trim();
+     // if (goodTypes.contains(s.node) && !badTypes.contains(s.parent)) {
+        strings.add(cell);
+        commands.add(cell);
+     // }
+    }
     row = i;
     level = level_;
     parent_id = (path+line_num_).hashCode();

@@ -1,1 +1,1 @@
-["PsiJavaToken","PsiDocToken","PsiElement(BAD_CHARACTER)"]
+["PsiJavaToken","PsiDocToken","PsiElement(BAD_CHARACTER)","PsiLiteralExpression","PsiModifierList","PsiField","PsiTypeElement","PsiParameter"]

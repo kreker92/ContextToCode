@@ -6,4 +6,5 @@ public class InnerContext {
   public int end;
   public int line_num;
   public String line_text;
+  public String clean_line_text = "";
 }
