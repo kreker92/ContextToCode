@@ -40,7 +40,7 @@ public class ContextDSL extends DSL {
 	  d.toAddInfo("path", v.path);
 	  d.toAddInfo("line", v.line_num+"");
       
-      if (v.level==0) {
+      if (v.getLevel()==0) {
         d.toProgram("id", Executor.CONNECT);
         d.toProgram("program", "connect");
       } else {

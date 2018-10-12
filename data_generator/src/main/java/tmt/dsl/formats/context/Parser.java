@@ -7,16 +7,14 @@ import tmt.dsl.formats.context.in.InnerContext;
 
 public class Parser {
 
-  public static Vector[] getSnippet(int start, String[] code, HashSet<String> commands, int parent_id, String key) {
+ /* public static Vector[] getSnippet(int start, String[] code, HashSet<String> commands, int parent_id, String key) {
     ArrayList<Vector> res = new ArrayList<Vector>();
 
     int count = 0;
     for (int i = start; i >= 0; i --) {
       String line = code[i];
-      System.err.println(line);
-      if (i != start && (isStart(line, key) || count > 3))
-        break;
       String line_clean = clean(line);
+      
       if (hasSense(line_clean)) {
         Vector v = new Vector(line_clean, commands, i, line, i == start, count, parent_id);
         if (!v.isEmpty()) {
@@ -24,23 +22,24 @@ public class Parser {
           count ++;
         }
       }
+      if (i != start && (isStart(line, key) || count > 3))
+        break;
     }
 
     return res.toArray(new Vector[res.size()]);
-  }
+  } */
   
-  public static Vector[] getSnippet(int start, InnerContext[] code, HashSet<String> commands, String path, int line_num, String key, ArrayList<String> goodTypes, ArrayList<String> badTypes) {
+  public static Vector[] getSnippet(int line_num, InnerContext[] code, HashSet<String> commands, String path, String key, ArrayList<String> goodTypes, ArrayList<String> badTypes, int  limit) {
     ArrayList<Vector> res = new ArrayList<Vector>();
 
     int count = 0;
-    for (int i = start; i >= 0; i --) {
+    for (int i = line_num; i >= 0; i --) {
       String line = code[i].line_text;
-
-      if (i != start && (isStart(line, key) || count > 3))
+      if (i != line_num && (isStart(line, key) || count > limit))
         break;
       String line_clean = clean(line);
       if (hasSense(line_clean)) {
-        Vector v = new Vector(code[i], commands, i, line, i == start, count, path, line_num, goodTypes, badTypes);
+        Vector v = new Vector(code[i], commands, i, line, i == line_num, count, path, line_num, goodTypes, badTypes);
         if (!v.isEmpty()) {
           res.add(0, v);
           count ++;

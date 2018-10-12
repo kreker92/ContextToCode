@@ -48,13 +48,15 @@ public class GServer {
 
 
     if (swtch == LEARN) {
-      g.key = "DriverManager.getConnection";
-      g.query = "DriverManager%20getConnection%20query";
+      g.key = "intent.getAction()";
+      g.description = "Retrieve the general action to be performed, such as ACTION_VIEW.";
 
-      g.root = "/root/ContextToCode/output/";
-      g.root_key = "cs/parsed";
+      g.root = "/root/ContextToCode/data/datasets/android/";
+      g.root_key = "ast/";
       g.vectors = "/root/ContextToCode/output/funcs/vectors";
 
+      
+      g.snippetize(); 
       g.setTrainAndTest(null);
     }
     else if (swtch == EVAL) {
@@ -67,12 +69,14 @@ public class GServer {
       res = g.eval();
     }
     else if (swtch == PATTERN) {
-      //    g.root_key = "/"+new Timestamp(System.currentTimeMillis())+"/";
-      g.root_key = "";
-      g.root = "../data/datasets/android/ast/";
-      g.vectors = g.root+g.root_key+"/vectors";
+      g.key = "intent.getAction()";
+      g.description = "Retrieve the general action to be performed, such as ACTION_VIEW.";
 
-      res = g.getPattern(null);
+      g.root = "/root/ContextToCode/data/datasets/android/";
+      g.root_key = "ast/";
+      g.vectors = "/root/ContextToCode/output/funcs/vectors";
+
+      g.loadCodeSearch(null, g.ASC, 5);
     }
     else if (swtch == INFERENCE) {
       //      g.root_key = "/"+new Timestamp(System.currentTimeMillis())+"/";

@@ -140,9 +140,9 @@ public class HelloAction extends AnAction {
 
                 final PsiFile psf = PsiFileFactory.getInstance(project).createFileFromText(file.getName(), fileType, text, -1, true);
 
+                System.err.println(file.getName()+"*"+((System.currentTimeMillis() - start)/1000));
                 parseFile(psf, output_elements, text, null);
 
-                System.err.println(file.getName()+"*"+((System.currentTimeMillis() - start)/1000));
                 try (Writer writer = new FileWriter("C:\\Users\\user\\Documents\\backup\\data\\parsed\\" + file.getName() + ".json")) {
                     Gson gson = new GsonBuilder().create();
                     gson.toJson(output_elements, writer);

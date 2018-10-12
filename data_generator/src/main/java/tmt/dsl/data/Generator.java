@@ -19,10 +19,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.nio.charset.Charset;
-
 import java.util.Map.Entry;
-
 import java.nio.file.Files;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import tmt.dsl.executor.info.Step;
 import tmt.dsl.formats.context.ContextDSL;
@@ -30,6 +30,7 @@ import tmt.dsl.formats.context.Parser;
 import tmt.dsl.formats.context.Vector;
 import tmt.dsl.formats.context.in.ElementInfo;
 import tmt.dsl.formats.context.in.InnerContext;
+import tmt.dsl.snippetize.Snippetizer;
 import tmt.dsl.tensorflow.TF;
 
 import com.google.gson.Gson;
@@ -94,103 +95,38 @@ import com.google.gson.JsonSyntaxException;
 public class Generator  {
 
   public static int limit;
-  
+
   public static String dsl_buffer;
   public static Gson gson;
   public static String key;
-  public static String query;
+  public static String description;
+
   public static String root_key;
   public static String root;
   public static String vectors;
   public static String model;
-  
+
   public static ArrayList<String> good_types;
   public static ArrayList<String> bad_types;
+  
+  public static final int ASC = 1;
+  public static final int DESC = 1;
 
   public static int setTrainAndTest(InnerContext[] data) throws Exception{
-    int count = 0;
     int res = 0;
-    
+
     try {
       long start1 = System.currentTimeMillis();
 
       int max = 0;
-      ArrayList<Vector> vs = loadCodeSearch(data);
+      ArrayList<Vector> vs = loadCodeSearch(data, ASC, 3);
 
       ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
 
       HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
       BufferedReader br = new BufferedReader(new FileReader(vectors));
-    //  for(String line; (line = br.readLine()) != null; ) {
-    //    for (Vector v : new Gson().fromJson(line, Vector[].class)) {
-		for (Vector v : vs) {
-          if (!sequences.containsKey(v.parent_id)) {
-            ArrayList<Vector> tmp = new ArrayList<>();
-            sequences.put(v.parent_id, tmp);
-          }
-
-          for (Integer n : v.vector)
-            if (n > max)
-              max = n;
-
-          sequences.get(v.parent_id).add(v);
-        }
-    //  }
-      ContextDSL cntx_dsl = null;
-      br.close();
-      
-      for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
-        cntx_dsl = new ContextDSL(s.getValue(), root+root_key);  
-        cntx_dsl.execute();
-        for (HashMap<Integer, Step> v : cntx_dsl.getData()){
-          count += v.keySet().size();
-        }
-        output.addAll(cntx_dsl.getData());
-      }
-
-      cntx_dsl.send(new Gson().toJson(output), "");
-      
-	  System.out.println("time: "+(System.currentTimeMillis() - start1)+" timestamp: "+new Timestamp(System.currentTimeMillis()));
-      long start = System.currentTimeMillis();
-      
-      /*StringBuffer sb = new StringBuffer();
-      
-      Process p = Runtime.getRuntime().exec("python3 /root/ContextToCode/predictor/main.py --do_inference");
-      p.waitFor();
-
-      BufferedReader reader = 
-           new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-      String line = "";           
-      while ((line = reader.readLine())!= null) {
-        sb.append(line+"\n");
-      }
-
-      String str = sb.toString();*/
-      
-      res = Integer.parseInt(Utils.readUrl("http://78.46.103.68:8081/"));
-      System.out.println("max:"+res+" time:"+(System.currentTimeMillis() - start));
-    } catch (Exception e) {
-      e.printStackTrace();
-    } 
-    
-    return res;
-  }
-
-  public static int getPattern(InnerContext[] data) throws Exception{
-    int res = 0;
-
-    try {
-      long start1 = System.currentTimeMillis();
-
-      int max = 0;
-      ArrayList<Vector> vs = loadCodeSearch(data);
-      System.err.println(vs);
-
-      ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
-
-      HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
-    //  BufferedReader br = new BufferedReader(new FileReader(vectors));
+      //  for(String line; (line = br.readLine()) != null; ) {
+      //    for (Vector v : new Gson().fromJson(line, Vector[].class)) {
       for (Vector v : vs) {
         if (!sequences.containsKey(v.parent_id)) {
           ArrayList<Vector> tmp = new ArrayList<>();
@@ -203,8 +139,10 @@ public class Generator  {
 
         sequences.get(v.parent_id).add(v);
       }
+      //  }
       ContextDSL cntx_dsl = null;
-      //br.close();
+      br.close();
+
       for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
         cntx_dsl = new ContextDSL(s.getValue(), root+root_key);  
         cntx_dsl.execute();
@@ -213,11 +151,26 @@ public class Generator  {
 
       cntx_dsl.send(new Gson().toJson(output), "");
 
-     /* System.out.println("time: "+(System.currentTimeMillis() - start1)+" timestamp: "+new Timestamp(System.currentTimeMillis()));
+      System.out.println("time: "+(System.currentTimeMillis() - start1)+" timestamp: "+new Timestamp(System.currentTimeMillis()));
       long start = System.currentTimeMillis();
 
+      /*StringBuffer sb = new StringBuffer();
+
+      Process p = Runtime.getRuntime().exec("python3 /root/ContextToCode/predictor/main.py --do_inference");
+      p.waitFor();
+
+      BufferedReader reader = 
+           new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+      String line = "";           
+      while ((line = reader.readLine())!= null) {
+        sb.append(line+"\n");
+      }
+
+      String str = sb.toString();*/
+
       res = Integer.parseInt(Utils.readUrl("http://78.46.103.68:8081/"));
-      System.out.println("max:"+res+" time:"+(System.currentTimeMillis() - start));*/
+      System.out.println("max:"+res+" time:"+(System.currentTimeMillis() - start));
     } catch (Exception e) {
       e.printStackTrace();
     } 
@@ -225,9 +178,8 @@ public class Generator  {
     return res;
   }
 
-
   public int eval() throws Exception {
-    loadCodeSearch(null);
+    loadCodeSearch(null, ASC, 3);
 
     ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
 
@@ -245,95 +197,83 @@ public class Generator  {
     }
     ContextDSL cntx_dsl = null;
     br.close();
-    
+
     for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
       cntx_dsl = new ContextDSL(s.getValue(), root+root_key);  
       cntx_dsl.execute();
       output.addAll(cntx_dsl.getData());
     }
 
-//    TF tf = new TF(output, model);
-//    return tf.eval();
+    //    TF tf = new TF(output, model);
+    //    return tf.eval();
     return 0;
   }
 
-  private static ArrayList<Vector> loadCodeSearch(InnerContext[] data) throws JsonSyntaxException, IOException, InterruptedException {
+  public static ArrayList<Vector> loadCodeSearch(InnerContext[] data, int direction, int limit) throws JsonSyntaxException, IOException, InterruptedException {
     //      ArrayList<String> code = new ArrayList<String>(Arrays.asList(Utils.readFile("/root/toCode/output/cs/66533677").split("\n")));
     ArrayList<Vector[]> res = new ArrayList<>();
     HashSet<String> commands = new HashSet<>();
     HashMap<String, Double> hot_ecnoding = new HashMap<>();
-    HashMap<String, Integer> popular_lines = new HashMap<>();
-    HashMap<String, Integer> popular_commands = new HashMap<>();
+    PopularCounter popular = new PopularCounter(bad_types);
 
     System.err.println("!"+root+root_key);
-    File file = new File(root+root_key+"/context.json"); 
+    File file = new File(root+"/context.json"); 
     file.delete();
-    file = new File(root+root_key+"/log.json"); 
+    file = new File(root+"/log.json"); 
     file.delete();
-        file = new File(root+root_key+"/pop_comm"); 
+    file = new File(root+"/pop_comm"); 
     file.delete();
-        file = new File(root+root_key+"/pop_lines"); 
+    file = new File(root+"/pop_lines"); 
     file.delete();
-    
+
     int count = 0;
     int top = 0;
     int all = 0;
 
     File[] files = new File(root+root_key).listFiles();
     for (File f : files) {
-     // if (f.getPath().contains("psi") || key != null) {
-        
-        InnerContext[] code;
-       // System.err.println(f.getPath());
-        if (data == null)
-          code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
-        else
-          code = data;
+      // if (f.getPath().contains("psi") || key != null) {
 
-        for (InnerContext c : code ) {
-            if (!c.elements.isEmpty() && !c.line_text.contains("import ")) {
-                String t = c.getLine(bad_types);
-              //  if (t.equals("catch remoteexception e"))
-                //    System.err.println(c.line_text);
+      InnerContext[] code;
+      // System.err.println(f.getPath());
+      if (data == null)
+        code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
+      else
+        code = data;
 
-                if (popular_lines.containsKey(t)) {
-                    popular_lines.put(t, popular_lines.get(t)+1);
-                }
-                else
-                    popular_lines.put(t, 1);
-                for (ElementInfo e : c.elements ) {
-                    if (popular_commands.containsKey(e.text))
-                        popular_commands.put(e.text, popular_commands.get(e.text)+1);
-                    else
-                        popular_commands.put(e.text, 1);
-                }
-            }
-    	}
-        
-        for (int line = code.length-1; line >= 0; line --) {
-        	if (key == null && line == code.length-1 || /*TRIN*/key != null  && code[line].line_text.contains(key) ) {
-        		Vector[] snip = Parser.getSnippet(line, code, commands, f.getPath(), line, key, good_types, bad_types);
-        		if (snip.length > 0)
-        			res.add(snip);
-        	}
+      if (direction == DESC)
+        ArrayUtils.reverse(code);
+      for (InnerContext c : code ) {
+        if (!c.elements.isEmpty() && c.line_text.toLowerCase().contains("intent")) {
+          //  if (t.equals("catch remoteexception e"))
+//          System.err.println(c.line_text);
+          popular.add(c);
         }
-//      }
+      }
+      for (int line = code.length-1; line >= 0; line --) {
+        if ((key == null && line == code.length-1) || (/*TRIN*/key != null  && code[line].line_text.contains(key)) ) {
+          Vector[] snip = Parser.getSnippet(line, code, commands, f.getPath(), key, good_types, bad_types, limit);
+          if (snip.length > 0)
+            res.add(snip);
+        }
+      }
+
+      //      }
     }
-            int counter = 0;
-            for (Integer c : popular_lines.values() ) {
-                counter ++;
-                if (c > 1)
-                    count += 1;
-                if (counter < 50)
-                    top += c;
-                all += c;
-            }
-    
-    Utils.writeFile1(sortByValue(popular_commands).toString(), root+root_key+"/pop_comm", false);
-    Utils.writeFile1(sortByValue(popular_lines).toString(), root+root_key+"/pop_lines", false);
+    int counter = 0;
+    for (Entry<PopularItem, Integer> c : popular.items.entrySet()) {
+      counter ++;
+      if (c.getValue() > 1)
+        count += 1;
+      if (counter < 50)
+        top += c.getValue();
+      all += c.getValue();
+    }
+
+    Utils.writeFile1(sortByValue(popular.commands).toString(), root+"/pop_comm", false);
+    Utils.writeFile1(sortByValue(popular.items).toString(), root+"/pop_lines", false);
     //Files.write(root+root_key+"/pop_lines", sortByValue(popular_lines).toString(), Charset.forName("UTF-8"));
     System.err.println(top+" * "+count+" * "+all);
-    System.exit(1);
     hot_ecnoding = hotEncode(commands);
 
     ArrayList<Vector> output = new ArrayList<>();
@@ -343,30 +283,37 @@ public class Generator  {
         output.add(v);
       }
     }
-        
-//    System.err.println(output+" ^ "+hot_ecnoding);
-//    System.exit(1);
+
+    //    System.err.println(output+" ^ "+hot_ecnoding);
+    //    System.exit(1);
     //Utils.saveJsonFile(vectors, output);
-	return output;
+    return output;
   }
-  
-  private static <K, V> Map<K, V> sortByValue(Map<K, V> map) {
-	    List<Entry<K, V>> list = new LinkedList<>(map.entrySet());
-	    Collections.sort(list, new Comparator<Object>() {
-	        @SuppressWarnings("unchecked")
-	        public int compare(Object o1, Object o2) {
-	            return ((Comparable<V>) ((Map.Entry<K, V>) (o2)).getValue()).compareTo(((Map.Entry<K, V>) (o1)).getValue());
-	        }
-	    });
 
-	    Map<K, V> result = new LinkedHashMap<>();
-	    for (Iterator<Entry<K, V>> it = list.iterator(); it.hasNext();) {
-	        Map.Entry<K, V> entry = (Map.Entry<K, V>) it.next();
-	        result.put(entry.getKey(), entry.getValue());
-	    }
+//  public static Comparator<PopularItem> comparator_desc = new Comparator<PopularItem>() {
+//    public int compare(PopularItem o1, PopularItem o2) {
+//      int c = o2.count.compareTo(o1.count);
+//      return c;
+//    }
+//  };
 
-	    return result;
-	}
+  private static <K, V> HashMap<K, V> sortByValue(Map<K, V> map) {
+    List<Entry<K, V>> list = new LinkedList<>(map.entrySet());
+    Collections.sort(list, new Comparator<Object>() {
+      @SuppressWarnings("unchecked")
+      public int compare(Object o1, Object o2) {
+        return ((Comparable<V>) ((Map.Entry<K, V>) (o2)).getValue()).compareTo(((Map.Entry<K, V>) (o1)).getValue());
+      }
+    });
+
+    HashMap<K, V> result = new LinkedHashMap<>();
+    for (Iterator<Entry<K, V>> it = list.iterator(); it.hasNext();) {
+      Map.Entry<K, V> entry = (Map.Entry<K, V>) it.next();
+      result.put(entry.getKey(), entry.getValue());
+    }
+
+    return result;
+  }
 
   private static HashMap<String, Double> hotEncode(HashSet<String> commands) throws IOException {
     HashMap<String, Double> hot_ecnoding = new HashMap<>();
@@ -374,15 +321,127 @@ public class Generator  {
     Double count = 0.0;
     File f = new File("/root/ContextToCode/output/buffer/hots");
     if(f.exists() && !f.isDirectory()) { 
-        return new Gson().fromJson(new FileReader("/root/ContextToCode/output/buffer/hots"), HashMap.class);
+      return new Gson().fromJson(new FileReader("/root/ContextToCode/output/buffer/hots"), HashMap.class);
     }
     else {
-        for (String comm : commands) {
-          hot_ecnoding.put(comm, count);
-          count++;
-        }
-        Utils.saveJsonFile("/root/ContextToCode/output/buffer/hots", hot_ecnoding);
-        return hot_ecnoding;
+      for (String comm : commands) {
+        hot_ecnoding.put(comm, count);
+        count++;
+      }
+      Utils.saveJsonFile("/root/ContextToCode/output/buffer/hots", hot_ecnoding);
+      return hot_ecnoding;
     }
+  }
+
+  public void snippetize() throws JsonSyntaxException, IOException {
+    int summ = 0;
+
+    try {
+      ArrayList<Vector> vs = loadCodeSearch(null, DESC, 3);
+      
+      HashMap<Integer, HashMap<String, Integer>> pre_snippet = new HashMap<>();
+      HashMap<Integer, HashMap<String, Integer>> snippet = new HashMap<>();
+
+      
+//      HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
+      for (Vector v : vs) {
+
+        if (!pre_snippet.containsKey(v.getLevel())) {
+          HashMap<String, Integer> temp = new HashMap<String, Integer>();
+          pre_snippet.put(v.getLevel(), temp);
+        }
+        
+        if (!pre_snippet.get(v.getLevel()).containsKey(v.getOrign()))
+          pre_snippet.get(v.getLevel()).put(v.getOrign(), 0);
+        
+        pre_snippet.get(v.getLevel()).put(v.getOrign(), pre_snippet.get(v.getLevel()).get(v.getOrign()) + 1);
+        if (v.getLevel() == 0)
+          summ+=1;
+
+//        if (!sequences.containsKey(v.parent_id)) {
+//          ArrayList<Vector> tmp = new ArrayList<>();
+//          sequences.put(v.parent_id, tmp);
+//        }
+//
+//        for (Integer n : v.vector)
+//          if (n > max)
+//            max = n;
+//
+//        sequences.get(v.parent_id).add(v);
+      }
+      
+      for (Entry<Integer, HashMap<String, Integer>> ps : pre_snippet.entrySet()) {
+        HashMap<String, Integer> s = new HashMap<>();
+        
+        for (Entry<String, Integer> p : ps.getValue().entrySet()) 
+          if (p.getValue() > 5)
+            s.put(p.getKey(), p.getValue());
+
+        snippet.put(ps.getKey(), sortByValue(s));
+      }
+      
+      Utils.writeFile1(new Gson().toJson(snippet), root+"/pre_snippet", false);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } 
+    System.err.println(summ);
+    System.exit(1);
+  }
+}
+
+
+class PopularCounter {
+  public HashMap<PopularItem, Integer> items = new HashMap<>();
+  public HashMap<PopularItem, Integer> commands = new HashMap<>();
+  public ArrayList<String> bad_types;
+
+  public PopularCounter(ArrayList<String> bad_types_) {
+    bad_types = bad_types_;
+  }
+
+  public void add(InnerContext c) {
+    PopularItem t1 = new PopularItem(c, bad_types);
+    if (items.containsKey(t1)) 
+      items.put(t1, items.get(t1)+1);
+    else
+      items.put(t1, 1);
+
+    for (ElementInfo e : c.elements ) {
+      PopularItem t2 = new PopularItem(e.text);
+      if (commands.containsKey(t2))
+        commands.put(t2, commands.get(t2)+1);
+      else
+        commands.put(t2, 1);
+    }
+  }
+}
+
+class PopularItem {
+  private String raw;
+  private String actual;
+
+  public PopularItem(InnerContext t, ArrayList<String> bad_types) {
+    raw = t.line_text;
+    actual = t.getLine(bad_types);
+  }
+
+  public PopularItem(String text) {
+    raw = text;
+    actual = text;
+  }
+
+  public int hashCode () {
+    return actual.hashCode();
+  }
+  
+  public String toString() {
+    return "actual: '"+actual+"', raw: '"+raw+"'";
+  }
+
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (!(obj instanceof PopularItem))
+      return false;
+    return this.actual.equals(((PopularItem) obj).actual);
   }
 }

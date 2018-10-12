@@ -58,7 +58,7 @@ def evaluate_addition():
         f = open('log/numbers.txt', 'r+')
         f.truncate()
 
-        for x in range(2, 40):
+        for x in range(51, 63):
             res = ""
             # try:
             repl(sess, npi, data, x, predict)
@@ -150,8 +150,8 @@ def repl(session, npi, data, pos, predict):
                     else:
                         predict["ncw"] += 1;
 
-                #print ('%s y= Prog_id: %s, Terminate: %s' % (count, prog_id, np.argmax(t)))
-                #print ('%s y` = Prog_id: %s, Terminate: %s' % (count, prog_out, terminate_out))
+                print ('%s y= Prog_id: %s' % (count, prog_id))
+                print ('%s y` = Prog_id: %s, Info: %s' % (count, prog_out, y[j]["addinfo"]))
 
                 count += 1
 
