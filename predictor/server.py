@@ -6,7 +6,7 @@ from tasks.eval import repl
 from model.npi import NPI
 from tasks.generate_data import transform
 from tasks.env.addition import AdditionCore
-from tasks.env.config import CONFIG, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH, TEST_CHUNK_PATH
+from tasks.env.config import CONFIG, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH_STABLE, TEST_CHUNK_PATH
 from tasks.env.config import get_env
 import numpy as np
 import pickle
@@ -25,7 +25,7 @@ class test:
 
         # Restore from Checkpoint
       saver = tf.train.Saver()
-      saver.restore(sess, CKPT_PATH)
+      saver.restore(sess, CKPT_PATH_STABLE)
 
       self.sess1 = sess
         # Run REPL

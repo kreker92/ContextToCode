@@ -2,6 +2,8 @@ package tmt.dsl.data;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,6 +26,8 @@ import java.nio.file.Files;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import tmt.dsl.DSL;
+import tmt.dsl.Template;
 import tmt.dsl.executor.info.Step;
 import tmt.dsl.formats.context.ContextDSL;
 import tmt.dsl.formats.context.Parser;
@@ -34,6 +38,7 @@ import tmt.dsl.snippetize.Snippetizer;
 import tmt.dsl.tensorflow.TF;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
 //if (args[0].equals("generate_redirects")) {
@@ -94,64 +99,68 @@ import com.google.gson.JsonSyntaxException;
 
 public class Generator  {
 
-  public static int limit;
+//  public static int limit = 15000;
 
-  public static String dsl_buffer;
-  public static Gson gson;
-  public static String key;
-  public static String description;
-
-  public static String root_key;
-  public static String root;
-  public static String vectors;
-  public static String model;
+  public static Gson gson = new Gson();
+  
+  public static String root = "../data/datasets/";
 
   public static ArrayList<String> good_types;
   public static ArrayList<String> bad_types;
   
   public static final int ASC = 1;
   public static final int DESC = 1;
+  
+  public Generator () throws JsonSyntaxException, JsonIOException, FileNotFoundException {
+	  good_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("../output/conf/good_types"), String[].class)) );
+	  bad_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("../output/conf/bad_types"), String[].class)) );
+  }
 
-  public static int setTrainAndTest(InnerContext[] data) throws Exception{
+  public static int setTrainAndTest(InnerContext[] data, ArrayList<Template> templates) throws Exception{
     int res = 0;
+    String filename = root+"context.json";
+    File f_ = new File(filename);
+    f_.createNewFile();
+    new FileOutputStream(f_, false);
 
     try {
-      long start1 = System.currentTimeMillis();
+        long start1 = System.currentTimeMillis();
 
-      int max = 0;
-      ArrayList<Vector> vs = loadCodeSearch(data, ASC, 3);
+        int max = 0;
 
-      ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
+        ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
+        for ( Template t : templates )
+        {
+        	HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
+        	//      BufferedReader br = new BufferedReader(new FileReader(vectors));
+        	//  for(String line; (line = br.readLine()) != null; ) {
+        	//    for (Vector v : new Gson().fromJson(line, Vector[].class)) {
 
-      HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
-      BufferedReader br = new BufferedReader(new FileReader(vectors));
-      //  for(String line; (line = br.readLine()) != null; ) {
-      //    for (Vector v : new Gson().fromJson(line, Vector[].class)) {
-      for (Vector v : vs) {
-        if (!sequences.containsKey(v.parent_id)) {
-          ArrayList<Vector> tmp = new ArrayList<>();
-          sequences.put(v.parent_id, tmp);
+        	for (Vector v : t.vs) {
+        		if (!sequences.containsKey(v.parent_id)) {
+        			ArrayList<Vector> tmp = new ArrayList<>();
+        			sequences.put(v.parent_id, tmp);
+        		}
+
+        		for (Integer n : v.vector)
+        			if (n > max)
+        				max = n;
+
+        		sequences.get(v.parent_id).add(v);
+        	}
+        	//  }
+        	ContextDSL cntx_dsl = null;
+        	//      br.close();
+
+        	for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
+        		cntx_dsl = new ContextDSL(s.getValue(), root, t.executor_comand);  
+        		cntx_dsl.execute();
+        		output.addAll(cntx_dsl.getData());
+        	}
         }
+        DSL.send(new Gson().toJson(output), "", filename);
 
-        for (Integer n : v.vector)
-          if (n > max)
-            max = n;
-
-        sequences.get(v.parent_id).add(v);
-      }
-      //  }
-      ContextDSL cntx_dsl = null;
-      br.close();
-
-      for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
-        cntx_dsl = new ContextDSL(s.getValue(), root+root_key);  
-        cntx_dsl.execute();
-        output.addAll(cntx_dsl.getData());
-      }
-
-      cntx_dsl.send(new Gson().toJson(output), "");
-
-      System.out.println("time: "+(System.currentTimeMillis() - start1)+" timestamp: "+new Timestamp(System.currentTimeMillis()));
+      System.err.println("max:"+max+"time: "+(System.currentTimeMillis() - start1)+" timestamp: "+new Timestamp(System.currentTimeMillis()));
       long start = System.currentTimeMillis();
 
       /*StringBuffer sb = new StringBuffer();
@@ -169,8 +178,7 @@ public class Generator  {
 
       String str = sb.toString();*/
 
-      res = Integer.parseInt(Utils.readUrl("http://78.46.103.68:8081/"));
-      System.out.println("max:"+res+" time:"+(System.currentTimeMillis() - start));
+//      res = Integer.parseInt(Utils.readUrl("http://78.46.103.68:8081/"));
     } catch (Exception e) {
       e.printStackTrace();
     } 
@@ -179,12 +187,13 @@ public class Generator  {
   }
 
   public int eval() throws Exception {
-    loadCodeSearch(null, ASC, 3);
+	  Template t = new Template();//(key_, description_, folder_, executor_comand_);
+    loadCodeSearch(null, ASC, 3, t);
 
     ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
 
     HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
-    BufferedReader br = new BufferedReader(new FileReader(vectors));
+    BufferedReader br = new BufferedReader(new FileReader(t.vectors));
     for(String line; (line = br.readLine()) != null; ) {
       for (Vector v : new Gson().fromJson(line, Vector[].class)) {
         if (!sequences.containsKey(v.parent_id)) {
@@ -199,7 +208,7 @@ public class Generator  {
     br.close();
 
     for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
-      cntx_dsl = new ContextDSL(s.getValue(), root+root_key);  
+      cntx_dsl = new ContextDSL(s.getValue(), root, t.executor_comand);  
       cntx_dsl.execute();
       output.addAll(cntx_dsl.getData());
     }
@@ -209,14 +218,14 @@ public class Generator  {
     return 0;
   }
 
-  public static ArrayList<Vector> loadCodeSearch(InnerContext[] data, int direction, int limit) throws JsonSyntaxException, IOException, InterruptedException {
+  public void loadCodeSearch(InnerContext[] data, int direction, int limit, Template t) throws JsonSyntaxException, IOException, InterruptedException {
     //      ArrayList<String> code = new ArrayList<String>(Arrays.asList(Utils.readFile("/root/toCode/output/cs/66533677").split("\n")));
     ArrayList<Vector[]> res = new ArrayList<>();
     HashSet<String> commands = new HashSet<>();
     HashMap<String, Double> hot_ecnoding = new HashMap<>();
     PopularCounter popular = new PopularCounter(bad_types);
 
-    System.err.println("!"+root+root_key);
+    System.err.println("!"+root+t.folder);
     File file = new File(root+"/context.json"); 
     file.delete();
     file = new File(root+"/log.json"); 
@@ -230,16 +239,13 @@ public class Generator  {
     int top = 0;
     int all = 0;
 
-    File[] files = new File(root+root_key).listFiles();
+    if (data == null) {
+    File[] files = new File(root+t.folder).listFiles();
     for (File f : files) {
       // if (f.getPath().contains("psi") || key != null) {
-
-      InnerContext[] code;
-      // System.err.println(f.getPath());
-      if (data == null)
-        code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
-      else
-        code = data;
+//      System.err.println(f.getPath());
+      
+      InnerContext[] code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
 
       if (direction == DESC)
         ArrayUtils.reverse(code);
@@ -250,15 +256,12 @@ public class Generator  {
           popular.add(c);
         }
       }
-      for (int line = code.length-1; line >= 0; line --) {
-        if ((key == null && line == code.length-1) || (/*TRIN*/key != null  && code[line].line_text.contains(key)) ) {
-          Vector[] snip = Parser.getSnippet(line, code, commands, f.getPath(), key, good_types, bad_types, limit);
-          if (snip.length > 0)
-            res.add(snip);
-        }
-      }
-
       //      }
+      iterateCode(code, t.key, f.getPath(), commands, res, limit);
+    }
+    } else {
+    	InnerContext[] code = data;
+        iterateCode(code, t.key, "", commands, res, limit);
     }
     int counter = 0;
     for (Entry<PopularItem, Integer> c : popular.items.entrySet()) {
@@ -274,20 +277,24 @@ public class Generator  {
     Utils.writeFile1(sortByValue(popular.items).toString(), root+"/pop_lines", false);
     //Files.write(root+root_key+"/pop_lines", sortByValue(popular_lines).toString(), Charset.forName("UTF-8"));
     System.err.println(top+" * "+count+" * "+all);
-    hot_ecnoding = hotEncode(commands);
+    hot_ecnoding = hotEncode(commands, root+"hots");
 
-    ArrayList<Vector> output = new ArrayList<>();
-    for (Vector[] c : res) {
+     for (Vector[] c : res) {
       for (Vector v : c) {
         v.vectorize(hot_ecnoding);
-        output.add(v);
+        t.vs.add(v);
       }
     }
-
-    //    System.err.println(output+" ^ "+hot_ecnoding);
-    //    System.exit(1);
-    //Utils.saveJsonFile(vectors, output);
-    return output;
+  }
+  
+  public void iterateCode(InnerContext[] code, String key, String path, HashSet<String> commands, ArrayList<Vector[]> res, int limit) {
+	  for (int line = code.length-1; line >= 0; line --) {
+		  if ((key == null && line == code.length-1) || (/*TRIN*/key != null  && code[line].line_text.contains(key)) ) {
+			  Vector[] snip = Parser.getSnippet(line, code, commands, path, key, good_types, bad_types, limit);
+			  if (snip.length > 0)
+				  res.add(snip);
+		  }
+	  }
   }
 
 //  public static Comparator<PopularItem> comparator_desc = new Comparator<PopularItem>() {
@@ -315,29 +322,30 @@ public class Generator  {
     return result;
   }
 
-  private static HashMap<String, Double> hotEncode(HashSet<String> commands) throws IOException {
+  private static HashMap<String, Double> hotEncode(HashSet<String> commands, String hots) throws IOException {
     HashMap<String, Double> hot_ecnoding = new HashMap<>();
 
     Double count = 0.0;
-    File f = new File("/root/ContextToCode/output/buffer/hots");
+    File f = new File(hots);
     if(f.exists() && !f.isDirectory()) { 
-      return new Gson().fromJson(new FileReader("/root/ContextToCode/output/buffer/hots"), HashMap.class);
+      hot_ecnoding = new Gson().fromJson(new FileReader(hots), HashMap.class);
+      count = hot_ecnoding.values().size()*1.0;
     }
-    else {
-      for (String comm : commands) {
+    for (String comm : commands) {
+      if (!hot_ecnoding.containsKey(comm)) {
         hot_ecnoding.put(comm, count);
         count++;
       }
-      Utils.saveJsonFile("/root/ContextToCode/output/buffer/hots", hot_ecnoding);
-      return hot_ecnoding;
     }
+    Utils.saveJsonFile(hots, hot_ecnoding);
+    return hot_ecnoding;
   }
 
   public void snippetize() throws JsonSyntaxException, IOException {
     int summ = 0;
 
     try {
-      ArrayList<Vector> vs = loadCodeSearch(null, DESC, 3);
+      ArrayList<Vector> vs = new ArrayList<>();//loadCodeSearch(null, DESC, 3, null);
       
       HashMap<Integer, HashMap<String, Integer>> pre_snippet = new HashMap<>();
       HashMap<Integer, HashMap<String, Integer>> snippet = new HashMap<>();

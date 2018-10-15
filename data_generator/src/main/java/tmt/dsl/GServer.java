@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 
 import tmt.dsl.data.Generator;
 import tmt.dsl.data.Utils;
+import tmt.dsl.formats.context.Vector;
 import tmt.dsl.formats.context.in.InnerContext;
 
 public class GServer {
@@ -39,62 +40,43 @@ public class GServer {
     PrintStream fileStream = new PrintStream(
         new FileOutputStream("../log/log.txt", true)); 
     System.setOut(fileStream);
-
-    g.limit = 15000;
-    g.dsl_buffer = "/root/data/dsl_buffer/";
-    g.gson  = new Gson();
-    g.good_types = new ArrayList( Arrays.asList( g.gson.fromJson(new FileReader("/root/ContextToCode/output/conf/good_types"), String[].class)) );
-    g.bad_types = new ArrayList( Arrays.asList( g.gson.fromJson(new FileReader("/root/ContextToCode/output/conf/bad_types"), String[].class)) );
-
+    
+    ArrayList<Template> templates = getTemplates();
 
     if (swtch == LEARN) {
-      g.key = "intent.getAction()";
-      g.description = "Retrieve the general action to be performed, such as ACTION_VIEW.";
-
-      g.root = "/root/ContextToCode/data/datasets/android/";
-      g.root_key = "ast/";
-      g.vectors = "/root/ContextToCode/output/funcs/vectors";
-
-      
-      g.snippetize(); 
-      g.setTrainAndTest(null);
+    	for (Template template : templates) 
+    		g.loadCodeSearch(null, g.ASC, 3, template);
+    	
+    	g.setTrainAndTest(null, templates);
     }
     else if (swtch == EVAL) {
-      g.root_key = "cs/parsed";
-      g.root = "/root/ContextToCode/output/";
-
-      g.key = null;
-      g.model = "";
-
       res = g.eval();
     }
     else if (swtch == PATTERN) {
-      g.key = "intent.getAction()";
-      g.description = "Retrieve the general action to be performed, such as ACTION_VIEW.";
-
-      g.root = "/root/ContextToCode/data/datasets/android/";
-      g.root_key = "ast/";
-      g.vectors = "/root/ContextToCode/output/funcs/vectors";
-
-      g.loadCodeSearch(null, g.ASC, 5);
+    	for (Template template : templates) 
+    		g.loadCodeSearch(null, g.ASC, 5, template);
     }
     else if (swtch == INFERENCE) {
-      //      g.root_key = "/"+new Timestamp(System.currentTimeMillis())+"/";
-      g.root_key = "/test/";
-      g.root = "/root/ContextToCode/output/buffer";
-      g.vectors = g.root+g.root_key+"/vectors";
-
-      g.key = null;
-      g.model = "";
-
       InnerContext[] code = null;
       if (data != null) {
         code = new Gson().fromJson(data, InnerContext[].class);
       }
 
-      res = g.setTrainAndTest(code);
+      res = g.setTrainAndTest(code, null);
     }
 
     return res;
+  }
+
+  private static ArrayList<Template> getTemplates() {
+	  ArrayList<Template> res = new ArrayList<>();
+//      g.key = "intent.getAction()";
+//      g.description = "Retrieve the general action to be performed, such as ACTION_VIEW.";
+//
+//      g.root = "/root/ContextToCode/data/datasets/android/";
+//      g.root_key = "ast/";
+	  res.add(new Template("intent.getAction()", "Retrieve the general action to be performed, such as ACTION_VIEW.", "android/ast/", "9"));
+	  res.add(new Template("DriverManager.getConnection", "Open DB connection", "database/ast/parsed/", "8"));
+	  return res;
   }
 }

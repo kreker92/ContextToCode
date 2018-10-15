@@ -3,6 +3,7 @@ package tmt.dsl.formats.context;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import tmt.dsl.Template;
 import tmt.dsl.formats.context.in.InnerContext;
 
 public class Parser {

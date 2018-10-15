@@ -35,21 +35,15 @@ public class DSL {
   public Executor exec;
   public ArrayList<ExecData> data;
   protected ArrayList<HashMap<Integer, Step>> out = new ArrayList<HashMap<Integer, Step>>();
-  protected String filename;
   protected String log;
 
-  public DSL (String filename_, String root) {
+  public DSL (String root) {
     exec = new Executor();
     data = new ArrayList<ExecData>();
 
-    filename = root+"/"+filename_+".json";
-    log = root+"/log.json";		
+    log = root+"log.json";		
 
     try {
-      File f_ = new File(filename);
-      f_.createNewFile();
-      new FileOutputStream(f_, false);
-      
       File l_ = new File(log);
       l_.createNewFile();
       new FileOutputStream(l_, false);
@@ -75,11 +69,11 @@ public class DSL {
     }
   }
 
-  public void send(String mess, String label) {
+  public static void send(String mess, String label, String filename_) {
     try {
       ArrayList<String> tmp = new ArrayList<String>();
       tmp.add(mess);
-      Utils.writeFile(tmp, filename, true);
+      Utils.writeFile(tmp, filename_, true);
     }
     catch (Exception e) {
       e.printStackTrace();

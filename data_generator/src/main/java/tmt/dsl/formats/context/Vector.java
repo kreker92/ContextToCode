@@ -47,10 +47,11 @@ public class Vector {
 //        System.err.println(s.node);
 //        System.exit(1);
 //      }
-     // if (goodTypes.contains(s.node) && !badTypes.contains(s.parent)) {
+      if (goodTypes.contains(s.node) && !badTypes.contains(s.parent)) {
         strings.add(s.text.trim());
-        commands.add(s.node+" * "+s.parent+" * "+s.text.trim());
-     // }
+//        commands.add(s.node+" * "+s.parent+" * "+s.text.trim());
+        commands.add(s.text.trim());
+      }
     }
     row = i;
     level = level_;
