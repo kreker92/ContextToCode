@@ -22,10 +22,10 @@ public class Element {
   private String type;
   private boolean visible = true;
   
-  public Element(String k, Object v, String t, boolean vis_) {
+  public Element(String k, Object v, String t, boolean vis_, String type_) {
     key = k;
     value = v;
-    type = "";
+    type = type_;
     visible = vis_;
   }
   

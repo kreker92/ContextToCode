@@ -109,7 +109,7 @@ public class Generator  {
   public static ArrayList<String> bad_types;
   
   public static final int ASC = 1;
-  public static final int DESC = 1;
+  public static final int DESC = 2;
   
   public Generator () throws JsonSyntaxException, JsonIOException, FileNotFoundException {
 	  good_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("../output/conf/good_types"), String[].class)) );
@@ -188,7 +188,7 @@ public class Generator  {
 
   public int eval() throws Exception {
 	  Template t = new Template();//(key_, description_, folder_, executor_comand_);
-    loadCodeSearch(null, ASC, 3, t);
+    loadCodeSearch(null, ASC, 3, t, null);
 
     ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
 
@@ -218,7 +218,7 @@ public class Generator  {
     return 0;
   }
 
-  public void loadCodeSearch(InnerContext[] data, int direction, int limit, Template t) throws JsonSyntaxException, IOException, InterruptedException {
+  public void loadCodeSearch(InnerContext[] data, int direction, int limit, Template t, Integer sample_size) throws JsonSyntaxException, IOException, InterruptedException {
     //      ArrayList<String> code = new ArrayList<String>(Arrays.asList(Utils.readFile("/root/toCode/output/cs/66533677").split("\n")));
     ArrayList<Vector[]> res = new ArrayList<>();
     HashSet<String> commands = new HashSet<>();
@@ -234,34 +234,38 @@ public class Generator  {
     file.delete();
     file = new File(root+"/pop_lines"); 
     file.delete();
+    int file_num = 0;
 
     int count = 0;
     int top = 0;
     int all = 0;
 
     if (data == null) {
-    File[] files = new File(root+t.folder).listFiles();
-    for (File f : files) {
-      // if (f.getPath().contains("psi") || key != null) {
-//      System.err.println(f.getPath());
-      
-      InnerContext[] code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
+      File[] files = new File(root+t.folder).listFiles();
+      for (File f : files) {
+        if (sample_size != null && file_num > sample_size)
+          break;
+        // if (f.getPath().contains("psi") || key != null) {
+        //      System.err.println(f.getPath());
 
-      if (direction == DESC)
-        ArrayUtils.reverse(code);
-      for (InnerContext c : code ) {
-        if (!c.elements.isEmpty() && c.line_text.toLowerCase().contains("intent")) {
-          //  if (t.equals("catch remoteexception e"))
-//          System.err.println(c.line_text);
-          popular.add(c);
+        InnerContext[] code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
+
+        if (direction == DESC)
+          ArrayUtils.reverse(code);
+        for (InnerContext c : code ) {
+          if (!c.elements.isEmpty() && c.line_text.toLowerCase().contains("import")) {
+            //  if (t.equals("catch remoteexception e"))
+            //          System.err.println(c.line_text);
+            popular.add(c);
+          }
         }
+        //      }
+        iterateCode(code, t.key, f.getPath(), commands, res, limit);
+        file_num += 1;
       }
-      //      }
-      iterateCode(code, t.key, f.getPath(), commands, res, limit);
-    }
     } else {
-    	InnerContext[] code = data;
-        iterateCode(code, t.key, "", commands, res, limit);
+      InnerContext[] code = data;
+      iterateCode(code, t.key, "", commands, res, limit);
     }
     int counter = 0;
     for (Entry<PopularItem, Integer> c : popular.items.entrySet()) {

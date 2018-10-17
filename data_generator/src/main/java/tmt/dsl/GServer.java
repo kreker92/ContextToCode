@@ -45,7 +45,7 @@ public class GServer {
 
     if (swtch == LEARN) {
     	for (Template template : templates) 
-    		g.loadCodeSearch(null, g.ASC, 3, template);
+    		g.loadCodeSearch(null, g.ASC, 5, template, null);
     	
     	g.setTrainAndTest(null, templates);
     }
@@ -53,8 +53,8 @@ public class GServer {
       res = g.eval();
     }
     else if (swtch == PATTERN) {
-    	for (Template template : templates) 
-    		g.loadCodeSearch(null, g.ASC, 5, template);
+    	Template t = new Template("intent.getAction()", "Retrieve the general action to be performed, such as ACTION_VIEW.", "android.content.intent/ast/", "9"); 
+    	g.loadCodeSearch(null, g.ASC, 5, t, null);
     }
     else if (swtch == INFERENCE) {
       InnerContext[] code = null;
@@ -75,8 +75,13 @@ public class GServer {
 //
 //      g.root = "/root/ContextToCode/data/datasets/android/";
 //      g.root_key = "ast/";
-	  res.add(new Template("intent.getAction()", "Retrieve the general action to be performed, such as ACTION_VIEW.", "android/ast/", "9"));
-	  res.add(new Template("DriverManager.getConnection", "Open DB connection", "database/ast/parsed/", "8"));
+//	   res.add(new Template("DriverManager.getConnection", "Open DB connection", "database/ast/parsed/", "8"));
+
+	  res.add(new Template(".getAction()", "Retrieve the general action to be performed, such as ACTION_VIEW", "android.content.intent/ast/", "8"));
+	  res.add(new Template(".startActivity(", "Launch a new activity", "android.app.activity/ast/", "9"));
+	  res.add(new Template(".putExtra(", "Launch a new activity", "android.content.intent/ast/", "10"));
+      res.add(new Template("activity.finish()", "Launch a new activity", "android.app.activity/ast/", "11"));
+      res.add(new Template("new Intent()", "Launch a new activity", "android.content.intent/ast/", "12")); 
 	  return res;
   }
 }

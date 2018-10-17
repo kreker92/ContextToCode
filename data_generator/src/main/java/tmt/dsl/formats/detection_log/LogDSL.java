@@ -24,18 +24,18 @@ import tmt.dsl.executor.info.ExecData;
 
 public class LogDSL extends DSL {
 
-  HashMap<Integer, String> qoh = new HashMap<Integer, String>();
+  /*HashMap<Integer, String> qoh = new HashMap<Integer, String>();
   ArrayList<ExecData> data = new ArrayList<ExecData>();
   Executor exec = new Executor();
   
   private static final String QUERY  = "1";
   private static final String SLA    = "1";
-  private static final String STATUS = "1";
+  private static final String STATUS = "1";*/
 
 
   public LogDSL(ArrayList<EventAtMinute> inputs, ArrayList<Integer> outputs, String client, String command, int client_id) {
     super("");
-    for (EventAtMinute e : inputs) {
+    /*for (EventAtMinute e : inputs) {
       ExecData d = new ExecData();
 
       d.toEnvironment("answer", "2", true);
@@ -63,10 +63,10 @@ public class LogDSL extends DSL {
         d.toEnvironment("anomaly_type", SLA, false);
       
       data.add(d); 
-    }
+    }*/
   }
 
-  public void execute(String command)throws Exception {
+  /*public void execute(String command)throws Exception {
     for (ExecData d : data) {
       
       if (command.equals("query")) {
@@ -86,6 +86,6 @@ public class LogDSL extends DSL {
       d.clear();
     }
 //    send(null);
-  }
+  }*/
 }
 

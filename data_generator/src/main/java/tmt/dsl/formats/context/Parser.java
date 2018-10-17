@@ -32,6 +32,7 @@ public class Parser {
   
   public static Vector[] getSnippet(int line_num, InnerContext[] code, HashSet<String> commands, String path, String key, ArrayList<String> goodTypes, ArrayList<String> badTypes, int  limit) {
     ArrayList<Vector> res = new ArrayList<Vector>();
+    HashSet<String> commands_local = new HashSet<>();
 
     int count = 0;
     for (int i = line_num; i >= 0; i --) {
@@ -39,16 +40,21 @@ public class Parser {
       if (i != line_num && (isStart(line, key) || count > limit))
         break;
       String line_clean = clean(line);
+//      System.err.println(i+"!"+path);
       if (hasSense(line_clean)) {
-        Vector v = new Vector(code[i], commands, i, line, i == line_num, count, path, line_num, goodTypes, badTypes);
+        Vector v = new Vector(code[i], commands_local, i, line, i == line_num, count, path, line_num, goodTypes, badTypes);
         if (!v.isEmpty()) {
           res.add(0, v);
           count ++;
         }
       }
     }
-
-    return res.toArray(new Vector[res.size()]);
+    if (res.size() > 1) {
+      commands.addAll(commands_local);
+      return res.toArray(new Vector[res.size()]);
+    }
+    else
+      return new Vector[0];
   }
   
   private static String clean(String line_raw) {

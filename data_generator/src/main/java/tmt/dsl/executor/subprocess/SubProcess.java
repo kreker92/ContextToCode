@@ -20,7 +20,7 @@ import tmt.dsl.executor.info.ExecData;
 
 public class SubProcess {
   public static void inner_check(boolean condition, ExecData d) {
-    if (((Integer)d.fromEnvironment("output").getValue()) == 0) {
+   /* if (((Integer)d.fromEnvironment("output").getValue()) == 0) {
       if (condition)
         d.toEnvironment("output", "2", true);
       else
@@ -28,6 +28,6 @@ public class SubProcess {
     }
     
     d.toProgram("id", Executor.CHECK);
-    d.toProgram("program", "check");
+    d.toProgram("program", "check");*/
   }
 }

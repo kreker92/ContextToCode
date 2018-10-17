@@ -13,6 +13,8 @@ public class Vector {
   private Integer row = null;
   private Integer level = null;
   private String origin;
+  private String node;
+  private String parent;
   private int label = 0;
   public int parent_id;
   public String path;
@@ -49,6 +51,8 @@ public class Vector {
 //      }
       if (goodTypes.contains(s.node) && !badTypes.contains(s.parent)) {
         strings.add(s.text.trim());
+        parent = s.parent;
+        node = s.node;
 //        commands.add(s.node+" * "+s.parent+" * "+s.text.trim());
         commands.add(s.text.trim());
       }
@@ -56,6 +60,14 @@ public class Vector {
     row = i;
     level = level_;
     parent_id = (path+line_num_).hashCode();
+  }
+  
+  public String getNode() {
+    return node;
+  }
+  
+  public String getParent() {
+    return parent;
   }
 
   public boolean isEmpty() {

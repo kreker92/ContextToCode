@@ -45,14 +45,14 @@ public class Executor {
   public static final String PROGRAM      = "2";
   public static final String ARGUMENT     = "3";
   
-  private SubProcess sub = new SubProcess();
+  //private SubProcess sub = new SubProcess();
   
   Gson gson = new Gson();
   
   int alarms = 0;
   int no_alarms = 0;
   
-  public void query_api(ExecData d) throws Exception {
+  /*public void query_api(ExecData d) throws Exception {
     d.next_step();
     String url = (String)d.fromEnvironment("url_api").getValue()+URLEncoder.encode((String)d.fromArgument("query").getValue(), "UTF-8");
     String json = Utils.readUrl(url);
@@ -158,5 +158,5 @@ public class Executor {
   public void check_time(ExecData d) {
     // TODO Auto-generated method stub
     
-  }
+  }*/
 }
