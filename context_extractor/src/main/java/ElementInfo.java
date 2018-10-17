@@ -1,11 +1,15 @@
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
+import com.intellij.psi.PsiJavaCodeReferenceCodeFragment;
+import com.intellij.psi.PsiReferenceExpression;
+import com.intellij.psi.impl.source.PsiTypeElementImpl;
+import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
 
 public class ElementInfo {
   public String node;
   public String type;
   public String text;
   public String parent;
+  public String ast_type;
   //public PsiReference  ref;
   //public PsiReference[]  refs;
   public String original;
@@ -21,13 +25,35 @@ public class ElementInfo {
           parent = psiElement.getParent().toString().split(":")[0];
           child = psiElement.getChildren().toString();
           original = psiElement.getOriginalElement().getText();
-//          if (parent.equals("PsiJavaCodeReferenceElement") && !psiElement.getNode().getTreeParent().getText().contains(".")) {
-//              System.err.println(psiElement.getNode().getTreeParent().getText() + " * " + psiElement.getOriginalElement().getText() + " * " + psiElement.getContext() + " * " + psiElement.getResolveScope() + "*" + psiElement.getTextOffset());
-//              System.err.println(psiElement.getReference()+ "*" + psiElement.getOriginalElement() + "*" + psiElement.getContext() + "*" + psiElement.getResolveScope() + "*" + psiElement.getTextOffset());
-//              System.exit(1);
-//          }
+      }
+      if (psiElement instanceof PsiReferenceExpression) {
+          if(((PsiReferenceExpression) psiElement).getType() != null)
+              ast_type = ((PsiReferenceExpression) psiElement).getType().toString();
+          else if (!psiElement.getParent().toString().contains("PsiMethodCallExpression"))
+              ast_type = psiElement.getReference().toString();
+      } else if (psiElement instanceof PsiTypeElementImpl) {
+          ast_type = ((PsiTypeElementImpl) psiElement).getType().toString();
+      } else if (node.equals("PsiIdentifier") && psiElement.getContext().getParent().getOriginalElement().toString().contains("PsiMethodCallExpression")) {
+          ast_type = psiElement.toString();
+      } else if (psiElement instanceof PsiLiteralExpressionImpl) {
+          ast_type = ((PsiLiteralExpressionImpl) psiElement).getType().toString();
       }
     //  ref = psiElement.getReference();
     //  refs = psiElement.getReferences();
+  }
+
+  public void print (PsiElement psiElement, String text_) {
+//          System.err.println(text_+" ____________ "+psiElement.getParent() + " ----- " + this.text
+//                  + " * "
+//                  + this.node+" * "
+//                  + this.line);
+//          System.err.println(psiElement.getReference()+ "*" + psiElement.getClass() + "*" + psiElement.getContext());
+      String type = null;
+      if (type != null)
+        System.err.println(text_+" * "+this.text + " * "+type);
+  }
+
+  public String toString() {
+      return ast_type;
   }
 }

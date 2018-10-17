@@ -119,7 +119,7 @@ public class HelloAction extends AnAction {
 
         File[] myFiles = myTargetDir.listFiles();
         for (File file : myFiles) {
-            if (!checkFiles.contains(file.getName()+".json")) {
+            if (checkFiles.contains(file.getName()+".json") && file.getName().equals("116009042")) {
                 String text_ = "";
                 try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                     String line;
@@ -298,7 +298,6 @@ public class HelloAction extends AnAction {
             bad_types.add("PsiJavaToken");
             bad_types.add("PsiDocToken");
             bad_types.add("PsiElement(BAD_CHARACTER)");
-            bad_types.add("PsiLiteralExpression");
             bad_types.add("PsiModifierList");
             bad_types.add("PsiField");
             bad_types.add("PsiTypeElement");
@@ -311,7 +310,7 @@ public class HelloAction extends AnAction {
                 if (meaninglessForContextTokenTypes.contains(psiElement.getNode().getElementType())) {
                     continue;
                 }
-                if (psiElement.getChildren().length > 0) {
+/*                if (psiElement.getChildren().length > 0) {
                     // This is an abstract node, while for bag-of-words model we are only concerned with
                     // concrete nodes.
                     continue;
@@ -320,12 +319,14 @@ public class HelloAction extends AnAction {
                     // The node's text representation is empty: won't help us with forming the query. E.g.
                     // REFERENCE_PARAMETER_LIST is present in PSI trie but its text may be empty.
                     continue;
-                }
+                } */
 
                 context.ic.elements.add(el);
-                if (!bad_types.contains(el.parent))
-                    context.ic.clean_line_text += psiElement.getText().toLowerCase()+" ";
+                if (!bad_types.contains(el.parent)) {
+                    context.ic.clean_line_text += psiElement.getText().toLowerCase() + " ";
+                }
             }
+            
 //            List<WordInfo> words =
 //                    wordCountMap.entrySet()
 //                            .stream()
