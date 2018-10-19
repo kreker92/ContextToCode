@@ -19,4 +19,18 @@ public class InnerContext {
     
     return res.toLowerCase().replaceAll("[^a-z]", " ").replaceAll(" +", " ").trim();
   }
+
+
+  public boolean matches(ArrayList<String> keys) {
+    for (String key : keys) {
+      boolean found = false;
+      for (ElementInfo el : elements)
+        if (el.ast_type != null && el.ast_type.equals(key)) 
+          found = true;
+      
+      if (!found)
+        return false;
+    }
+    return true;
+  }
 }

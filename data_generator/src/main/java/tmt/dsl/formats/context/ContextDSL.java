@@ -39,6 +39,7 @@ public class ContextDSL extends DSL {
 	  d.toAddInfo("label", inputs.hashCode()+"");
 	  d.toAddInfo("path", v.path);
 	  d.toAddInfo("line", v.line_num+"");
+	  d.toAddInfo("text", v.getOrign());
       
       if (v.getLevel()==0) {
         d.toProgram("id", executor_comand);

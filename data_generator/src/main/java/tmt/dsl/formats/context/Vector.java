@@ -37,7 +37,7 @@ public class Vector {
   }*/
   
   public Vector(InnerContext c, HashSet<String> commands, int i, String line, boolean b, int level_, String path_, int line_num_, ArrayList<String> goodTypes, ArrayList<String> badTypes) {
-    origin = line.toLowerCase().replaceAll("[^a-z]", " ").replaceAll(" +", " ").trim();;
+    origin = line;//.toLowerCase().replaceAll("[^a-z]", " ").replaceAll(" +", " ").trim();;
     line_num = line_num_;
     path = path_;
 
@@ -49,7 +49,13 @@ public class Vector {
 //        System.err.println(s.node);
 //        System.exit(1);
 //      }
-      if (goodTypes.contains(s.node) && !badTypes.contains(s.parent)) {
+      if (s.ast_type != null && !s.ast_type.equals("null")) {
+        strings.add(s.ast_type.trim());
+        parent = s.parent;
+        node = s.node;
+//        commands.add(s.node+" * "+s.parent+" * "+s.text.trim());
+        commands.add(s.ast_type.trim());
+      } else if (goodTypes.contains(s.node) && !badTypes.contains(s.parent)) {
         strings.add(s.text.trim());
         parent = s.parent;
         node = s.node;

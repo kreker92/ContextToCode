@@ -30,14 +30,14 @@ public class Parser {
     return res.toArray(new Vector[res.size()]);
   } */
   
-  public static Vector[] getSnippet(int line_num, InnerContext[] code, HashSet<String> commands, String path, String key, ArrayList<String> goodTypes, ArrayList<String> badTypes, int  limit) {
+  public static Vector[] getSnippet(int line_num, InnerContext[] code, HashSet<String> commands, String path, ArrayList<String> keys, ArrayList<String> goodTypes, ArrayList<String> badTypes, int  limit) {
     ArrayList<Vector> res = new ArrayList<Vector>();
     HashSet<String> commands_local = new HashSet<>();
 
     int count = 0;
     for (int i = line_num; i >= 0; i --) {
       String line = code[i].line_text;
-      if (i != line_num && (isStart(line, key) || count > limit))
+      if (i != line_num && (isStart(code[i], keys) || count > limit))
         break;
       String line_clean = clean(line);
 //      System.err.println(i+"!"+path);
@@ -73,8 +73,8 @@ public class Parser {
       return true;
   }
 
-  private static boolean isStart(String string, String key) {
-    if (string.contains("public ") || string.contains("private ") || string.contains("protected ") || key != null && string.contains(key))
+  private static boolean isStart(InnerContext code, ArrayList<String> keys) {
+    if (code.line_text.contains("public ") || code.line_text.contains("private ") || code.line_text.contains("protected ") || code.matches(keys))
       return true;
     else
       return false;

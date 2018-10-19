@@ -30,15 +30,15 @@ import tmt.dsl.formats.detection_log.LogUtils;
 public class Executor {
 
   //programs
-  public static final String BEGIN        = "0";
+ /* public static final String BEGIN        = "0";
   public static final String CALL_API     = "1";
   public static final String PARSE        = "2";
   public static final String DIFF         = "6";
   public static final String CHECK        = "3";
   public static final String ALARM        = "4";
   public static final String NO_ALARM     = "5";
-  public static final String CONNECT      = "6";
-  public static final String NOT_CONNECT  = "7";
+  public static final String CONNECT      = "6";*/
+  public static final String NOT_CONNECT  = "1";
   
   //traces
   public static final String ENVIRONMENT  = "1";

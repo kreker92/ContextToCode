@@ -7,6 +7,7 @@ public class ElementInfo {
   public String text;
   int line;
   public String type;
+  public String ast_type;
   public String parent;
   public String child;
 //

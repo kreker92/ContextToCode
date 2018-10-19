@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import tmt.dsl.formats.context.Vector;
 
 public class Template {
-	public String key;
+	public ArrayList<String> keys;
 	public String description;
 	public String snippet;
 
@@ -15,8 +15,8 @@ public class Template {
 	public ArrayList<Vector> vs = new ArrayList<>();
 	public String executor_comand;
 	
-	public Template(String key_, String description_, String folder_, String executor_comand_) {
-		key = key_;
+	public Template(ArrayList<String> keys_, String description_, String folder_, String executor_comand_) {
+		keys = keys_;
 		description = description_;
 		folder = folder_;
 		executor_comand = executor_comand_;

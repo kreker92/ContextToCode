@@ -160,10 +160,10 @@ public class Generator  {
         }
         DSL.send(new Gson().toJson(output), "", filename);
 
-      System.err.println("max:"+max+"time: "+(System.currentTimeMillis() - start1)+" timestamp: "+new Timestamp(System.currentTimeMillis()));
-      long start = System.currentTimeMillis();
+      System.err.println("max: "+max+" time: "+(System.currentTimeMillis() - start1)+" size: "+output.size());
+      /*long start = System.currentTimeMillis();
 
-      /*StringBuffer sb = new StringBuffer();
+      StringBuffer sb = new StringBuffer();
 
       Process p = Runtime.getRuntime().exec("python3 /root/ContextToCode/predictor/main.py --do_inference");
       p.waitFor();
@@ -260,12 +260,13 @@ public class Generator  {
           }
         }
         //      }
-        iterateCode(code, t.key, f.getPath(), commands, res, limit);
+        iterateCode(code, t.keys, f.getPath(), commands, res, limit);
+
         file_num += 1;
       }
     } else {
       InnerContext[] code = data;
-      iterateCode(code, t.key, "", commands, res, limit);
+      iterateCode(code, t.keys, "", commands, res, limit);
     }
     int counter = 0;
     for (Entry<PopularItem, Integer> c : popular.items.entrySet()) {
@@ -291,10 +292,10 @@ public class Generator  {
     }
   }
   
-  public void iterateCode(InnerContext[] code, String key, String path, HashSet<String> commands, ArrayList<Vector[]> res, int limit) {
+  public void iterateCode(InnerContext[] code, ArrayList<String> keys, String path, HashSet<String> commands, ArrayList<Vector[]> res, int limit) {
 	  for (int line = code.length-1; line >= 0; line --) {
-		  if ((key == null && line == code.length-1) || (/*TRIN*/key != null  && code[line].line_text.contains(key)) ) {
-			  Vector[] snip = Parser.getSnippet(line, code, commands, path, key, good_types, bad_types, limit);
+		  if ((keys == null && line == code.length-1) || (/*TRIN*/keys != null  && code[line].matches(keys)) ) {
+			  Vector[] snip = Parser.getSnippet(line, code, commands, path, keys, good_types, bad_types, limit);
 			  if (snip.length > 0)
 				  res.add(snip);
 		  }

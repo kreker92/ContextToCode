@@ -12,8 +12,8 @@ public class ElementInfo {
   public String ast_type;
   //public PsiReference  ref;
   //public PsiReference[]  refs;
-  public String original;
-  public String child;
+  //public String original;
+  //public String child;
   int line;
 
   public ElementInfo(PsiElement psiElement, int line_) {
@@ -23,13 +23,19 @@ public class ElementInfo {
       line = line_;
       if (psiElement.getParent() != null) {
           parent = psiElement.getParent().toString().split(":")[0];
-          child = psiElement.getChildren().toString();
-          original = psiElement.getOriginalElement().getText();
+        //  child = psiElement.getChildren().toString();
+        //  original = psiElement.getOriginalElement().getText();
       }
+
+//                System.err.println(" ____________ "+psiElement.getParent() + " ----- " + this.text
+//                  + " * "
+//                  + this.node+" * "
+//                  + this.line);
+//          System.err.println(psiElement.getReference()+ "*" + psiElement.getClass() + "*" + psiElement.getContext());
       if (psiElement instanceof PsiReferenceExpression) {
           if(((PsiReferenceExpression) psiElement).getType() != null)
               ast_type = ((PsiReferenceExpression) psiElement).getType().toString();
-          else if (!psiElement.getParent().toString().contains("PsiMethodCallExpression"))
+          else if (!psiElement.getParent().toString().contains("PsiMethodCallExpression") && psiElement.getReference() != null)
               ast_type = psiElement.getReference().toString();
       } else if (psiElement instanceof PsiTypeElementImpl) {
           ast_type = ((PsiTypeElementImpl) psiElement).getType().toString();

@@ -41,10 +41,10 @@ public class ExecData {
   }
   
   public void next_step() {
-    Step st = buffer.get(carrier);
+//    Step st = buffer.get(carrier);
     update_carrier();
     update_buffer();
-    copy_previous_buffer(st);
+  //  copy_previous_buffer(st);
   }
   
   public void flush_buffer(ArrayList<HashMap<Integer, Step>> out) {

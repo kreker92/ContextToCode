@@ -119,7 +119,8 @@ public class HelloAction extends AnAction {
 
         File[] myFiles = myTargetDir.listFiles();
         for (File file : myFiles) {
-            if (checkFiles.contains(file.getName()+".json") && file.getName().equals("116009042")) {
+            if (!checkFiles.contains(file.getName()+".json")) {// && file.getName().equals("100512211")) {
+                System.err.println(file.getName());
                 String text_ = "";
                 try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                     String line;
@@ -140,8 +141,8 @@ public class HelloAction extends AnAction {
 
                 final PsiFile psf = PsiFileFactory.getInstance(project).createFileFromText(file.getName(), fileType, text, -1, true);
 
-                System.err.println(file.getName()+"*"+((System.currentTimeMillis() - start)/1000));
                 parseFile(psf, output_elements, text, null);
+                System.err.println(((System.currentTimeMillis() - start)/1000));
 
                 try (Writer writer = new FileWriter("C:\\Users\\user\\Documents\\backup\\data\\parsed\\" + file.getName() + ".json")) {
                     Gson gson = new GsonBuilder().create();
@@ -322,11 +323,11 @@ public class HelloAction extends AnAction {
                 } */
 
                 context.ic.elements.add(el);
-                if (!bad_types.contains(el.parent)) {
-                    context.ic.clean_line_text += psiElement.getText().toLowerCase() + " ";
-                }
+//                if (!bad_types.contains(el.parent)) {
+//                    context.ic.clean_line_text += psiElement.getText().toLowerCase() + " ";
+//                }
             }
-            
+
 //            List<WordInfo> words =
 //                    wordCountMap.entrySet()
 //                            .stream()

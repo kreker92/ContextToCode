@@ -45,7 +45,7 @@ public class GServer {
 
     if (swtch == LEARN) {
     	for (Template template : templates) 
-    		g.loadCodeSearch(null, g.ASC, 5, template, null);
+    		g.loadCodeSearch(null, g.ASC, 3, template, null);
     	
     	g.setTrainAndTest(null, templates);
     }
@@ -53,7 +53,7 @@ public class GServer {
       res = g.eval();
     }
     else if (swtch == PATTERN) {
-    	Template t = new Template("intent.getAction()", "Retrieve the general action to be performed, such as ACTION_VIEW.", "android.content.intent/ast/", "9"); 
+    	Template t = new Template(new ArrayList<String>(Arrays.asList("PsiType:Intent", "PsiIdentifier:getAction")), "Retrieve the general action to be performed, such as ACTION_VIEW.", "android.content.intent/ast/", "9"); 
     	g.loadCodeSearch(null, g.ASC, 5, t, null);
     }
     else if (swtch == INFERENCE) {
@@ -77,11 +77,12 @@ public class GServer {
 //      g.root_key = "ast/";
 //	   res.add(new Template("DriverManager.getConnection", "Open DB connection", "database/ast/parsed/", "8"));
 
-	  res.add(new Template(".getAction()", "Retrieve the general action to be performed, such as ACTION_VIEW", "android.content.intent/ast/", "8"));
-	  res.add(new Template(".startActivity(", "Launch a new activity", "android.app.activity/ast/", "9"));
+	  res.add(new Template( new ArrayList<String>(Arrays.asList("PsiType:Intent", "PsiIdentifier:startActivity")), "Retrieve the general action to be performed, such as ACTION_VIEW", "android.content.intent/ast/", "2"));
+//	  res.add(new Template( new ArrayList<String>(Arrays.asList("PsiReferenceExpression:DriverManager", "PsiIdentifier:getConnection")), "Retrieve the general action to be performed, such as ACTION_VIEW", "database/ast2/", "8"));
+/*	  res.add(new Template(".startActivity(", "Launch a new activity", "android.app.activity/ast/", "9"));
 	  res.add(new Template(".putExtra(", "Launch a new activity", "android.content.intent/ast/", "10"));
       res.add(new Template("activity.finish()", "Launch a new activity", "android.app.activity/ast/", "11"));
-      res.add(new Template("new Intent()", "Launch a new activity", "android.content.intent/ast/", "12")); 
+      res.add(new Template("new Intent()", "Launch a new activity", "android.content.intent/ast/", "12"));*/ 
 	  return res;
   }
 }
