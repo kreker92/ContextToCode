@@ -6,13 +6,14 @@ Loads in an Addition NPI, and starts a REPL for interactive addition.
 from model.npi import NPI
 from tasks.generate_data import transform
 from tasks.env.addition import AdditionCore
-from tasks.env.config import CONFIG, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH, TEST_CHUNK_PATH
+from tasks.env.config import CONFIG, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH, TEST_CHUNK_PATH, EVAL_LIMIT
 from tasks.env.config import get_env
 import numpy as np
 import pickle
 import tensorflow as tf
 from tensorflow.python.platform import gfile
 import json
+import random
 
 
 def evaluate_addition():
@@ -58,12 +59,17 @@ def evaluate_addition():
         f = open('log/numbers.txt', 'r+')
         f.truncate()
 
-        for x in range(51, 63):
-            res = ""
+        limit = EVAL_LIMIT;
+        r = list(range(1000))
+        random.shuffle(r)
+        for x in r:
+            limit -= 1
+            if limit > 0:
+                res = ""
             # try:
-            repl(sess, npi, data, x, predict)
+                repl(sess, npi, data, x, predict)
             # except:
-            print ("--------------------------")
+                print (str(limit)+"--------------------------")
             # if res:
             #    eq+=1
             # else:
