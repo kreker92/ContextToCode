@@ -30,7 +30,7 @@ public class Parser {
     return res.toArray(new Vector[res.size()]);
   } */
   
-  public static Vector[] getSnippet(int line_num, InnerContext[] code, HashSet<String> commands, String path, ArrayList<String> keys, ArrayList<String> goodTypes, ArrayList<String> badTypes, int  limit) {
+  public static Vector[] getSnippet(int line_num, InnerContext[] code, HashSet<String> commands, String path, ArrayList<InnerContext> keys, ArrayList<String> goodTypes, ArrayList<String> badTypes, int  limit) {
     ArrayList<Vector> res = new ArrayList<Vector>();
     HashSet<String> commands_local = new HashSet<>();
 
@@ -73,7 +73,7 @@ public class Parser {
       return true;
   }
 
-  private static boolean isStart(InnerContext code, ArrayList<String> keys) {
+  private static boolean isStart(InnerContext code, ArrayList<InnerContext> keys) {
     if (code.line_text.contains("public ") || code.line_text.contains("private ") || code.line_text.contains("protected ") || code.matches(keys))
       return true;
     else

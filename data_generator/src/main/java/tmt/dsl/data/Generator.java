@@ -153,9 +153,9 @@ public class Generator  {
         	//      br.close();
 
         	for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
-        		cntx_dsl = new ContextDSL(s.getValue(), root, t.executor_comand);  
-        		cntx_dsl.execute();
-        		output.addAll(cntx_dsl.getData());
+        	  cntx_dsl = new ContextDSL(s.getValue(), root);  
+        	  cntx_dsl.execute();
+        	  output.addAll(cntx_dsl.getData());
         	}
         }
         DSL.send(new Gson().toJson(output), "", filename);
@@ -208,7 +208,7 @@ public class Generator  {
     br.close();
 
     for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
-      cntx_dsl = new ContextDSL(s.getValue(), root, t.executor_comand);  
+      cntx_dsl = new ContextDSL(s.getValue(), root);//t.executor_comand);  
       cntx_dsl.execute();
       output.addAll(cntx_dsl.getData());
     }
@@ -224,6 +224,8 @@ public class Generator  {
     HashSet<String> commands = new HashSet<>();
     HashMap<String, Double> hot_ecnoding = new HashMap<>();
     PopularCounter popular = new PopularCounter(bad_types);
+    
+    InnerContext key = t.true_key;
 
     System.err.println("!"+root+t.folder);
     File file = new File(root+"/context.json"); 
@@ -250,23 +252,27 @@ public class Generator  {
 
         InnerContext[] code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
 
-        if (direction == DESC)
+        if ( direction == DESC )
           ArrayUtils.reverse(code);
-        for (InnerContext c : code ) {
+        for ( InnerContext c : code ) {
+          if (c.sameElements(key)) 
+            c.executor_command = key.executor_command;
+          else
+            c.executor_command = "1";
+          
           if (!c.elements.isEmpty() && c.line_text.toLowerCase().contains("import")) {
             //  if (t.equals("catch remoteexception e"))
-            //          System.err.println(c.line_text);
+            //          System.err.println(c.line_text);              
             popular.add(c);
           }
         }
         //      }
-        iterateCode(code, t.keys, f.getPath(), commands, res, limit);
-
+        iterateCode(code, t, f.getPath(), commands, res, limit);
         file_num += 1;
       }
     } else {
       InnerContext[] code = data;
-      iterateCode(code, t.keys, "", commands, res, limit);
+      iterateCode(code, t, "", commands, res, limit);
     }
     int counter = 0;
     for (Entry<PopularItem, Integer> c : popular.items.entrySet()) {
@@ -281,7 +287,7 @@ public class Generator  {
     Utils.writeFile1(sortByValue(popular.commands).toString(), root+"/pop_comm", false);
     Utils.writeFile1(sortByValue(popular.items).toString(), root+"/pop_lines", false);
     //Files.write(root+root_key+"/pop_lines", sortByValue(popular_lines).toString(), Charset.forName("UTF-8"));
-    System.err.println(top+" * "+count+" * "+all);
+    System.err.println(top+" * "+count+" * "+res.size());
     hot_ecnoding = hotEncode(commands, root+"hots");
 
      for (Vector[] c : res) {
@@ -292,10 +298,11 @@ public class Generator  {
     }
   }
   
-  public void iterateCode(InnerContext[] code, ArrayList<String> keys, String path, HashSet<String> commands, ArrayList<Vector[]> res, int limit) {
+  public void iterateCode(InnerContext[] code, Template t, String path, HashSet<String> commands, ArrayList<Vector[]> res, int limit) {
 	  for (int line = code.length-1; line >= 0; line --) {
-		  if ((keys == null && line == code.length-1) || (/*TRIN*/keys != null  && code[line].matches(keys)) ) {
-			  Vector[] snip = Parser.getSnippet(line, code, commands, path, keys, good_types, bad_types, limit);
+	    if (code[line].matches(t.keys))
+	      if ( (t.keys.isEmpty() && line == code.length-1) || (/*TRIN*/!t.keys.isEmpty()  && code[line].matches(t.keys)) ) {
+			  Vector[] snip = Parser.getSnippet(line, code, commands, path, t.keys, good_types, bad_types, limit);
 			  if (snip.length > 0)
 				  res.add(snip);
 		  }

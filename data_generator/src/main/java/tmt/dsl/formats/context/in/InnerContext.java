@@ -8,8 +8,16 @@ public class InnerContext {
   public int end;
   public int line_num;
   public String line_text;
+  public String type;
+  public String executor_command;
+
   
-  
+  public InnerContext(String type_, String executor_command_) {
+    type = type_;
+    executor_command = executor_command_;
+  }
+
+
   public String getLine(ArrayList<String> bad_types) {
     String res = "";
     
@@ -21,12 +29,22 @@ public class InnerContext {
   }
 
 
-  public boolean matches(ArrayList<String> keys) {
-    for (String key : keys) {
+  public boolean matches(ArrayList<InnerContext> keys) {
+    for (InnerContext key : keys) 
+      if (key.sameElements(this))
+        return true;
+        
+    return false;
+  }
+
+
+  public boolean sameElements(InnerContext innerContext) {
+    for (ElementInfo e1 : innerContext.elements) {
       boolean found = false;
-      for (ElementInfo el : elements)
-        if (el.ast_type != null && el.ast_type.equals(key)) 
+      for (ElementInfo e2 : elements)
+        if (e1.equals(e2)) {
           found = true;
+        }
       
       if (!found)
         return false;

@@ -19,6 +19,8 @@ public class Vector {
   public int parent_id;
   public String path;
   public int line_num;
+  
+  private String program;
 
   /*public Vector(String o, HashSet<String> commands, int i, String line, boolean b, int level_, int parent_id_) {
     origin = line.toLowerCase().replaceAll("[^a-z]", " ").replaceAll(" +", " ").trim();
@@ -66,6 +68,7 @@ public class Vector {
     row = i;
     level = level_;
     parent_id = (path+line_num_).hashCode();
+    program = c.executor_command;
   }
   
   public String getNode() {
@@ -99,5 +102,9 @@ public class Vector {
 
   public String toString() {
     return strings+" - "+origin+" - "+level;
+  }
+
+  public String getProgram() {
+    return program;
   }
 }
