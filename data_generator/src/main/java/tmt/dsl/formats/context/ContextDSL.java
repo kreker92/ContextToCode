@@ -42,8 +42,8 @@ public class ContextDSL extends DSL {
 	  d.toAddInfo("text", v.getOrign());
       
       d.toProgram("id", v.getProgram()+"");
-      System.err.println("#"+v.getProgram());
-      if (!v.getProgram().equals("1")) 
+      
+      if (!v.getProgram().equals(Executor.NOT_CONNECT)) 
         d.toProgram("program", "connect");
       else 
         d.toProgram("program", "not_connect");

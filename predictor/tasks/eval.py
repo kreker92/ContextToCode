@@ -145,7 +145,7 @@ def repl(session, npi, data, pos, predict):
 
                 prog_id = np.argmax(n_p)
 
-                if int(prog_out) == 6:
+                if int(prog_out) > 1:
                     if int(prog_out) == int(prog_id):
                         predict["cr"] += 1;
                     else:

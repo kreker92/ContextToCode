@@ -46,7 +46,7 @@ public class GServer {
 
     if (swtch == LEARN) {
     	for (Template template : templates) 
-    		g.loadCodeSearch(null, g.ASC, 3, template, 500);
+    		g.loadCodeSearch(null, g.ASC, 3, template, null);
     	
     	g.setTrainAndTest(null, templates);
     }
@@ -84,12 +84,11 @@ public class GServer {
 	  ic.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
 	  ic.elements.add(new ElementInfo("ast_type", "PsiIdentifier:getAction"));
 	  
-	  InnerContext ic1 = new InnerContext("falsekey", "1");
+	  InnerContext ic1 = new InnerContext("truekey", "4");
       ic1.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
       ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:startActivity"));
 	  
 	  t1.keys.add(ic);
-	  t1.true_key = ic;
 	  t1.keys.add(ic1);
 	  
 	  res.add(t1);

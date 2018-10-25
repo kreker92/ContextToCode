@@ -9,8 +9,7 @@ public class Template {
 	public ArrayList<InnerContext> keys = new ArrayList<InnerContext>();
 	public String description;
 	public String snippet;
-	public InnerContext true_key;
-
+	
 	public String folder;
 	public String vectors;
 	public String model;

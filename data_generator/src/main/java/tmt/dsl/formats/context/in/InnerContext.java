@@ -9,7 +9,7 @@ public class InnerContext {
   public int line_num;
   public String line_text;
   public String type;
-  public String executor_command;
+  public String executor_command = "1";
 
   
   public InnerContext(String type_, String executor_command_) {
@@ -31,22 +31,25 @@ public class InnerContext {
 
   public boolean matches(ArrayList<InnerContext> keys) {
     for (InnerContext key : keys) 
-      if (key.sameElements(this))
+      if (this.hasElements(key))
         return true;
         
     return false;
   }
 
 
-  public boolean sameElements(InnerContext innerContext) {
+  public boolean hasElements(InnerContext innerContext) {
+    if (this.elements.isEmpty())
+      return false;
+    
     for (ElementInfo e1 : innerContext.elements) {
-      boolean found = false;
+      boolean found_el = false;
       for (ElementInfo e2 : elements)
-        if (e1.equals(e2)) {
-          found = true;
-        }
+        if (e1.equals(e2)) 
+          found_el = true;
+        
       
-      if (!found)
+      if (!found_el)
         return false;
     }
     return true;

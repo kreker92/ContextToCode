@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.nio.charset.Charset;
 import java.util.Map.Entry;
+import tmt.dsl.executor.Executor;
 import java.nio.file.Files;
-
 import org.apache.commons.lang3.ArrayUtils;
 
 import tmt.dsl.DSL;
@@ -225,8 +225,6 @@ public class Generator  {
     HashMap<String, Double> hot_ecnoding = new HashMap<>();
     PopularCounter popular = new PopularCounter(bad_types);
     
-    InnerContext key = t.true_key;
-
     System.err.println("!"+root+t.folder);
     File file = new File(root+"/context.json"); 
     file.delete();
@@ -255,10 +253,14 @@ public class Generator  {
         if ( direction == DESC )
           ArrayUtils.reverse(code);
         for ( InnerContext c : code ) {
-          if (c.sameElements(key)) 
-            c.executor_command = key.executor_command;
-          else
-            c.executor_command = "1";
+          if (c.matches(t.keys)) {
+            for (InnerContext key : t.keys)
+              if (c.hasElements(key)) 
+                c.executor_command = key.executor_command;
+          } else {
+            c.executor_command = Executor.NOT_CONNECT;
+          }
+            
           
           if (!c.elements.isEmpty() && c.line_text.toLowerCase().contains("import")) {
             //  if (t.equals("catch remoteexception e"))
@@ -303,8 +305,9 @@ public class Generator  {
 	    if (code[line].matches(t.keys))
 	      if ( (t.keys.isEmpty() && line == code.length-1) || (/*TRIN*/!t.keys.isEmpty()  && code[line].matches(t.keys)) ) {
 			  Vector[] snip = Parser.getSnippet(line, code, commands, path, t.keys, good_types, bad_types, limit);
-			  if (snip.length > 0)
+			  if (snip.length > 0) {
 				  res.add(snip);
+			  }
 		  }
 	  }
   }
