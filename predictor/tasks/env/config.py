@@ -3,22 +3,25 @@ config.py
 
 Configuration Variables for the Addition NPI Task => Stores Scratch-Pad Dimensions, Vector/Program
 Embedding Information, etc.
+
+!cd "/content/drive/My Drive/app/" && python3 main.py --do_train true --num_epochs 11
 """
 import numpy as np
 import tensorflow as tf
 
-DATA_PATH_TRAIN = "/root/ContextToCode/predictor/tasks/env/data/train.pik"
-DATA_PATH_TEST = "/root/ContextToCode/predictor/tasks/env/data/test.pik"
-LOG_PATH = "/root/ContextToCode/predictor/log/"
-CKPT_PATH = "/root/ContextToCode/predictor/log/model.ckpt"
-CKPT_PATH_STABLE = "/root/ContextToCode/predictor/stable/model.ckpt"
-DSL_DATA_PATH = "/root/ContextToCode/predictor/dsl/data/data_buffer.json"
-TEST_CHUNK_PATH = "/root/ContextToCode/predictor/dsl/data/test.json"
+DATA_PATH_TRAIN = "tasks/env/data/train.pik"
+DATA_PATH_TEST = "tasks/env/data/test.pik"
+LOG_PATH = "log/"
+CKPT_PATH = "log/model.ckpt"
+CKPT_PATH_STABLE = "stable/model.ckpt"
+DSL_DATA_PATH = "/root/ContextToCode/data/datasets/context.json"
+TEST_CHUNK_PATH = "dsl/data/test.json"
+EVAL_LIMIT = 50
 
 CONFIG = {
     "ENVIRONMENT_ROW": 9,         # Input 1, Input 2, Carry, Output
     "ENVIRONMENT_COL": 9,         # 10-Digit Maximum for Addition Task
-    "ENVIRONMENT_DEPTH": 8857,      # Size of each element vector => One-Hot, Options: 0-9
+    "ENVIRONMENT_DEPTH": 33367,      # Size of each element vector => One-Hot, Options: 0-9
 
     "ARGUMENT_NUM": 1,            # Maximum Number of Program Arguments
     "ARGUMENT_DEPTH": 75,         # Size of Argument Vector => One-Hot, Options 0-9, Default (10)

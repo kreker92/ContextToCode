@@ -74,7 +74,7 @@ public class Parser {
   }
 
   private static boolean isStart(InnerContext code, ArrayList<InnerContext> keys) {
-    if (code.line_text.contains("public ") || code.line_text.contains("private ") || code.line_text.contains("protected ") || code.matches(keys))
+    if (code.line_text.contains("public ") || code.line_text.contains("private ") || code.line_text.contains("protected ") ) // || code.matches(keys))
       return true;
     else
       return false;

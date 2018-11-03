@@ -68,6 +68,20 @@ public class GServer {
 
     return res;
   }
+  
+  /**
+  
+  InnerContext ic = new InnerContext("truekey", "2");
+	  ic.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
+	  ic.elements.add(new ElementInfo("ast_type", "PsiIdentifier:getAction"));
+	  
+	  InnerContext ic1 = new InnerContext("truekey", "4");
+      ic1.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
+      ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:startActivity"));
+      
+   predict_connect_right 30 predict_connect_wrong 19 predict_not_connect_right 68 predict_not_connect_wrong 12
+   
+  */
 
   private static ArrayList<Template> getTemplates() {
 	  ArrayList<Template> res = new ArrayList<>();
@@ -87,13 +101,33 @@ public class GServer {
 	  InnerContext ic1 = new InnerContext("truekey", "4");
       ic1.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
       ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:startActivity"));
-	  
+
+      InnerContext ic2 = new InnerContext("truekey", "3");
+      ic2.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
+      ic2.elements.add(new ElementInfo("ast_type", "PsiIdentifier:putExtra"));
+      
 	  t1.keys.add(ic);
 	  t1.keys.add(ic1);
+	  t1.keys.add(ic2);
 	  
 	  res.add(t1);
+      
+      /*Template t2 = new Template("Retrieve the general action to be performed, such as ACTION_VIEW", "database/ast2/");
 	  
-	  Template t2 = new Template("Retrieve the general action to be performed, such as ACTION_VIEW", "android.content.intent/ast/");
+	  InnerContext ic1 = new InnerContext("truekey", "4");
+	  ic1.elements.add(new ElementInfo("ast_type", "PsiReferenceExpression:DriverManager"));
+	  ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:getConnection"));
+	  
+	  InnerContext ic1 = new InnerContext("truekey", "4");
+      ic1.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
+      ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:startActivity"));
+	  
+	  t2.keys.add(ic1);
+	  //t1.keys.add(ic1);
+	  
+	  res.add(t2);*/
+	  
+	/*  Template t2 = new Template("Retrieve the general action to be performed, such as ACTION_VIEW", "android.content.intent/ast/");
 
 	  InnerContext ic2 = new InnerContext("falsekey", "2");
 	  ic2.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
@@ -106,7 +140,8 @@ public class GServer {
 	  t2.keys.add(ic2);
 	  t2.keys.add(ic3);
 
-	 // res.add(t2);
+	  res.add(t2); */
+      
 	//  res.add(new Template( new ArrayList<String>(Arrays.asList("PsiReferenceExpression:DriverManager", "PsiIdentifier:getConnection")), "Retrieve the general action to be performed, such as ACTION_VIEW", "database/ast2/", "3"));
 	//  res.add(new Template( new ArrayList<String>(Arrays.asList("PsiType:Intent", "PsiIdentifier:getAction")), new ArrayList<String>(Arrays.asList("PsiType:Intent", "PsiIdentifier:startActivity")), "Retrieve the general action to be performed, such as ACTION_VIEW", "android.content.intent/ast/", "4"));
 /*	  res.add(new Template(".startActivity(", "Launch a new activity", "android.app.activity/ast/", "9"));

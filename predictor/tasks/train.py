@@ -43,11 +43,15 @@ def train_addition(epochs, verbose=0):
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
 
+    # Reset NPI States
+    npi.reset_state()
+    tf.get_default_graph().finalize()
+
+            
     # Start Training
     for ep in range(1, epochs + 1):
+        sum = 0
         for i in range(len(data)):
-            # Reset NPI States
-            npi.reset_state()
 
             # Setup Environment
             steps = data[i]
@@ -103,9 +107,9 @@ def train_addition(epochs, verbose=0):
                         #     step_def_loss += loss
                         #     term_acc += t_acc
                         #     prog_acc += p_acc
-
-                print ("Epoch {0:02d} Step {1:03d} Loss: {2:03f} Term: {3:03f}, Prog: {4:03f}" \
-                        .format(ep, i, step_def_loss / len(x), term_acc / len(x), prog_acc / len(x)))
+                sum += prog_acc / len(x)
+                print ("Epoch {0:02d} Step {1:03d} Loss: {2:03f} Term: {3:03f}, Prog: {4:03f} AVG: {5:03f}" \
+                        .format(ep, i, step_def_loss / len(x), term_acc / len(x), prog_acc / len(x), sum / i))
             #   print ("Epoch {0:02d} Step {1:03d}  Prog: {2:03f}" \
             #           .format(ep, i, prog_acc / len(x)))
         # Save Model
