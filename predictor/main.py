@@ -3,6 +3,7 @@ main.py
 """
 import tensorflow as tf
 # from tasks.env.config
+import time
 
 from tasks.generate_data import generate_addition
 from tasks.eval import evaluate_addition, inference
@@ -20,7 +21,10 @@ tf.app.flags.DEFINE_integer("num_test", 600, "Number of test examples to generat
 tf.app.flags.DEFINE_boolean("do_train", False, "Boolean whether to continue training model.")
 tf.app.flags.DEFINE_boolean("do_eval", False, "Boolean whether to perform model evaluation.")
 tf.app.flags.DEFINE_boolean("do_inference", False, "Boolean whether to perform model evaluation.")
-tf.app.flags.DEFINE_integer("num_epochs", 1, "Number of training epochs to perform.")
+tf.app.flags.DEFINE_integer("num_epochs",  1, "Number of training epochs to perform.")
+tf.app.flags.DEFINE_integer("start_epoch", 0, "Number of training epochs to perform.")
+
+start_time = time.time()
 
 # def split( ):
 #     with open('/root/GeneratedScripts/db/yandex/clickhouse/traces/clickHouseQuery.json', 'r') as f:
@@ -57,7 +61,8 @@ def main(_):
 
         # Train Model (if necessary)
         if FLAGS.do_train:
-            train_addition(FLAGS.num_epochs)
+            train_addition(FLAGS.num_epochs, FLAGS.start_epoch)
+            print("--- %s seconds ---" % (time.time() - start_time))
 
         # Evaluate Model
         if FLAGS.do_eval:

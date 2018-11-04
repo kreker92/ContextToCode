@@ -18,7 +18,7 @@ WRITE_OUT = 0
 IN1_PTR, IN2_PTR, OUT_PTR = range(3)
 LEFT, RIGHT = 0, 1
 
-def train_addition(epochs, verbose=0):
+def train_addition(epochs, start_epoch, verbose=0):
     """
     Instantiates an Addition Core, NPI, then loads and fits model to data.
 
@@ -27,6 +27,9 @@ def train_addition(epochs, verbose=0):
     # Load Data
     with open(DATA_PATH_TRAIN, 'rb') as f:
         data = pickle.load(f)
+		
+   # f = open('log/log_train.txt', 'r+')
+    #f.truncate()
 
     # Initialize Addition Core
     print ('Initializing Addition Core!')
@@ -41,15 +44,20 @@ def train_addition(epochs, verbose=0):
 
     # Initialize TF Session
     sess = tf.Session()
-    sess.run(tf.global_variables_initializer())
+	
+    if start_epoch > 0:
+        saver = tf.train.Saver()
+        saver.restore(sess, "log/model-{0:04d}.ckpt".format(start_epoch))
+    else:
+        sess.run(tf.global_variables_initializer())        
 
     # Reset NPI States
     npi.reset_state()
     tf.get_default_graph().finalize()
 
-            
+
     # Start Training
-    for ep in range(1, epochs + 1):
+    for ep in range(start_epoch+1, epochs + 1):
         sum = 0
         for i in range(len(data)):
 
@@ -108,12 +116,13 @@ def train_addition(epochs, verbose=0):
                         #     term_acc += t_acc
                         #     prog_acc += p_acc
                 sum += prog_acc / len(x)
-                print ("Epoch {0:02d} Step {1:03d} Loss: {2:03f} Term: {3:03f}, Prog: {4:03f} AVG: {5:03f}" \
-                        .format(ep, i, step_def_loss / len(x), term_acc / len(x), prog_acc / len(x), sum / i))
-            #   print ("Epoch {0:02d} Step {1:03d}  Prog: {2:03f}" \
-            #           .format(ep, i, prog_acc / len(x)))
+                #with open('log/log_train.txt', "a") as myfile:
+                 #   myfile.write("Epoch {0:02d} Step {1:03d} Loss: {2:03f} Term: {3:03f}, Prog: {4:03f} AVG: {5:03f}" \
+                  #      .format(ep, i, step_def_loss / len(x), term_acc / len(x), prog_acc / len(x), sum / i))
+        print ("Epoch {0:02d} Step {1:03d}  AVG: {2:03f}" \
+                        .format(ep, len(data), sum / len(data)))
         # Save Model
-        saver.save(sess, CKPT_PATH)
+        saver.save(sess, "log/model-{0:04d}.ckpt".format(ep))
         # !!!!
         tf.train.write_graph(sess.graph_def, '/tmp/tf/log', 'graph.pb', as_text=False)
         # tf.train.write_graph(my_graph, path_to_model_pb, 'saved_model.pb', as_text=False)
