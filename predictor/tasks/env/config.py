@@ -12,7 +12,7 @@ import tensorflow as tf
 DATA_PATH_TRAIN = "tasks/env/data/train.pik"
 DATA_PATH_TEST = "tasks/env/data/test.pik"
 LOG_PATH = "log/"
-CKPT_PATH = "log/model.ckpt"
+CKPT_PATH = "log/model-0011.ckpt"
 CKPT_PATH_STABLE = "stable/model.ckpt"
 DSL_DATA_PATH = "/root/ContextToCode/data/datasets/context.json"
 TEST_CHUNK_PATH = "dsl/data/test.json"

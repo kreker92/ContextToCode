@@ -3,8 +3,8 @@ package tmt.dsl.formats.context;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import tmt.dsl.Template;
-import tmt.dsl.formats.context.in.InnerContext;
+import tmt.dsl.Classifier;
+import tmt.dsl.formats.context.in.InnerClass;
 
 public class Parser {
 
@@ -30,7 +30,7 @@ public class Parser {
     return res.toArray(new Vector[res.size()]);
   } */
   
-  public static Vector[] getSnippet(int line_num, InnerContext[] code, HashSet<String> commands, String path, ArrayList<InnerContext> keys, ArrayList<String> goodTypes, ArrayList<String> badTypes, int  limit) {
+  public static Vector[] getSnippet(int line_num, InnerClass[] code, HashSet<String> commands, String path, ArrayList<InnerClass> keys, ArrayList<String> goodTypes, ArrayList<String> badTypes, int  limit) {
     ArrayList<Vector> res = new ArrayList<Vector>();
     HashSet<String> commands_local = new HashSet<>();
 
@@ -73,7 +73,7 @@ public class Parser {
       return true;
   }
 
-  private static boolean isStart(InnerContext code, ArrayList<InnerContext> keys) {
+  private static boolean isStart(InnerClass code, ArrayList<InnerClass> keys) {
     if (code.line_text.contains("public ") || code.line_text.contains("private ") || code.line_text.contains("protected ") ) // || code.matches(keys))
       return true;
     else

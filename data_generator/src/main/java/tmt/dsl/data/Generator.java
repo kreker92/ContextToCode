@@ -27,13 +27,13 @@ import java.nio.file.Files;
 import org.apache.commons.lang3.ArrayUtils;
 
 import tmt.dsl.DSL;
-import tmt.dsl.Template;
+import tmt.dsl.Classifier;
 import tmt.dsl.executor.info.Step;
 import tmt.dsl.formats.context.ContextDSL;
 import tmt.dsl.formats.context.Parser;
 import tmt.dsl.formats.context.Vector;
 import tmt.dsl.formats.context.in.ElementInfo;
-import tmt.dsl.formats.context.in.InnerContext;
+import tmt.dsl.formats.context.in.InnerClass;
 import tmt.dsl.snippetize.Snippetizer;
 import tmt.dsl.tensorflow.TF;
 
@@ -116,7 +116,7 @@ public class Generator  {
 	  bad_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("../output/conf/bad_types"), String[].class)) );
   }
 
-  public static int setTrainAndTest(InnerContext[] data, ArrayList<Template> templates) throws Exception{
+  public static int setTrainAndTest(InnerClass[] data, ArrayList<Classifier> templates) throws Exception{
     int res = 0;
     String filename = root+"context.json";
     File f_ = new File(filename);
@@ -129,7 +129,7 @@ public class Generator  {
         int max = 0;
 
         ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
-        for ( Template t : templates )
+        for ( Classifier t : templates )
         {
         	HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
         	//      BufferedReader br = new BufferedReader(new FileReader(vectors));
@@ -187,7 +187,7 @@ public class Generator  {
   }
 
   public int eval() throws Exception {
-	  Template t = new Template();//(key_, description_, folder_, executor_comand_);
+	  Classifier t = new Classifier();//(key_, description_, folder_, executor_comand_);
     loadCodeSearch(null, ASC, 3, t, null);
 
     ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
@@ -218,7 +218,7 @@ public class Generator  {
     return 0;
   }
 
-  public void loadCodeSearch(InnerContext[] data, int direction, int limit, Template t, Integer sample_size) throws JsonSyntaxException, IOException, InterruptedException {
+  public void loadCodeSearch(InnerClass[] data, int direction, int limit, Classifier t, Integer sample_size) throws JsonSyntaxException, IOException, InterruptedException {
     //      ArrayList<String> code = new ArrayList<String>(Arrays.asList(Utils.readFile("/root/toCode/output/cs/66533677").split("\n")));
     ArrayList<Vector[]> res = new ArrayList<>();
     HashSet<String> commands = new HashSet<>();
@@ -248,13 +248,13 @@ public class Generator  {
         // if (f.getPath().contains("psi") || key != null) {
         //      System.err.println(f.getPath());
 
-        InnerContext[] code = gson.fromJson(Utils.readFile(f.getPath()), InnerContext[].class);
+        InnerClass[] code = gson.fromJson(Utils.readFile(f.getPath()), InnerClass[].class);
 
         if ( direction == DESC )
           ArrayUtils.reverse(code);
-        for ( InnerContext c : code ) {
-          if (c.matches(t.keys)) {
-            for (InnerContext key : t.keys)
+        for ( InnerClass c : code ) {
+          if (c.matches(t.classes)) {
+            for (InnerClass key : t.classes)
               if (c.hasElements(key)) 
                 c.executor_command = key.executor_command;
           } else {
@@ -273,7 +273,7 @@ public class Generator  {
         file_num += 1;
       }
     } else {
-      InnerContext[] code = data;
+      InnerClass[] code = data;
       iterateCode(code, t, "", commands, res, limit);
     }
     int counter = 0;
@@ -300,11 +300,11 @@ public class Generator  {
     }
   }
   
-  public void iterateCode(InnerContext[] code, Template t, String path, HashSet<String> commands, ArrayList<Vector[]> res, int limit) {
+  public void iterateCode(InnerClass[] code, Classifier t, String path, HashSet<String> commands, ArrayList<Vector[]> res, int limit) {
 	  for (int line = code.length-1; line >= 0; line --) {
-	    if (code[line].matches(t.keys))
-	      if ( (t.keys.isEmpty() && line == code.length-1) || (/*TRIN*/!t.keys.isEmpty()  && code[line].matches(t.keys)) ) {
-			  Vector[] snip = Parser.getSnippet(line, code, commands, path, t.keys, good_types, bad_types, limit);
+	    if (code[line].matches(t.classes))
+	      if ( (t.classes.isEmpty() && line == code.length-1) || (/*TRIN*/!t.classes.isEmpty()  && code[line].matches(t.classes)) ) {
+			  Vector[] snip = Parser.getSnippet(line, code, commands, path, t.classes, good_types, bad_types, limit);
 			  if (snip.length > 0) {
 				  res.add(snip);
 			  }
@@ -422,7 +422,7 @@ class PopularCounter {
     bad_types = bad_types_;
   }
 
-  public void add(InnerContext c) {
+  public void add(InnerClass c) {
     PopularItem t1 = new PopularItem(c, bad_types);
     if (items.containsKey(t1)) 
       items.put(t1, items.get(t1)+1);
@@ -443,7 +443,7 @@ class PopularItem {
   private String raw;
   private String actual;
 
-  public PopularItem(InnerContext t, ArrayList<String> bad_types) {
+  public PopularItem(InnerClass t, ArrayList<String> bad_types) {
     raw = t.line_text;
     actual = t.getLine(bad_types);
   }

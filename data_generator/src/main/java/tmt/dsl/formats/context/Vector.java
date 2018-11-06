@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import tmt.dsl.formats.context.in.ElementInfo;
-import tmt.dsl.formats.context.in.InnerContext;
+import tmt.dsl.formats.context.in.InnerClass;
 
 public class Vector {
   public ArrayList<Integer> vector = new ArrayList<>();
@@ -38,7 +38,7 @@ public class Vector {
     parent_id = parent_id_;
   }*/
   
-  public Vector(InnerContext c, HashSet<String> commands, int i, String line, boolean b, int level_, String path_, int line_num_, ArrayList<String> goodTypes, ArrayList<String> badTypes) {
+  public Vector(InnerClass c, HashSet<String> commands, int i, String line, boolean b, int level_, String path_, int line_num_, ArrayList<String> goodTypes, ArrayList<String> badTypes) {
     origin = line;//.toLowerCase().replaceAll("[^a-z]", " ").replaceAll(" +", " ").trim();;
     line_num = line_num_;
     path = path_;

@@ -50,18 +50,18 @@ def evaluate_addition():
         predict["cw"] = 0;
         predict["cr"] = 0;
 
-        f = open('log/prog_produced.txt', 'r+')
+        f = open('log/prog_produced.txt', 'w+')
         f.truncate()
 
-        f = open('log/prog_orig.txt', 'r+')
+        f = open('log/prog_orig.txt', 'w+')
         f.truncate()
 
-        f = open('log/numbers.txt', 'r+')
-        f.truncate()
+        #f = open('log/numbers.txt', 'r+')
+        #f.truncate()
 
         limit = EVAL_LIMIT;
         r = list(range(1000))
-        random.shuffle(r)
+       # random.shuffle(r)
         for x in r:
             limit -= 1
             if limit > 0:

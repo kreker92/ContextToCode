@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 
 import tmt.dsl.GServer;
 import tmt.dsl.data.Utils;
-import tmt.dsl.formats.context.in.InnerContext;
+import tmt.dsl.formats.context.in.InnerClass;
 
 import com.google.gson.Gson;
 

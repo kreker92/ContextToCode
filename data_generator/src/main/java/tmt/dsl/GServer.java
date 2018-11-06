@@ -13,7 +13,7 @@ import tmt.dsl.data.Generator;
 import tmt.dsl.data.Utils;
 import tmt.dsl.formats.context.Vector;
 import tmt.dsl.formats.context.in.ElementInfo;
-import tmt.dsl.formats.context.in.InnerContext;
+import tmt.dsl.formats.context.in.InnerClass;
 
 public class GServer {
 
@@ -42,10 +42,10 @@ public class GServer {
         new FileOutputStream("../log/log.txt", true)); 
     System.setOut(fileStream);
     
-    ArrayList<Template> templates = getTemplates();
+    ArrayList<Classifier> templates = getTemplates();
 
     if (swtch == LEARN) {
-    	for (Template template : templates) 
+    	for (Classifier template : templates) 
     		g.loadCodeSearch(null, g.ASC, 3, template, null);
     	
     	g.setTrainAndTest(null, templates);
@@ -58,9 +58,9 @@ public class GServer {
     	//g.loadCodeSearch(null, g.ASC, 5, t, null);
     }
     else if (swtch == INFERENCE) {
-      InnerContext[] code = null;
+      InnerClass[] code = null;
       if (data != null) {
-        code = new Gson().fromJson(data, InnerContext[].class);
+        code = new Gson().fromJson(data, InnerClass[].class);
       }
 
       res = g.setTrainAndTest(code, null);
@@ -83,8 +83,8 @@ public class GServer {
    
   */
 
-  private static ArrayList<Template> getTemplates() {
-	  ArrayList<Template> res = new ArrayList<>();
+  private static ArrayList<Classifier> getTemplates() {
+	  ArrayList<Classifier> res = new ArrayList<>();
 //      g.key = "intent.getAction()";
 //      g.description = "Retrieve the general action to be performed, such as ACTION_VIEW.";
 //
@@ -92,23 +92,23 @@ public class GServer {
 //      g.root_key = "ast/";
 //	   res.add(new Template("DriverManager.getConnection", "Open DB connection", "database/ast/parsed/", "8"));
 
-	  Template t1 = new Template("Retrieve the general action to be performed, such as ACTION_VIEW", "android.content.intent/ast/");
+	  Classifier t1 = new Classifier("android.content.intent/ast/");
 	  
-	  InnerContext ic = new InnerContext("truekey", "2");
+	  InnerClass ic = new InnerClass("truekey", "2");
 	  ic.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
 	  ic.elements.add(new ElementInfo("ast_type", "PsiIdentifier:getAction"));
 	  
-	  InnerContext ic1 = new InnerContext("truekey", "4");
+	  InnerClass ic1 = new InnerClass("truekey", "4");
       ic1.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
       ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:startActivity"));
 
-      InnerContext ic2 = new InnerContext("truekey", "3");
+      InnerClass ic2 = new InnerClass("truekey", "3");
       ic2.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
       ic2.elements.add(new ElementInfo("ast_type", "PsiIdentifier:putExtra"));
       
-	  t1.keys.add(ic);
-	  t1.keys.add(ic1);
-	  t1.keys.add(ic2);
+	  t1.classes.add(ic);
+	  t1.classes.add(ic1);
+	  t1.classes.add(ic2);
 	  
 	  res.add(t1);
       

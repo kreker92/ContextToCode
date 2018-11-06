@@ -16,6 +16,8 @@ public class ElementInfo {
   public ElementInfo(String type, String value) {
     if (type.equals("ast_type"))
       ast_type = value;
+    if (type.equals("type"))
+      type = value;
   }
   
   public boolean equals(Object o2) {
