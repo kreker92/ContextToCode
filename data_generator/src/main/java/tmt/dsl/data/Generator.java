@@ -22,8 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.nio.charset.Charset;
 import java.util.Map.Entry;
+
 import tmt.dsl.executor.Executor;
+
 import java.nio.file.Files;
+
 import org.apache.commons.lang3.ArrayUtils;
 
 import tmt.dsl.DSL;
@@ -262,11 +265,11 @@ public class Generator  {
           }
             
           
-          if (!c.elements.isEmpty() && c.line_text.toLowerCase().contains("import")) {
+//          if (!c.elements.isEmpty() && c.line_text.toLowerCase().contains("import")) {
             //  if (t.equals("catch remoteexception e"))
             //          System.err.println(c.line_text);              
             popular.add(c);
-          }
+//          }
         }
         //      }
         iterateCode(code, t, f.getPath(), commands, res, limit);
@@ -277,17 +280,18 @@ public class Generator  {
       iterateCode(code, t, "", commands, res, limit);
     }
     int counter = 0;
-    for (Entry<PopularItem, Integer> c : popular.items.entrySet()) {
+   /* for (Entry<PopularType, Integer> c : popular.items.entrySet()) {
       counter ++;
       if (c.getValue() > 1)
         count += 1;
       if (counter < 50)
         top += c.getValue();
       all += c.getValue();
-    }
+    }*/
 
+    Utils.writeFile1(sortByValue(popular.ast_types).toString(), root+"/pop_lines", false);
     Utils.writeFile1(sortByValue(popular.commands).toString(), root+"/pop_comm", false);
-    Utils.writeFile1(sortByValue(popular.items).toString(), root+"/pop_lines", false);
+    
     //Files.write(root+root_key+"/pop_lines", sortByValue(popular_lines).toString(), Charset.forName("UTF-8"));
     System.err.println(top+" * "+count+" * "+res.size());
     hot_ecnoding = hotEncode(commands, root+"hots");
@@ -414,8 +418,8 @@ public class Generator  {
 
 
 class PopularCounter {
-  public HashMap<PopularItem, Integer> items = new HashMap<>();
-  public HashMap<PopularItem, Integer> commands = new HashMap<>();
+  public HashMap<String, Integer> ast_types = new HashMap<>();
+  public HashMap<String, Integer> commands = new HashMap<>();
   public ArrayList<String> bad_types;
 
   public PopularCounter(ArrayList<String> bad_types_) {
@@ -423,32 +427,37 @@ class PopularCounter {
   }
 
   public void add(InnerClass c) {
-    PopularItem t1 = new PopularItem(c, bad_types);
-    if (items.containsKey(t1)) 
-      items.put(t1, items.get(t1)+1);
-    else
-      items.put(t1, 1);
-
+    String prev_type = "";
     for (ElementInfo e : c.elements ) {
-      PopularItem t2 = new PopularItem(e.text);
-      if (commands.containsKey(t2))
-        commands.put(t2, commands.get(t2)+1);
-      else
-        commands.put(t2, 1);
+      if (e.ast_type != null && !e.ast_type.isEmpty()) {
+        //        PopularType t1 = new PopularType(c, bad_types);
+        if (e.ast_type.contains("PsiType:")) {
+          prev_type = e.ast_type;
+          if (ast_types.containsKey(e.ast_type)) 
+            ast_types.put(e.ast_type, ast_types.get(e.ast_type)+1);
+          else 
+            ast_types.put(e.ast_type, 1);
+        } else if (e.ast_type.contains("PsiIdentifier:") && !prev_type.isEmpty()) {
+          if (commands.containsKey(prev_type+"*#*"+e.ast_type))
+            commands.put(prev_type+"*#*"+e.ast_type, commands.get(prev_type+"*#*"+e.ast_type)+1);
+          else
+            commands.put(prev_type+"*#*"+e.ast_type, 1);
+        }
+      }
     }
   }
 }
 
-class PopularItem {
+class PopularType {
   private String raw;
   private String actual;
 
-  public PopularItem(InnerClass t, ArrayList<String> bad_types) {
+  public PopularType(InnerClass t, ArrayList<String> bad_types) {
     raw = t.line_text;
     actual = t.getLine(bad_types);
   }
 
-  public PopularItem(String text) {
+  public PopularType(String text) {
     raw = text;
     actual = text;
   }
@@ -463,8 +472,38 @@ class PopularItem {
 
   public boolean equals(Object obj) {
     if (obj == null) return false;
-    if (!(obj instanceof PopularItem))
+    if (!(obj instanceof PopularType))
       return false;
-    return this.actual.equals(((PopularItem) obj).actual);
+    return this.actual.equals(((PopularType) obj).actual);
   }
+}
+
+class PopularIdentifier {
+	private String raw;
+	private String actual;
+
+	public PopularIdentifier(InnerClass t, ArrayList<String> bad_types) {
+		raw = t.line_text;
+		actual = t.getLine(bad_types);
+	}
+
+	public PopularIdentifier(String text) {
+		raw = text;
+		actual = text;
+	}
+
+	public int hashCode () {
+		return actual.hashCode();
+	}
+
+	public String toString() {
+		return "actual: '"+actual+"', raw: '"+raw+"'";
+	}
+
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (!(obj instanceof PopularIdentifier))
+			return false;
+		return this.actual.equals(((PopularIdentifier) obj).actual);
+	}
 }

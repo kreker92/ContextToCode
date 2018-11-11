@@ -23,6 +23,8 @@ tf.app.flags.DEFINE_boolean("do_eval", False, "Boolean whether to perform model 
 tf.app.flags.DEFINE_boolean("do_inference", False, "Boolean whether to perform model evaluation.")
 tf.app.flags.DEFINE_integer("num_epochs",  1, "Number of training epochs to perform.")
 tf.app.flags.DEFINE_integer("start_epoch", 0, "Number of training epochs to perform.")
+tf.app.flags.DEFINE_integer("start_step", 0, "Number of training epochs to perform.")
+
 
 start_time = time.time()
 
@@ -61,7 +63,7 @@ def main(_):
 
         # Train Model (if necessary)
         if FLAGS.do_train:
-            train_addition(FLAGS.num_epochs, FLAGS.start_epoch)
+            train_addition(FLAGS.num_epochs, FLAGS.start_epoch, FLAGS.start_step)
             print("--- %s seconds ---" % (time.time() - start_time))
 
         # Evaluate Model

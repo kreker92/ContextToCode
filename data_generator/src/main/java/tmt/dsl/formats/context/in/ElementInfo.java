@@ -6,18 +6,20 @@ import com.intellij.psi.PsiElement;
 
 public class ElementInfo {
   public String node = "";
-  public String text;
+  public String text = "";
   public int line;
   public String type = "";
   public String ast_type = "";
   public String parent;
   public String child;
   
-  public ElementInfo(String type, String value) {
+  public ElementInfo(String type, String value, String text_key) {
     if (type.equals("ast_type"))
       ast_type = value;
     if (type.equals("type"))
-      type = value;
+      this.type = value;
+    if (text_key != null)
+      text = text_key;
   }
   
   public boolean equals(Object o2) {
@@ -27,17 +29,20 @@ public class ElementInfo {
       return true;
     if (!(o2 instanceof ElementInfo)) 
       return false;
-    
-    if ( Utils.compare(ast_type, ((ElementInfo)o2).ast_type) )
-     /*   node.equals(((ElementInfo)o2).node) ||
-        type.equals(((ElementInfo)o2).type)) */
-      return true;
-//      &&  ast_type.equals(((ElementInfo)o2).ast_type))
-      
+    if ( !ast_type.isEmpty() )
+      return Utils.compare(ast_type, ((ElementInfo)o2).ast_type);
+    else if ( !type.isEmpty() )
+      if (Utils.compare(type, ((ElementInfo)o2).type)) 
+        if ( !text.isEmpty() ) 
+          return ((ElementInfo)o2).text.contains(text);
+        else
+          return true;
+
     return false;
   }
   
   public int hashCode() {
+	  System.exit(1);
     return (type+" "+ast_type+" "+parent+" "+node+" "+text).hashCode();
   }
 //

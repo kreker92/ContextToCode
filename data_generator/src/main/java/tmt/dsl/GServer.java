@@ -95,20 +95,30 @@ public class GServer {
 	  Classifier t1 = new Classifier("android.content.intent/ast/");
 	  
 	  InnerClass ic = new InnerClass("truekey", "2");
-	  ic.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
-	  ic.elements.add(new ElementInfo("ast_type", "PsiIdentifier:getAction"));
+	  ic.elements.add(new ElementInfo("ast_type", "PsiType:String", null));
+      ic.elements.add(new ElementInfo("ast_type", "PsiIdentifier:equals", null));
 	  
-	  InnerClass ic1 = new InnerClass("truekey", "4");
-      ic1.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
-      ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:startActivity"));
+	  InnerClass ic1 = new InnerClass("truekey", "3");
+      ic1.elements.add(new ElementInfo("ast_type", "PsiType:StringBuilder", null));
+      ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:append", null));
 
-      InnerClass ic2 = new InnerClass("truekey", "3");
-      ic2.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
-      ic2.elements.add(new ElementInfo("ast_type", "PsiIdentifier:putExtra"));
+      InnerClass ic2 = new InnerClass("truekey", "4");
+      ic2.elements.add(new ElementInfo("ast_type", "PsiType:PrintWriter", null));
+      ic2.elements.add(new ElementInfo("ast_type", "PsiIdentifier:print", null));
       
-	  t1.classes.add(ic);
+      InnerClass ic3 = new InnerClass("truekey", "5");
+      ic3.elements.add(new ElementInfo("type", "NEW_EXPRESSION", "new Intent("));
+      ic3.elements.add(new ElementInfo("type", "JAVA_CODE_REFERENCE", "Intent"));
+      
+      InnerClass ic4 = new InnerClass("truekey", "6"); 
+      ic4.elements.add(new ElementInfo("ast_type", "PsiType:View", null));
+      ic4.elements.add(new ElementInfo("ast_type", "PsiIdentifier:findViewById", null));
+      
+      t1.classes.add(ic3);
+      t1.classes.add(ic4);
+      t1.classes.add(ic2);
 	  t1.classes.add(ic1);
-	  t1.classes.add(ic2);
+	  t1.classes.add(ic);
 	  
 	  res.add(t1);
       

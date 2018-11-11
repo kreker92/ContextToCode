@@ -43,14 +43,14 @@ public class DSL {
 
     log = root+"log.json";		
 
-    try {
+  /*  try {
       File l_ = new File(log);
       l_.createNewFile();
       new FileOutputStream(l_, false);
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
-    } // if file already exists will do nothing  
+    } // if file already exists will do nothing  */
   }
 
   public ArrayList<HashMap<Integer, Step>> getBuffer() {
