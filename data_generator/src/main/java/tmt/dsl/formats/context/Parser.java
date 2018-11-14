@@ -33,23 +33,27 @@ public class Parser {
   public static Vector[] getSnippet(int line_num, InnerClass[] code, HashSet<String> commands, String path, ArrayList<InnerClass> keys, ArrayList<String> goodTypes, ArrayList<String> badTypes, int  limit) {
     ArrayList<Vector> res = new ArrayList<Vector>();
     HashSet<String> commands_local = new HashSet<>();
+    ArrayList<String> sequence = new ArrayList<>();
 
     int count = 0;
     for (int i = line_num; i >= 0; i --) {
       String line = code[i].line_text;
-      if (i != line_num && (isStart(code[i], keys) || count > limit))
+      if (i != line_num && (isStart(code[i], keys) || withContext(sequence, limit, count))) 
         break;
+
       String line_clean = clean(line);
 //      System.err.println(i+"!"+path);
       if (hasSense(line_clean)) {
         Vector v = new Vector(code[i], commands_local, i, line, i == line_num, count, path, line_num, goodTypes, badTypes);
         if (!v.isEmpty()) {
           res.add(0, v);
+          sequence.add(code[i].executor_command);
           count ++;
         }
       }
     }
-    if (res.size() > 1) {
+
+    if (res.size() > 1 && sequence.get(sequence.size()-1).equals("1")) {
       commands.addAll(commands_local);
       return res.toArray(new Vector[res.size()]);
     }
@@ -57,6 +61,15 @@ public class Parser {
       return new Vector[0];
   }
   
+  private static boolean withContext(ArrayList<String> sequence, int limit, int count) {
+    if (sequence.size() >= limit 
+        && sequence.get(count-2).equals("1") 
+        && sequence.get(count-1).equals("1")) 
+      return true;
+    else
+      return false;
+}
+
   private static String clean(String line_raw) {
     String line = "";
     if (line_raw.contains("//"))

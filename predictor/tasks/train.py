@@ -13,7 +13,7 @@ import tensorflow as tf
 import numpy as np
 import os
 
-
+chunk = 50000
 MOVE_PID, WRITE_PID = 0, 1
 WRITE_OUT = 0
 IN1_PTR, IN2_PTR, OUT_PTR = range(3)
@@ -46,11 +46,11 @@ def train_addition(epochs, start_epoch, start_step, verbose=0):
     # Initialize TF Session
     sess = tf.Session()
 	
-    if start_epoch > 0:
+    if start_epoch > 0 or start_step > 0:
         saver = tf.train.Saver()
         if start_step > 0:
-            saver.restore(sess, "log/model-{0:04d}-{1:06d}.ckpt".format(start_epoch, start_step))
-            print("log/model-{0:04d}-{1:06d}.ckpt".format(start_epoch, start_step))
+            saver.restore(sess, "log/model-{0:04d}-{1:06d}.ckpt".format(start_epoch+1, start_step))
+            print("log/model-{0:04d}-{1:06d}.ckpt".format(start_epoch+1, start_step))
         else:
             saver.restore(sess, "log/model-{0:04d}.ckpt".format(start_epoch))
             print("log/model-{0:04d}.ckpt".format(start_epoch))
@@ -126,12 +126,12 @@ def train_addition(epochs, start_epoch, start_step, verbose=0):
                     if i % 1000 == 0:
                         print("Epoch {0:02d} Step {1:03d} Loss: {2:03f} Term: {3:03f}, Prog: {4:03f} AVG: {5:03f}" \
                             .format(ep, i, step_def_loss / len(x), term_acc / len(x), prog_acc / len(x), sum / (i - start_step)))
-                    if i % 10000 == 0:
+                    if i % chunk == 0:
                         saver.save(sess, "log/model-{0:04d}-{1:06d}.ckpt".format(ep, i))
-                        if os.path.exists("log/model-{0:04d}-{1:06d}.ckpt.meta".format(ep, i-10000)):
-                            os.remove("log/model-{0:04d}-{1:06d}.ckpt.meta".format(ep, i-10000))
-                            os.remove("log/model-{0:04d}-{1:06d}.ckpt.index".format(ep, i-10000))
-                            os.remove("log/model-{0:04d}-{1:06d}.ckpt.data-00000-of-00001".format(ep, i-10000))
+                        if os.path.exists("log/model-{0:04d}-{1:06d}.ckpt.meta".format(ep, i-chunk)):
+                            os.remove("log/model-{0:04d}-{1:06d}.ckpt.meta".format(ep, i-chunk))
+                            os.remove("log/model-{0:04d}-{1:06d}.ckpt.index".format(ep, i-chunk))
+                            os.remove("log/model-{0:04d}-{1:06d}.ckpt.data-00000-of-00001".format(ep, i-chunk))
         print ("Epoch {0:02d} Step {1:03d}  AVG: {2:03f}" \
                         .format(ep, len(data), sum / len(data)))
         # Save Model
