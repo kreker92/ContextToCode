@@ -37,6 +37,7 @@ import tmt.dsl.formats.context.Parser;
 import tmt.dsl.formats.context.Vector;
 import tmt.dsl.formats.context.in.ElementInfo;
 import tmt.dsl.formats.context.in.InnerClass;
+import tmt.dsl.pumpkin.Pumpkin;
 import tmt.dsl.snippetize.Snippetizer;
 import tmt.dsl.tensorflow.TF;
 
@@ -119,19 +120,19 @@ public class Generator  {
 	  bad_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("../output/conf/bad_types"), String[].class)) );
   }
 
-  public static int setTrainAndTest(InnerClass[] data, ArrayList<Classifier> templates) throws Exception{
-    int res = 0;
+  public static ArrayList<HashMap<Integer, Step>> setTrainAndTest(InnerClass[] data, ArrayList<Classifier> templates) throws Exception{
     String filename = root+"context.json";
     File f_ = new File(filename);
     f_.createNewFile();
     new FileOutputStream(f_, false);
 
+    ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
+    
     try {
         long start1 = System.currentTimeMillis();
 
         int max = 0;
 
-        ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
         for ( Classifier t : templates )
         {
         	HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
@@ -164,34 +165,35 @@ public class Generator  {
         DSL.send(new Gson().toJson(output), "", filename);
 
       System.err.println("max: "+max+" time: "+(System.currentTimeMillis() - start1)+" size: "+output.size());
-      /*long start = System.currentTimeMillis();
-
-      StringBuffer sb = new StringBuffer();
-
-      Process p = Runtime.getRuntime().exec("python3 /root/ContextToCode/predictor/main.py --do_inference");
-      p.waitFor();
-
-      BufferedReader reader = 
-           new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-      String line = "";           
-      while ((line = reader.readLine())!= null) {
-        sb.append(line+"\n");
-      }
-
-      String str = sb.toString();*/
-
-//      res = Integer.parseInt(Utils.readUrl("http://78.46.103.68:8081/"));
     } catch (Exception e) {
       e.printStackTrace();
     } 
+    
+    return output;
+  }
 
-    return res;
+  public static int[] filter_through_npi(ArrayList<HashMap<Integer, Step>> context) throws NumberFormatException, Exception {
+//    StringBuffer sb = new StringBuffer();
+//
+//    Process p = Runtime.getRuntime().exec("python3 /root/ContextToCode/predictor/main.py --do_inference");
+//    p.waitFor();
+//
+//    BufferedReader reader = 
+//         new BufferedReader(new InputStreamReader(p.getInputStream()));
+//
+//    String line = "";           
+//    while ((line = reader.readLine())!= null) {
+//      sb.append(line+"\n");
+//    }
+
+    Pumpkin pmp = new Pumpkin(new Gson().fromJson(Utils.sendPost(new Gson().toJson(context), "http://78.46.103.68:8081/"), int[].class), context);
+    pmp.snippetize();
+    return null;
   }
 
   public int eval() throws Exception {
 	  Classifier t = new Classifier();//(key_, description_, folder_, executor_comand_);
-    loadCodeSearch(null, ASC, 3, t, null);
+    loadCodeSearch(null, ASC, 2, t, null);
 
     ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
 
@@ -280,6 +282,7 @@ public class Generator  {
       iterateCode(code, t, "", commands, res, limit);
     }
     int counter = 0;
+//    System.exit(1);
    /* for (Entry<PopularType, Integer> c : popular.items.entrySet()) {
       counter ++;
       if (c.getValue() > 1)

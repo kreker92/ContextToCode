@@ -6,11 +6,13 @@ import java.io.PrintStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import com.google.gson.Gson;
 
 import tmt.dsl.data.Generator;
 import tmt.dsl.data.Utils;
+import tmt.dsl.executor.info.Step;
 import tmt.dsl.formats.context.Vector;
 import tmt.dsl.formats.context.in.ElementInfo;
 import tmt.dsl.formats.context.in.InnerClass;
@@ -33,8 +35,8 @@ public class GServer {
       router(PATTERN, "");
   }
 
-  public static int router(int swtch, String data) throws Exception {
-    int res = 0;
+  public static int[] router(int swtch, String data) throws Exception {
+    int[] res = null;
 
     Generator g = new Generator(); 
 
@@ -50,12 +52,19 @@ public class GServer {
     	
     	g.setTrainAndTest(null, templates);
     }
-    else if (swtch == EVAL) {
-      res = g.eval();
-    }
+//    else if (swtch == EVAL) {
+//      res = g.eval();
+//    }
     else if (swtch == PATTERN) {
-    	//Template t = new Template(new ArrayList<String>(Arrays.asList("PsiType:Intent", "PsiIdentifier:getAction")), new ArrayList<String>(Arrays.asList("PsiType:Intent", "PsiIdentifier:getAction")), "Retrieve the general action to be performed, such as ACTION_VIEW.", "android.content.intent/ast/", "9"); 
-    	//g.loadCodeSearch(null, g.ASC, 5, t, null);
+      for (Classifier template : templates) 
+        g.loadCodeSearch(null, g.ASC, 6, template, 10);
+
+      ArrayList<HashMap<Integer, Step>> out_raw = g.setTrainAndTest(null, templates);
+      ArrayList<HashMap<Integer, Step>> out = new ArrayList<>();
+      
+      out.add(out_raw.get(6));
+      
+      res = g.filter_through_npi(out, templates);
     }
     else if (swtch == INFERENCE) {
       InnerClass[] code = null;
@@ -63,7 +72,9 @@ public class GServer {
         code = new Gson().fromJson(data, InnerClass[].class);
       }
 
-      res = g.setTrainAndTest(code, null);
+      ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(code, null);
+      
+      res = g.filter_through_npi(out);
     }
 
     return res;
@@ -94,31 +105,31 @@ public class GServer {
 
 	  Classifier t1 = new Classifier("android.content.intent/ast/");
 	  
-	  InnerClass ic = new InnerClass("truekey", "2");
+	 /* InnerClass ic = new InnerClass("truekey", "2");
 	  ic.elements.add(new ElementInfo("ast_type", "PsiType:String", null));
-      ic.elements.add(new ElementInfo("ast_type", "PsiIdentifier:equals", null));
+      ic.elements.add(new ElementInfo("ast_type", "PsiIdentifier:equals", null)); */
 	  
-	  InnerClass ic1 = new InnerClass("truekey", "3");
-      ic1.elements.add(new ElementInfo("ast_type", "PsiType:StringBuilder", null));
-      ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:append", null));
-
-      InnerClass ic2 = new InnerClass("truekey", "4");
-      ic2.elements.add(new ElementInfo("ast_type", "PsiType:PrintWriter", null));
-      ic2.elements.add(new ElementInfo("ast_type", "PsiIdentifier:print", null));
-      
+//	  InnerClass ic1 = new InnerClass("truekey", "3");
+//      ic1.elements.add(new ElementInfo("ast_type", "PsiType:StringBuilder", null));
+//      ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:append", null)); 
+//
+////      InnerClass ic2 = new InnerClass("truekey", "4");
+////      ic2.elements.add(new ElementInfo("ast_type", "PsiType:PrintWriter", null));
+////      ic2.elements.add(new ElementInfo("ast_type", "PsiIdentifier:print", null));
+//      
       InnerClass ic3 = new InnerClass("truekey", "5");
       ic3.elements.add(new ElementInfo("type", "NEW_EXPRESSION", "new Intent("));
       ic3.elements.add(new ElementInfo("type", "JAVA_CODE_REFERENCE", "Intent"));
       
-      InnerClass ic4 = new InnerClass("truekey", "6"); 
-      ic4.elements.add(new ElementInfo("ast_type", "PsiType:View", null));
-      ic4.elements.add(new ElementInfo("ast_type", "PsiIdentifier:findViewById", null));
+//      InnerClass ic4 = new InnerClass("truekey", "6"); 
+//      ic4.elements.add(new ElementInfo("ast_type", "PsiType:View", null));
+//      ic4.elements.add(new ElementInfo("ast_type", "PsiIdentifier:findViewById", null));
       
       t1.classes.add(ic3);
-      t1.classes.add(ic4);
-      t1.classes.add(ic2);
-	  t1.classes.add(ic1);
-	  t1.classes.add(ic);
+//      t1.classes.add(ic4);
+//      t1.classes.add(ic2);
+//	  t1.classes.add(ic1);
+	 // t1.classes.add(ic);
 	  
 	  res.add(t1);
       

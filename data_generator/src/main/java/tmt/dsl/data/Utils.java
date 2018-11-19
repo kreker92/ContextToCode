@@ -18,13 +18,11 @@ package tmt.dsl.data;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -32,9 +30,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -137,5 +144,30 @@ public class Utils {
       if (reader != null)
         reader.close();
     }
+  }
+
+  public static String sendPost(String string, String url_) throws IOException {
+    HttpClient httpclient = HttpClients.createDefault();
+    HttpPost httppost = new HttpPost(url_);
+
+    // Request parameters and other properties.
+    List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+    params.add(new BasicNameValuePair("context", string));
+//    params.add(new BasicNameValuePair("param-2", "Hello!"));
+    httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+
+    //Execute and get the response.
+    HttpResponse response = httpclient.execute(httppost);
+    HttpEntity entity = response.getEntity();
+
+    String res = "";
+    if (entity != null) {
+      try (InputStream instream = entity.getContent()) {
+        Scanner s = new Scanner(instream).useDelimiter("\\A");
+        res += s.hasNext() ? s.next() : "";
+      }
+    }
+    
+    return res;
   }
 }

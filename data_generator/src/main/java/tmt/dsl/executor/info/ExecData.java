@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import tmt.dsl.executor.Executor;
+import tmt.dsl.formats.context.in.ElementInfo;
 
 public class ExecData {
   HashMap<Integer, Step> buffer;
@@ -64,7 +65,7 @@ public class ExecData {
 	  buffer.get(carrier).supervised_env.put(k, new Element(k, v, Executor.ENVIRONMENT, visible, type));
   }
   
-  public void toAddInfo(String k, String v) {
+  public void toAddInfo(String k, Object v) {
 	  buffer.get(carrier).additional_info.put(k, v);
   }
   

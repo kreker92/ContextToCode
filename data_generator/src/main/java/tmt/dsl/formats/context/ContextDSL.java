@@ -33,10 +33,10 @@ public class ContextDSL extends DSL {
       }
       commands++;
       
-      for (int i = 0; i < v.vector.size(); i++) {  //Integer i : v.vector) {
-    	  d.toAddInfo(v.vector.get(i)+"", v.strings.get(i));
-      }
-	  d.toAddInfo("label", inputs.hashCode()+"");
+//      for (int i = 0; i < v.vector.size(); i++) {  //Integer i : v.vector) {
+//    	  d.toAddInfo(v.vector.get(i)+"", v.strings.get(i));
+//      }
+	  d.toAddInfo("el", v.el);
 	  d.toAddInfo("path", v.path);
 	  d.toAddInfo("line", v.line_num+"");
 	  d.toAddInfo("text", v.getOrign());

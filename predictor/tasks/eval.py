@@ -6,7 +6,7 @@ Loads in an Addition NPI, and starts a REPL for interactive addition.
 from model.npi import NPI
 from tasks.generate_data import transform
 from tasks.env.addition import AdditionCore
-from tasks.env.config import CONFIG, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH, TEST_CHUNK_PATH, EVAL_LIMIT
+from tasks.env.config import CONFIG, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH, TEST_CHUNK_PATH, EVAL_LIMIT, CKPT_PATH_CLASS3, CKPT_PATH_CLASS2, CKPT_PATH_CLASS1
 from tasks.env.config import get_env
 import numpy as np
 import pickle
@@ -24,7 +24,6 @@ def evaluate_addition():
         # Load Data
         with open(DATA_PATH_TEST, 'rb') as f:
             data = pickle.load(f)
-
         # Initialize Addition Core
         core = AdditionCore()
 
@@ -49,83 +48,87 @@ def evaluate_addition():
         predict["ncr"] = 0;
         predict["cw"] = 0;
         predict["cr"] = 0;
-
-        f = open('log/prog_produced.txt', 'w+')
-        f.truncate()
-
-        f = open('log/prog_orig.txt', 'w+')
-        f.truncate()
+        count = 0;
 
         #f = open('log/numbers.txt', 'r+')
         #f.truncate()
 
-        limit = EVAL_LIMIT;
+        limit = EVAL_LIMIT
         r = list(range(1000))
        # random.shuffle(r)
         for x in r:
             limit -= 1
             if limit > 0:
                 res = ""
-            # try:
-                repl(sess, npi, data, x, predict)
-            # except:
+                print(repl(sess, npi, data, x))
+                print("predict_connect_right " + str(predict["cr"]) + " predict_connect_wrong " + str(predict["cw"]) + " predict_not_connect_right " + str(predict["ncr"]) + " predict_not_connect_wrong " + str(predict["ncw"]))
                 print (str(limit)+"--------------------------")
-            # if res:
-            #    eq+=1
-            # else:
-            #    not_eq+=1
-        # repeat()
 
-def inference():
-    with tf.Session() as sess:
-        # Load Data
-        dataset = []
+def verbose (prog_out, prog_id, count, predict):
+                if int(prog_out) > 1:
+                    if int(prog_out) == int(prog_id):
+                        predict["cr"] += 1;
+                    else:
+                        predict["cw"] += 1;
+                else:
+                    if int(prog_out) == int(prog_id):
+                        predict["ncr"] += 1;
+                    else:
+                        predict["ncw"] += 1;
 
-        with open("/root/ContextToCode/output/buffer/test/context.json", 'r') as handle:
-          data = json.load(handle)
-        transform(data[0], dataset)
-        # Initialize Addition Core
-        core = AdditionCore()
+                print ('%s y= Prog_id: %s' % (count, prog_id))
+                print ('%s y` = Prog_id: %s, Info: %s' % (count, prog_out, y[j]["addinfo"]))
 
-        # Initialize NPI Model
-        npi = NPI(core, CONFIG, LOG_PATH)
+                count += 1
+def multiclass_eval():
+      with open(DATA_PATH_TEST, 'rb') as f:
+          data = pickle.load(f)
+
+      sess1 = tf.Session()
+      sess2 = tf.Session()
+      sess3 = tf.Session()
+
+      # Initialize Addition Core
+      core = AdditionCore()
+      # Initialize NPI Model
+      npi = NPI(core, CONFIG, LOG_PATH)
 
         # Restore from Checkpoint
-        saver = tf.train.Saver()
-        saver.restore(sess, CKPT_PATH)
+      saver = tf.train.Saver()
+      saver.restore(sess1, CKPT_PATH_CLASS1)
+      saver.restore(sess2, CKPT_PATH_CLASS2)
+      saver.restore(sess3, CKPT_PATH_CLASS3)
 
-        # Run REPL
+      predict = {};
+      predict["ncw"] = 0;
+      predict["ncr"] = 0;
+      predict["cw"] = 0;
+      predict["cr"] = 0;
 
-        predict = {};
-        predict["ncw"] = 0;
-        predict["ncr"] = 0;
-        predict["cw"] = 0;
-        predict["cr"] = 0;
+      f = open('log/prog_produced.txt', 'w+')
+      f.truncate()
 
-        f = open('/root/ContextToCode/predictor/log/prog_produced.txt', 'r+')
-        f.truncate()
+      limit = EVAL_LIMIT
+      r = list(range(1000))
+      # random.shuffle(r)
+      for x in r:
+          limit -= 1
+          if limit > 0:
+            with open("/root/ContextToCode/predictor/log/prog_produced.txt", "a") as myfile:
+                myfile.write(str(repl(sess1, npi, data, x))+"\n")
+                myfile.write(str(repl(sess2, npi, data, x))+"\n")
+                myfile.write(str(repl(sess3, npi, data, x))+"\n")
+            print (str(limit)+"--------------------------")
 
-        f = open('/root/ContextToCode/predictor/log/prog_orig.txt', 'r+')
-        f.truncate()
-
-        repl(sess, npi, dataset, 0, predict)
-
-def repl(session, npi, data, pos, predict):
+def repl(session, npi, data, pos):
         steps = data[pos]
 
         # f = open('log/prog_orig.txt', 'r+')
         # f.truncate()
 
-        with open("/root/ContextToCode/predictor/log/prog_orig.txt", "a") as myfile:
-            for s in steps:
-                myfile.write(str(data)+"\n")
-
         # Reset NPI States
         npi.reset_state()
-
-        count = 0
-
-        output = 0
+        programs = []
 
         x, y = steps[:-1], steps[1:]
 
@@ -143,23 +146,11 @@ def repl(session, npi, data, pos, predict):
                 t, n_p = session.run([npi.terminate, npi.program_distribution],
                                              feed_dict={npi.env_in: env_in, npi.arg_in:arg_in, npi.prg_in: prog_in})
 
-                prog_id = np.argmax(n_p)
-
-                if int(prog_out) > 1:
-                    if int(prog_out) == int(prog_id):
-                        predict["cr"] += 1;
-                    else:
-                        predict["cw"] += 1;
-                else:
-                    if int(prog_out) == int(prog_id):
-                        predict["ncr"] += 1;
-                    else:
-                        predict["ncw"] += 1;
-
-                print ('%s y= Prog_id: %s' % (count, prog_id))
-                print ('%s y` = Prog_id: %s, Info: %s' % (count, prog_out, y[j]["addinfo"]))
-
-                count += 1
+                programs.append(np.argmax(n_p))
+                #print (n_p)
+                #print ('y Prog_id: %s' %  (np.argmax(n_p)))
+                #print ('y` = Prog_id: %s, Info: %s' % (prog_out, y[j]["addinfo"]))
+                print ('fact %s predict %s' % (prog_out, np.argmax(n_p)))
 
                 # Next step
                # if np.argmax(t) == 1:
@@ -181,14 +172,14 @@ def repl(session, npi, data, pos, predict):
                     # prog_name = PROGRAM_SET[prog_id][0]
 
                     # print([np.argmax(n_p), PROGRAM_SET[prog_id][0]], [np.argmax(n_args[0]), np.argmax(n_args[1])])
-                with open("/root/ContextToCode/predictor/log/prog_produced.txt", "a") as myfile:
-                    myfile.write(str(x[j]) + ":"+str(prog_id)+"\n")
+                #with open("/root/ContextToCode/predictor/log/prog_produced.txt", "a") as myfile:
+                 #   myfile.write(str(x[j]) + ":"+str(prog_id)+"\n")
 
-                output = prog_id
+                #output = prog_id
 
                 # cont = raw_input('Continue? ')
-        print("predict:#"+str(output)+"# predict_connect_right " + str(predict["cr"]) + " predict_connect_wrong " + str(predict["cw"]) + " predict_not_connect_right " + str(predict["ncr"]) + " predict_not_connect_wrong " + str(predict["ncw"]))
-        return bytes(str(output), 'UTF-8')
+        print("**************************************")
+        return programs
 
 def repeat():
         lines = [line.rstrip('\n') for line in open("log/prog.txt")]

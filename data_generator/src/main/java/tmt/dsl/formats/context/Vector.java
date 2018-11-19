@@ -19,6 +19,7 @@ public class Vector {
   public int parent_id;
   public String path;
   public int line_num;
+  public ArrayList<ElementInfo> el = new ArrayList<>();
   
   private String program;
 
@@ -51,6 +52,7 @@ public class Vector {
 //        System.err.println(s.node);
 //        System.exit(1);
 //      }
+      el.add(s);
       if (s.ast_type != null && !s.ast_type.equals("null")) {
         strings.add(s.ast_type.trim());
         parent = s.parent;

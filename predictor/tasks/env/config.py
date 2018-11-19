@@ -9,19 +9,22 @@ Embedding Information, etc.
 import numpy as np
 import tensorflow as tf
 
-DATA_PATH_TRAIN = "tasks/env/data/train.pik"
-DATA_PATH_TEST = "tasks/env/data/test.pik"
+DATA_PATH_TRAIN = "log/network_dimension_research/multyonehot/train.pik"
+DATA_PATH_TEST = "log/network_dimension_research/multyonehot/test.pik"
 LOG_PATH = "log/"
-CKPT_PATH = "log/model-0011.ckpt"
-CKPT_PATH_STABLE = "stable/model.ckpt"
+CKPT_PATH = "log/1class/StringBuilder_append/multyonehot/model-0008.ckpt"
+CKPT_PATH_CLASS1 = "log/1class/StringBuilder_append/multyonehot/model-0008.ckpt"
+CKPT_PATH_CLASS3 = "log/1class/View_findViewById/multyonehot/model-0008.ckpt"
+CKPT_PATH_CLASS2 = "log/1class/New_intent/multyonehot/model-0008.ckpt"
+CKPT_PATH_CLASS4 = "log/1class/PrintWriter_print/multyonehot/model-0008.ckpt"
 DSL_DATA_PATH = "/root/ContextToCode/data/datasets/context.json"
 TEST_CHUNK_PATH = "dsl/data/test.json"
-EVAL_LIMIT = 50
+EVAL_LIMIT = 5
 
 CONFIG = {
     "ENVIRONMENT_ROW": 9,         # Input 1, Input 2, Carry, Output
     "ENVIRONMENT_COL": 9,         # 10-Digit Maximum for Addition Task
-    "ENVIRONMENT_DEPTH": 33367,      # Size of each element vector => One-Hot, Options: 0-9
+    "ENVIRONMENT_DEPTH": 61225,      # Size of each element vector => One-Hot, Options: 0-9
 
     "ARGUMENT_NUM": 1,            # Maximum Number of Program Arguments
     "ARGUMENT_DEPTH": 75,         # Size of Argument Vector => One-Hot, Options 0-9, Default (10)
