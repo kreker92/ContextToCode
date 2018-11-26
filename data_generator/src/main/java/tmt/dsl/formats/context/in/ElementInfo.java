@@ -45,6 +45,10 @@ public class ElementInfo {
 	  System.exit(1);
     return (type+" "+ast_type+" "+parent+" "+node+" "+text).hashCode();
   }
+  
+  public String toString() {
+    return type+" "+ast_type+" "+parent+" "+node+" "+text;
+  }
 //
 //
 //  public ElementInfo(PsiElement psiElement, int line_) {

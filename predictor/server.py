@@ -6,7 +6,7 @@ from tasks.eval import repl
 from model.npi import NPI
 from tasks.generate_data import transform
 from tasks.env.addition import AdditionCore
-from tasks.env.config import CONFIG, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH_CLASS3, CKPT_PATH_CLASS2, CKPT_PATH_CLASS4, CKPT_PATH_CLASS1, TEST_CHUNK_PATH
+from tasks.env.config import CONFIG, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH_CLASS3, CKPT_PATH_CLASS2, CKPT_PATH_CLASS4, CKPT_PATH_CLASS5, CKPT_PATH_CLASS1, TEST_CHUNK_PATH
 from tasks.env.config import get_env
 import numpy as np
 import pickle
@@ -21,6 +21,7 @@ class test:
       self.sess2 = tf.Session()
       self.sess3 = tf.Session()
       self.sess4 = tf.Session()
+      self.sess5 = tf.Session()
 
 
        # Initialize Addition Core
@@ -35,7 +36,8 @@ class test:
       saver.restore(self.sess2, CKPT_PATH_CLASS2)
       saver.restore(self.sess3, CKPT_PATH_CLASS3)
       saver.restore(self.sess4, CKPT_PATH_CLASS4)
-	 
+      saver.restore(self.sess5, CKPT_PATH_CLASS5)
+
  
       f = open('/root/ContextToCode/predictor/log/prog_produced.txt', 'r+')
       f.truncate()
@@ -58,17 +60,14 @@ class myHandler(BaseHTTPRequestHandler):
 		
     def get_predictions(self, dataset):
         predict = {};
-        predict["ncw"] = 0;
-        predict["ncr"] = 0;
-        predict["cw"] = 0;
-        predict["cr"] = 0;
         res = []
 
         #self.wfile.write(repl(self.t1.sess1, self.t1.npi, dataset, 0, predict)) #Doesnt work
-        res.append(int(repl(self.t1.sess1, self.t1.npi, dataset, 0)[-1]))
-        res.append(int(repl(self.t1.sess2, self.t1.npi, dataset, 0)[-1]))
-        res.append(int(repl(self.t1.sess3, self.t1.npi, dataset, 0)[-1]))
-        res.append(int(repl(self.t1.sess4, self.t1.npi, dataset, 0)[-1]))
+        res.append(int(repl(self.t1.sess1, self.t1.npi, dataset, 0, predict)[-1]))
+        res.append(int(repl(self.t1.sess2, self.t1.npi, dataset, 0, predict)[-1]))
+        res.append(int(repl(self.t1.sess3, self.t1.npi, dataset, 0, predict)[-1]))
+        res.append(int(repl(self.t1.sess4, self.t1.npi, dataset, 0, predict)[-1]))
+        res.append(int(repl(self.t1.sess5, self.t1.npi, dataset, 0, predict)[-1]))
         self.wfile.write(bytes(json.dumps(res), 'utf-8'))
 
     def __init__(self, t1, *args):
@@ -79,9 +78,9 @@ class myHandler(BaseHTTPRequestHandler):
         self._set_headers()
         dataset = []
 
-        with open("/root/ContextToCode/output/buffer/test/context.json", 'r') as handle:
+        with open("/root/ContextToCode/data/datasets/context.json", 'r') as handle:
           data = json.load(handle)
-        transform(data[0], dataset)
+        transform(data[3], dataset)
 
         self.get_predictions(dataset)		
         return

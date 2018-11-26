@@ -52,7 +52,7 @@ public class Vector {
 //        System.err.println(s.node);
 //        System.exit(1);
 //      }
-      el.add(s);
+      el.add(new ElementInfo("ast_type", s.ast_type, s.text));
       if (s.ast_type != null && !s.ast_type.equals("null")) {
         strings.add(s.ast_type.trim());
         parent = s.parent;
@@ -96,7 +96,7 @@ public class Vector {
   public void vectorize(HashMap<String, Double> hot_ecnoding) {
     for (String s : strings) {
 	  int val = -1;
-	  if (hot_ecnoding.containsKey(s))
+	  if (hot_ecnoding.containsKey(s) && hot_ecnoding.get(s) < 104969)
 		val = ((Double)hot_ecnoding.get(s)).intValue();
       vector.add(val);
     }

@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import com.google.gson.Gson;
 
@@ -26,17 +27,19 @@ public class GServer {
 
   public static void main(String[] args) throws Exception{
     if (args[0].equals("learn")) 
-      router(LEARN, "");
+      router(LEARN, null);
     else if (args[0].equals("eval"))
-      router(EVAL, "");
-    else if (args[0].equals("inference"))
-      router(INFERENCE, "");
+      router(EVAL, null);
+    else if (args[0].equals("inference")) {
+        InnerClass[] code = new Gson().fromJson(Utils.readFile("/root/ContextToCode/data/datasets/post"), InnerClass[].class);
+        router(INFERENCE, code);
+    }
     else if (args[0].equals("pattern"))
-      router(PATTERN, "");
+      router(PATTERN, null);
   }
 
-  public static int[] router(int swtch, String data) throws Exception {
-    int[] res = null;
+  public static ArrayList<HashMap<String, String>> router(int swtch, InnerClass[] code) throws Exception {
+    ArrayList<HashMap<String, String>> res = null;
 
     Generator g = new Generator(); 
 
@@ -57,24 +60,32 @@ public class GServer {
 //    }
     else if (swtch == PATTERN) {
       for (Classifier template : templates) 
-        g.loadCodeSearch(null, g.ASC, 6, template, 10);
+        g.loadCodeSearch(null, g.ASC, 6, template, null);
 
       ArrayList<HashMap<Integer, Step>> out_raw = g.setTrainAndTest(null, templates);
       ArrayList<HashMap<Integer, Step>> out = new ArrayList<>();
       
-      out.add(out_raw.get(6));
-      
-      res = g.filter_through_npi(out, templates);
+      for (int i = 20; i > 10; i--) {
+        out.add(out_raw.get(i));
+        res = g.filter_through_npi(out, templates);
+        out.clear();
+      }
     }
     else if (swtch == INFERENCE) {
-      InnerClass[] code = null;
-      if (data != null) {
-        code = new Gson().fromJson(data, InnerClass[].class);
-      }
+//      InnerClass[] code = null;
+//      if (data != null) {
+//        code = new Gson().fromJson(data, InnerClass[].class);
+//      }
 
-      ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(code, null);
+    	for ( InnerClass c : code )
+    		c.executor_command = "1";
+    		
+      for (Classifier template : templates) 
+          g.loadCodeSearch(code, g.ASC, 6, template, null);
       
-      res = g.filter_through_npi(out);
+      ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(code, templates);
+      
+      res = g.filter_through_npi(out, templates);
     }
 
     return res;
@@ -103,33 +114,81 @@ public class GServer {
 //      g.root_key = "ast/";
 //	   res.add(new Template("DriverManager.getConnection", "Open DB connection", "database/ast/parsed/", "8"));
 
-	  Classifier t1 = new Classifier("android.content.intent/ast/");
+	  Classifier t1 = new Classifier("android_crossvalidation/ast");
 	  
-	 /* InnerClass ic = new InnerClass("truekey", "2");
+	  InnerClass ic = new InnerClass("falsekey", "2");
 	  ic.elements.add(new ElementInfo("ast_type", "PsiType:String", null));
-      ic.elements.add(new ElementInfo("ast_type", "PsiIdentifier:equals", null)); */
+      ic.elements.add(new ElementInfo("ast_type", "PsiIdentifier:equals", null)); 
 	  
-//	  InnerClass ic1 = new InnerClass("truekey", "3");
-//      ic1.elements.add(new ElementInfo("ast_type", "PsiType:StringBuilder", null));
-//      ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:append", null)); 
-//
-////      InnerClass ic2 = new InnerClass("truekey", "4");
-////      ic2.elements.add(new ElementInfo("ast_type", "PsiType:PrintWriter", null));
-////      ic2.elements.add(new ElementInfo("ast_type", "PsiIdentifier:print", null));
-//      
-      InnerClass ic3 = new InnerClass("truekey", "5");
+	  InnerClass ic1 = new InnerClass("falsekey", "3");
+      ic1.elements.add(new ElementInfo("ast_type", "PsiType:StringBuilder", null));
+      ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:append", null)); 
+
+      InnerClass ic2 = new InnerClass("truekey", "4");
+      ic2.elements.add(new ElementInfo("ast_type", "PsiType:PrintWriter", null));
+      ic2.elements.add(new ElementInfo("ast_type", "PsiIdentifier:print", null));
+      
+      InnerClass ic3 = new InnerClass("falsekey", "5");
       ic3.elements.add(new ElementInfo("type", "NEW_EXPRESSION", "new Intent("));
       ic3.elements.add(new ElementInfo("type", "JAVA_CODE_REFERENCE", "Intent"));
       
-//      InnerClass ic4 = new InnerClass("truekey", "6"); 
-//      ic4.elements.add(new ElementInfo("ast_type", "PsiType:View", null));
-//      ic4.elements.add(new ElementInfo("ast_type", "PsiIdentifier:findViewById", null));
+      InnerClass ic4 = new InnerClass("falsekey", "6"); 
+      ic4.elements.add(new ElementInfo("ast_type", "PsiType:View", null));
+      ic4.elements.add(new ElementInfo("ast_type", "PsiIdentifier:findViewById", null));
+      LinkedHashMap<String, String> temp4_1 = new LinkedHashMap<>();
+      temp4_1.put("literal1","mView = ");
+      temp4_1.put("stab_req","PsiType:View");
+      temp4_1.put("literal2",".findViewById(int id))");
+      ic4.scheme.add(temp4_1);
+      ic4.description = "Finds the first descendant view with the given ID, the view itself if the ID matches getId(), or null if the ID is invalid (< 0) or there is no matching view in the hierarchy.";
       
-      t1.classes.add(ic3);
+      InnerClass ic5 = new InnerClass("falsekey", "7"); 
+      ic5.elements.add(new ElementInfo("ast_type", "PsiType:TextView", null));
+      ic5.elements.add(new ElementInfo("ast_type", "PsiIdentifier:findViewById", null));
+      LinkedHashMap<String, String> temp5_1 = new LinkedHashMap<>();
+      temp5_1.put("literal1","mTextView = ");
+      temp5_1.put("stab_req","PsiType:TextView");
+      temp5_1.put("literal2",".findViewById(int id))");
+      ic5.scheme.add(temp5_1);
+      ic5.description = "Finds the first descendant view with the given ID, the view itself if the ID matches getId(), or null if the ID is invalid (< 0) or there is no matching view in the hierarchy.";
+
+      InnerClass ic6 = new InnerClass("truekey", "8"); 
+      ic6.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
+      ic6.elements.add(new ElementInfo("ast_type", "PsiIdentifier:getString", null));
+      LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
+      temp6_1.put("literal1","String mCursorString = ");
+      temp6_1.put("stab_req","PsiType:Cursor");
+      temp6_1.put("literal2",".getString(int id))");
+      ic6.scheme.add(temp6_1);
+      ic6.description = "Finds the first descendant view with the given ID, the view itself if the ID matches getId(), or null if the ID is invalid (< 0) or there is no matching view in the hierarchy.";
+
+      
+      InnerClass ic7 = new InnerClass("truekey", "9"); 
+      ic7.elements.add(new ElementInfo("ast_type", "PsiType:TextView", null));
+      ic7.elements.add(new ElementInfo("ast_type", "PsiIdentifier:setText", null));
+      LinkedHashMap<String, String> temp7_1 = new LinkedHashMap<>();
+      temp7_1.put("stab_req","PsiType:TextView");
+      temp7_1.put("literal1",".setText(int id))");
+      ic7.scheme.add(temp7_1);
+      ic7.description = "Finds the first descendant view with the given ID, the view itself if the ID matches getId(), or null if the ID is invalid (< 0) or there is no matching view in the hierarchy.";
+
+      InnerClass ic8 = new InnerClass("truekey", "10"); 
+      ic8.elements.add(new ElementInfo("ast_type", "PsiType:Context", null));
+      ic8.elements.add(new ElementInfo("ast_type", "PsiIdentifier:getResources", null));
+      LinkedHashMap<String, String> temp8_1 = new LinkedHashMap<>();
+      temp8_1.put("literal1","Resources mResource = ");
+      temp8_1.put("stab_req","PsiType:TextView");
+      temp8_1.put("literal2",".getResources())");
+      ic8.scheme.add(temp8_1);
+      ic8.description = "Finds the first descendant view with the given ID, the view itself if the ID matches getId(), or null if the ID is invalid (< 0) or there is no matching view in the hierarchy.";
+
 //      t1.classes.add(ic4);
-//      t1.classes.add(ic2);
-//	  t1.classes.add(ic1);
-	 // t1.classes.add(ic);
+//      t1.classes.add(ic3);
+ //     t1.classes.add(ic1);
+ //     t1.classes.add(ic6);
+//	  t1.classes.add(ic7);
+//	  t1.classes.add(ic6);
+//	  t1.classes.add(ic5);
 	  
 	  res.add(t1);
       

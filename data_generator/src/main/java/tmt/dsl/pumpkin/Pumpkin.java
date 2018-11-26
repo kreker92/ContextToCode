@@ -1,18 +1,24 @@
 package tmt.dsl.pumpkin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import com.google.gson.Gson;
 
 import tmt.dsl.Classifier;
 import tmt.dsl.executor.info.Step;
+import tmt.dsl.formats.context.in.ElementInfo;
 import tmt.dsl.formats.context.in.InnerClass;
 
 public class Pumpkin {
   ArrayList<Integer> candidates = new ArrayList<>();
-  ArrayList<HashMap<Integer, Step>> context;
+  ArrayList<Integer> lines;
   HashMap<Integer, InnerClass> stabs = new HashMap<>();
+  private ArrayList<HashMap<Integer, Step>> context;
 
   public Pumpkin(int[] res, ArrayList<HashMap<Integer, Step>> context_, ArrayList<Classifier> ts) {
     for (int r : res)
@@ -22,15 +28,55 @@ public class Pumpkin {
     for (Classifier t : ts)
       for (InnerClass c : t.classes)
         stabs.put(Integer.parseInt(c.executor_command), c);
+    
+    lines = new ArrayList(context_.get(0).keySet());
+    Collections.sort(lines, Collections.reverseOrder());
+    
     context = context_;
   }
 
-  public int[] snippetize() {
+  public ArrayList<HashMap<String, String>> snippetize() {
+    ArrayList<HashMap<String, String>> snippets = new ArrayList<>();
     for (Integer c : candidates)
-      stabs.get(c);
+      if (stabs.containsKey(c))
+        fill(stabs.get(c), snippets);
     
-    System.err.println(candidates +" * "+new Gson().toJson(context));
-    return null;
+    System.err.println(new Gson().toJson(snippets));
+    return snippets;
+  }
+
+  private void fill(InnerClass innerClass, ArrayList<HashMap<String, String>> snippets) {
+    boolean complete = false;
+    String snippet = "";
+
+    for (LinkedHashMap<String, String> scs : innerClass.scheme)
+      for (Entry<String, String> sc : scs.entrySet()){ 
+        if (sc.getKey().contains("literal"))
+          snippet += sc.getValue();
+        else if (sc.getKey().contains("stab_req")) { 
+          String var = getFirstVar(sc.getValue());
+          if (!var.isEmpty()) {
+            snippet += var;
+            complete = true;
+          }
+        }
+      }
+    if (complete) {
+      HashMap<String, String> temp = new HashMap<>();
+      temp.put("prediction", snippet);
+      temp.put("code", innerClass.executor_command);
+      temp.put("documentation", innerClass.description);
+      snippets.add(temp);
+    }
+  }
+
+  private String getFirstVar(String type) {
+    for (HashMap<Integer, Step> cs : context)
+      for (Integer l : lines)
+        for (ElementInfo el : (ArrayList<ElementInfo>)cs.get(l).additional_info.get("el")) 
+          if (el.ast_type != null && !el.ast_type.isEmpty() && type.equals(el.ast_type)) 
+            return el.text;
+    return "";
   }
 
 }

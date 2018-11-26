@@ -1,6 +1,8 @@
 package tmt.dsl.formats.context.in;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class InnerClass {
   public ArrayList<ElementInfo> elements = new ArrayList<>();
@@ -11,8 +13,8 @@ public class InnerClass {
   public String type;
   public String executor_command = "1";
   
+  public ArrayList<LinkedHashMap<String, String>> scheme = new ArrayList<LinkedHashMap<String, String>>();
   public String description;
-  public String snippet;
   
   public InnerClass(String type_, String executor_command_) {
     type = type_;

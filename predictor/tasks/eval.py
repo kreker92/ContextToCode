@@ -60,11 +60,11 @@ def evaluate_addition():
             limit -= 1
             if limit > 0:
                 res = ""
-                print(repl(sess, npi, data, x))
+                print(repl(sess, npi, data, x, predict))
                 print("predict_connect_right " + str(predict["cr"]) + " predict_connect_wrong " + str(predict["cw"]) + " predict_not_connect_right " + str(predict["ncr"]) + " predict_not_connect_wrong " + str(predict["ncw"]))
                 print (str(limit)+"--------------------------")
 
-def verbose (prog_out, prog_id, count, predict):
+def verbose (prog_out, prog_id, predict):
                 if int(prog_out) > 1:
                     if int(prog_out) == int(prog_id):
                         predict["cr"] += 1;
@@ -76,10 +76,10 @@ def verbose (prog_out, prog_id, count, predict):
                     else:
                         predict["ncw"] += 1;
 
-                print ('%s y= Prog_id: %s' % (count, prog_id))
-                print ('%s y` = Prog_id: %s, Info: %s' % (count, prog_out, y[j]["addinfo"]))
+#                print ('%s y= Prog_id: %s' % (count, prog_id))
+#                print ('%s y` = Prog_id: %s, Info: %s' % (count, prog_out, y[j]["addinfo"]))
 
-                count += 1
+#                count += 1
 def multiclass_eval():
       with open(DATA_PATH_TEST, 'rb') as f:
           data = pickle.load(f)
@@ -115,12 +115,12 @@ def multiclass_eval():
           limit -= 1
           if limit > 0:
             with open("/root/ContextToCode/predictor/log/prog_produced.txt", "a") as myfile:
-                myfile.write(str(repl(sess1, npi, data, x))+"\n")
-                myfile.write(str(repl(sess2, npi, data, x))+"\n")
-                myfile.write(str(repl(sess3, npi, data, x))+"\n")
+                myfile.write(str(repl(sess1, npi, data, x, predict))+"\n")
+                myfile.write(str(repl(sess2, npi, data, x, predict))+"\n")
+                myfile.write(str(repl(sess3, npi, data, x, predict))+"\n")
             print (str(limit)+"--------------------------")
 
-def repl(session, npi, data, pos):
+def repl(session, npi, data, pos, predict):
         steps = data[pos]
 
         # f = open('log/prog_orig.txt', 'r+')
@@ -151,6 +151,8 @@ def repl(session, npi, data, pos):
                 #print ('y Prog_id: %s' %  (np.argmax(n_p)))
                 #print ('y` = Prog_id: %s, Info: %s' % (prog_out, y[j]["addinfo"]))
                 print ('fact %s predict %s' % (prog_out, np.argmax(n_p)))
+                if predict:
+                    verbose (prog_out, np.argmax(n_p), predict)
 
                 # Next step
                # if np.argmax(t) == 1:

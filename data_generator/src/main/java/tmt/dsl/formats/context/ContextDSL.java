@@ -28,7 +28,7 @@ public class ContextDSL extends DSL {
       
       for (Integer i : v.vector) {
         d.toEnvironment("param_"+count, i+"", true, v.getParent());
-        System.err.println("param_"+count+", "+i+"");
+//        System.err.println("param_"+count+", "+i+"");
         count++;
       }
       commands++;

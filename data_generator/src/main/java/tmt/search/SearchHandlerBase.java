@@ -34,7 +34,7 @@ public abstract class SearchHandlerBase extends HandlerBase {
     }
 
     try {
-      response = (GServer.router(GServer.INFERENCE, files.get("postData"))+"").getBytes();
+      response = new Gson().toJson(GServer.router(GServer.INFERENCE, new Gson().fromJson(files.get("postData")+"",  InnerClass[].class))).getBytes();
 
     } catch (Exception e) {
       

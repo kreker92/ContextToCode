@@ -172,7 +172,7 @@ public class Generator  {
     return output;
   }
 
-  public static int[] filter_through_npi(ArrayList<HashMap<Integer, Step>> context) throws NumberFormatException, Exception {
+  public static ArrayList<HashMap<String, String>> filter_through_npi(ArrayList<HashMap<Integer, Step>> context, ArrayList<Classifier> templates) throws NumberFormatException, Exception {
 //    StringBuffer sb = new StringBuffer();
 //
 //    Process p = Runtime.getRuntime().exec("python3 /root/ContextToCode/predictor/main.py --do_inference");
@@ -186,9 +186,10 @@ public class Generator  {
 //      sb.append(line+"\n");
 //    }
 
-    Pumpkin pmp = new Pumpkin(new Gson().fromJson(Utils.sendPost(new Gson().toJson(context), "http://78.46.103.68:8081/"), int[].class), context);
-    pmp.snippetize();
-    return null;
+    HashMap<Integer, Step> st = context.get(context.size()-1);
+    System.err.println(st.get(st.keySet().size()-1).program);
+    Pumpkin pmp = new Pumpkin(new Gson().fromJson(Utils.sendPost(new Gson().toJson(context), "http://78.46.103.68:8081/"), int[].class), context, templates);
+    return pmp.snippetize();
   }
 
   public int eval() throws Exception {
@@ -260,8 +261,12 @@ public class Generator  {
         for ( InnerClass c : code ) {
           if (c.matches(t.classes)) {
             for (InnerClass key : t.classes)
-              if (c.hasElements(key)) 
-                c.executor_command = key.executor_command;
+              if (c.hasElements(key)) {
+                if (key.type.equals("truekey"))
+                  c.executor_command = key.executor_command;
+                else
+                  c.executor_command = "1";
+              }
           } else {
             c.executor_command = Executor.NOT_CONNECT;
           }
@@ -309,7 +314,7 @@ public class Generator  {
   
   public void iterateCode(InnerClass[] code, Classifier t, String path, HashSet<String> commands, ArrayList<Vector[]> res, int limit) {
 	  for (int line = code.length-1; line >= 0; line --) {
-	    if (code[line].matches(t.classes))
+	    if (code[line].matches(t.classes) || t.classes.isEmpty())
 	      if ( (t.classes.isEmpty() && line == code.length-1) || (/*TRIN*/!t.classes.isEmpty()  && code[line].matches(t.classes)) ) {
 			  Vector[] snip = Parser.getSnippet(line, code, commands, path, t.classes, good_types, bad_types, limit);
 			  if (snip.length > 0) {
