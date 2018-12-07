@@ -10,7 +10,9 @@
   <idea-version since-build="145.0"/>
   <depends>com.intellij.modules.lang</depends>
 
-  <application-components>
+
+
+ <!-- <application-components>
     <component>
       <implementation-class>MyApplicationComponent</implementation-class>
     </component>
@@ -20,11 +22,11 @@
         <component>
             <implementation-class>MyProjectComponent</implementation-class>
         </component>
-    </project-components>
+    </project-components>-->
 
   <extensions defaultExtensionNs="com.intellij">
-      <preloadingActivity implementation="MyPreloadingActivity"/>
-
-      <postStartupActivity implementation="MyPostStartupActivity"/>
+      <!--<preloadingActivity implementation="MyPreloadingActivity"/>-->
+      <annotator language="JAVA" implementationClass="SimpleAnnotator"/>
+      <!--<postStartupActivity implementation="MyPostStartupActivity"/>-->
   </extensions>
 </idea-plugin>

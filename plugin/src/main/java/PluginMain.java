@@ -1,3 +1,4 @@
+import attributes.TextAttributes;
 import com.intellij.codeInsight.daemon.impl.*;
 import com.intellij.codeInspection.*;
 import com.intellij.codeInspection.ex.InspectionManagerEx;
@@ -17,15 +18,15 @@ import java.util.List;
 
 /**
  */
-public class MyProjectComponent implements ProjectComponent {
-    private final static Logger LOG = Logger.getInstance(MyProjectComponent.class);
+public class PluginMain implements ProjectComponent {
+    private final static Logger LOG = Logger.getInstance(PluginMain.class);
 
     private final Project project;
 
     /**
      * @param project The current project, i.e. the project which was just opened.
      */
-    public MyProjectComponent(Project project) {
+    public PluginMain(Project project) {
         this.project = project;
 
         PsiManager.getInstance(project).addPsiTreeChangeListener(new PsiTreeChangeAdapter() {
@@ -53,6 +54,7 @@ public class MyProjectComponent implements ProjectComponent {
         Document document = PsiDocumentManager
                 .getInstance(project)
                 .getDocument(file);
+
         AnnotationHolderImpl annotationHolder = new AnnotationHolderImpl(new AnnotationSession(file));
 
         LocalInspectionsPass localInspectionsPass = new LocalInspectionsPass(file,
@@ -74,7 +76,15 @@ public class MyProjectComponent implements ProjectComponent {
         ArrayList<HighlightInfo> hls = new ArrayList<>();
         for ( ProblemDescriptor p_ : problemDescriptors) {
             SuggestGenerate p = (SuggestGenerate) p_;
-            TextRange range = new TextRange(document.getLineStartOffset(p.getLineNumber()), document.getLineEndOffset(p.getLineNumber()));
+
+            int start_line = p.getLineNumber();
+
+            int end_line = p.getLineNumber();
+
+            if (document.getLineNumber(file.getLastChild().getTextOffset()) != end_line)
+                end_line += 1;
+
+            TextRange range = new TextRange(document.getLineStartOffset(start_line), document.getLineEndOffset(end_line));
 
             System.err.println(range);
 
@@ -86,10 +96,10 @@ public class MyProjectComponent implements ProjectComponent {
 //            hl.add(createHighlight(p.getPsiElement(), "huy!!!"));
 //        }
 
-            Annotation annotation = annotationHolder.createWarningAnnotation(range, p.getAnnotationMessage());
+            Annotation annotation = annotationHolder.createWarningAnnotation(range, "Suggest for next line:" +p.getAnnotationMessage());
             annotation.setHighlightType(ProblemHighlightType.INFORMATION);
             annotation.setTextAttributes(TextAttributes.CRITICAL);
-            annotation.registerFix(new QuickFix(p.getFixMessage()));
+            annotation.registerFix(new QuickFix(p.getFixMessage(), project, p.getLineNumber()));
 
             HighlightInfo hl = HighlightInfo.fromAnnotation(annotation);
             hls.add(hl);
@@ -108,7 +118,7 @@ public class MyProjectComponent implements ProjectComponent {
         HighlightInfo.Builder builder = HighlightInfo.newHighlightInfo(HighlightInfoType.WARNING)
                 .range(range)
                 .severity(HighlightSeverity.ERROR)
-                .textAttributes(TextAttributes.CRITICAL);
+                .textAttributes(attributes.TextAttributes.CRITICAL);
 
         if (message != null && !message.isEmpty() && !"...".equals(message)) {
             builder.descriptionAndTooltip("SonarLint: " + message);
@@ -138,28 +148,5 @@ public class MyProjectComponent implements ProjectComponent {
     @NotNull
     public String getComponentName() {
         return "myProjectComponent";
-    }
-
-    private void parseFile(PsiFile psf, ArrayList<InnerContext> output_elements, String text, Integer end) {
-        SelectionContextExtractor contextExtractor = new SelectionContextExtractor(psf);
-        String word = "\n";
-        ArrayList<Integer> ends = new ArrayList<>();
-
-        for (int i = -1; (i = text.indexOf(word, i + 1)) != -1; i++) {
-            if (end == null || i <= end)
-                ends.add(i);
-        }
-
-        int previous = 0;
-        int line = 0;
-
-        for (int e : ends) {
-            SelectionContext context = contextExtractor.extractContext(previous, e+1, line, text.substring(previous, e+1));
-          //  SelectionContextQueryBuilder queryBuilder = new SelectionContextQueryBuilder(context);
-           // queryBuilder.buildQuery();
-            previous = e+1;
-            line ++;
-            output_elements.add(context.ic);
-        }
     }
 }

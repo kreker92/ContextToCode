@@ -1,3 +1,5 @@
+package analyzer;
+
 import com.google.gson.internal.LinkedTreeMap;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -30,6 +32,8 @@ import javax.swing.*;
 
 import org.jdesktop.swingx.VerticalLayout;
 import org.jdesktop.swingx.prompt.PromptSupport;
+import util.Actions;
+
 /**
  * ContextHelper's side panel.
  */
@@ -140,7 +144,7 @@ public class ContextHelperPanel extends JPanel implements Runnable {
         bottomPanel.setLayout(new BorderLayout());
 
         bottomPanel.add(jfxPanel, BorderLayout.CENTER);
-        queryJTextField1.addActionListener(actionEvent -> {
+      /*  queryJTextField1.addActionListener(actionEvent -> {
             System.err.println("insert:"+code1);
             action.insert(code1);
         });
@@ -151,7 +155,7 @@ public class ContextHelperPanel extends JPanel implements Runnable {
         queryJTextField3.addActionListener(actionEvent -> {
             System.err.println("insert:"+code3);
             action.insert(code3);
-        });
+        });*/
 
     }
 
