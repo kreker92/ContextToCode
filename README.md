@@ -1,18 +1,4 @@
 # ContextToCode
-Context based technology that suggest you code completions in natural language ("Open DB connection").
+Context based technology that suggest you code completions 
 
-## Description, snippet mining
-
-![enter image description here](https://raw.githubusercontent.com/nayname/ThousandMonkeysTypewriter.github.io/master/desr%20parsing.jpg)
-
-## Pattern recognition in dataset, network training
-
-![enter image description here](https://raw.githubusercontent.com/nayname/ThousandMonkeysTypewriter.github.io/master/learn.jpg)
-
-## Network deployment, recognition in IDE
-
-![enter image description here](https://raw.githubusercontent.com/nayname/ThousandMonkeysTypewriter.github.io/master/deploy.jpg)
-
-
-
-
+[![SCREENCAST](https://img.youtube.com/vi/lCiYBMB9cvM/hqdefault.jpg)](https://www.youtube.com/watch?v=lCiYBMB9cvM&t=5s)
