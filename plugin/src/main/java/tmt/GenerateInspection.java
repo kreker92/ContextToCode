@@ -1,6 +1,11 @@
+package tmt;
+
+import tmt.analyze.filter.Filter;
 import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemDescriptor;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -13,10 +18,18 @@ public class GenerateInspection extends LocalInspectionTool {
     public ProblemDescriptor[] checkFile(@NotNull final PsiFile psiFile,
                                          @NotNull final InspectionManager manager,
                                          final boolean isOnTheFly) {
-        Analyzer an = new Analyzer(psiFile);
 
-        an.analyze(manager);
-        ArrayList<SuggestGenerate> suggests = an.getSuggests();
+        Editor ed = FileEditorManager.getInstance(psiFile.getProject()).getSelectedTextEditor();
+        int current_scope = ed.getCaretModel().getLogicalPosition().line;
+        String current_text = psiFile.getText().substring(ed.getDocument().getLineStartOffset(current_scope), ed.getDocument().getLineEndOffset(current_scope));
+
+        ArrayList<SuggestGenerate> suggests = new ArrayList<>();
+
+        if (Filter.pass(psiFile, current_scope, ed)) {
+            Analyzer an = new Analyzer(psiFile, current_scope, ed);
+            an.analyze(manager);
+            suggests = Filter.removeDoubles(an.getSuggests(), current_text);
+        }
         return suggests.toArray(new ProblemDescriptor[suggests.size()]);
     }
 
@@ -34,7 +47,7 @@ public class GenerateInspection extends LocalInspectionTool {
     @NotNull
     @Override
     public String getShortName() {
-        return "GenerateInspection";
+        return "tmt.GenerateInspection";
     }
 
     @Nls

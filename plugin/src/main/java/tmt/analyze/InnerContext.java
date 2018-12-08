@@ -1,3 +1,7 @@
+package tmt.analyze;
+
+import tmt.analyze.ElementInfo;
+
 import java.util.ArrayList;
 
 public class InnerContext {

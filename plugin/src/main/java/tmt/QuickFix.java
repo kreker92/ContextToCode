@@ -1,10 +1,12 @@
+package tmt;
+
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
-import util.Actions;
+import tmt.util.Actions;
 
 class QuickFix extends BaseIntentionAction {
     private final Actions act;

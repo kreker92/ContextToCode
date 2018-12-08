@@ -1,4 +1,4 @@
-package attributes;
+package tmt.attributes;
 
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 

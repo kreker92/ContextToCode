@@ -1,10 +1,12 @@
-import analyzer.ContextHelperPanel;
-import analyzer.ElementInfo;
-import analyzer.InnerContext;
+package tmt;
+
+import tmt.analyze.ContextHelperPanel;
+import tmt.analyze.ElementInfo;
+import tmt.analyze.InnerContext;
+import tmt.analyze.SyntaxUtils;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.intellij.codeInspection.InspectionManager;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -14,31 +16,25 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 
 
-import java.util.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Sets;
-import com.intellij.psi.JavaTokenType;
-import com.intellij.psi.TokenType;
-import com.intellij.psi.tree.IElementType;
-import util.Actions;
+import tmt.util.Actions;
 
 public class Analyzer {
     private ArrayList<SuggestGenerate> suggests = new ArrayList<>();
     private Project project;
     private Editor ed;
-    private Document document;
     private PsiFile fi;
     private Actions act;
+    private int scope;
 
-    public Analyzer(PsiFile file_) {
+    public Analyzer(PsiFile file_, int sc_, Editor ed) {
         project = file_.getProject();
-        ed = FileEditorManager.getInstance(project).getSelectedTextEditor();
-        document = ed.getDocument();
         fi = file_;
         act = new Actions(project);
+        scope = sc_;
+        this.ed = FileEditorManager.getInstance(fi.getProject()).getSelectedTextEditor();
     }
 
     public void analyze(InspectionManager manager) {
@@ -46,17 +42,6 @@ public class Analyzer {
 
         try {
             ArrayList<InnerContext> output_elements = new ArrayList<>();
-
-//            char ch = fi.getText().charAt(ed.getSelectionModel().getSelectionEnd()-1);
-//            if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n' || ch == '/') {
-//                //ed.getCaretModel().moveToLogicalPosition(new LogicalPosition(ed.getCaretModel().getLogicalPosition().line, ed.getCaretModel().getLogicalPosition().column));
-//            }
-//            else {
-//          //      ed.getCaretModel().moveToLogicalPosition(new LogicalPosition(ed.getCaretModel().getLogicalPosition().line+1, ed.getCaretModel().getLogicalPosition().column));
-//            //    ed.getCaretModel().moveToOffset(document.getLineStartOffset(ed.getCaretModel().getLogicalPosition().line));
-//            }
-
-            int selected_line = ed.getCaretModel().getLogicalPosition().line;
 
             parseFile(fi, output_elements, fi.getText(), ed.getSelectionModel().getSelectionEnd());
 
@@ -67,7 +52,7 @@ public class Analyzer {
             helperComponent.setQueryingStatus(res);
 
             for ( LinkedTreeMap<String, String> sugg : res) {
-                suggests.add(new SuggestGenerate(selected_line, sugg.get("documentation"), sugg.get("prediction")));
+                suggests.add(new SuggestGenerate(scope, sugg.get("documentation"), sugg.get("prediction")));
             }
 
         } catch (Exception e) {
@@ -135,85 +120,13 @@ class SelectionContextExtractor {
 
     public SelectionContext extractContext(int selectionStartOffset, int selectionEndOffset, int line, String text) {
         List<PsiElement> psiElements = new ArrayList<>();
-        traversePsiElement(psiFile, psiElements, selectionStartOffset, selectionEndOffset);
+        SyntaxUtils.traversePsiElement(psiFile, psiElements, selectionStartOffset, selectionEndOffset);
         return new SelectionContext(psiElements, selectionStartOffset, selectionEndOffset, line, text);
-    }
-
-    private void traversePsiElement(PsiElement element, List<PsiElement> selectedElements, int selectionStartOffset, int selectionEndOffset) {
-        int elementStart = element.getTextOffset();
-        int elementEnd = elementStart + element.getTextLength();
-        if (selectionStartOffset <= elementStart && elementEnd <= selectionEndOffset) {
-            selectedElements.add(element);
-        }
-        for (PsiElement childElement : element.getChildren()) {
-            traversePsiElement(childElement, selectedElements, selectionStartOffset, selectionEndOffset);
-        }
     }
 }
 
 class SelectionContextQueryBuilder {
     private final int MAX_WORDS_FOR_QUERY = 5;
-
-    private final Set<IElementType> meaninglessForContextTokenTypes =
-            Sets.newHashSet(
-                    TokenType.WHITE_SPACE,
-
-                    JavaTokenType.C_STYLE_COMMENT,
-                    JavaTokenType.END_OF_LINE_COMMENT,
-
-                    JavaTokenType.LPARENTH,
-                    JavaTokenType.RPARENTH,
-                    JavaTokenType.LBRACE,
-                    JavaTokenType.RBRACE,
-                    JavaTokenType.LBRACKET,
-                    JavaTokenType.RBRACKET,
-                    JavaTokenType.SEMICOLON,
-                    JavaTokenType.COMMA,
-                    JavaTokenType.DOT,
-                    JavaTokenType.ELLIPSIS,
-                    JavaTokenType.AT,
-
-                    JavaTokenType.EQ,
-                    JavaTokenType.GT,
-                    JavaTokenType.LT,
-                    JavaTokenType.EXCL,
-                    JavaTokenType.TILDE,
-                    JavaTokenType.QUEST,
-                    JavaTokenType.COLON,
-                    JavaTokenType.PLUS,
-                    JavaTokenType.MINUS,
-                    JavaTokenType.ASTERISK,
-                    JavaTokenType.DIV,
-                    JavaTokenType.AND,
-                    JavaTokenType.OR,
-                    JavaTokenType.XOR,
-                    JavaTokenType.PERC,
-
-                    JavaTokenType.EQEQ,
-                    JavaTokenType.LE,
-                    JavaTokenType.GE,
-                    JavaTokenType.NE,
-                    JavaTokenType.ANDAND,
-                    JavaTokenType.OROR,
-                    JavaTokenType.PLUSPLUS,
-                    JavaTokenType.MINUSMINUS,
-                    JavaTokenType.LTLT,
-                    JavaTokenType.GTGT,
-                    JavaTokenType.GTGTGT,
-                    JavaTokenType.PLUSEQ,
-                    JavaTokenType.MINUSEQ,
-                    JavaTokenType.ASTERISKEQ,
-                    JavaTokenType.DIVEQ,
-                    JavaTokenType.ANDEQ,
-                    JavaTokenType.OREQ,
-                    JavaTokenType.XOREQ,
-                    JavaTokenType.PERCEQ,
-                    JavaTokenType.LTLTEQ,
-                    JavaTokenType.GTGTEQ,
-                    JavaTokenType.GTGTGTEQ,
-
-                    JavaTokenType.DOUBLE_COLON,
-                    JavaTokenType.ARROW);
 
     private final SelectionContext context;
 
@@ -237,7 +150,7 @@ class SelectionContextQueryBuilder {
         for (PsiElement psiElement : psiElements) {
             ElementInfo el = new ElementInfo(psiElement, context.ic.line_num);
 
-            if (meaninglessForContextTokenTypes.contains(psiElement.getNode().getElementType())) {
+            if (SyntaxUtils.meaninglessForContextTokenTypes.contains(psiElement.getNode().getElementType())) {
                 continue;
             }
 /*                if (psiElement.getChildren().length > 0) {

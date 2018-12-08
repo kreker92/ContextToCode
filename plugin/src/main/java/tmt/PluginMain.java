@@ -1,4 +1,6 @@
-import attributes.TextAttributes;
+package tmt;
+
+import tmt.attributes.TextAttributes;
 import com.intellij.codeInsight.daemon.impl.*;
 import com.intellij.codeInspection.*;
 import com.intellij.codeInspection.ex.InspectionManagerEx;
@@ -71,6 +73,7 @@ public class PluginMain implements ProjectComponent {
 
         InspectionManagerEx inspectionManager = (InspectionManagerEx) InspectionManager.getInstance(file.getProject());
         GlobalInspectionContext context = inspectionManager.createNewGlobalContext(false);
+
         final List<ProblemDescriptor> problemDescriptors = InspectionEngine.runInspectionOnFile(file, new LocalInspectionToolWrapper(inspectionTool), context);
 
         ArrayList<HighlightInfo> hls = new ArrayList<>();
@@ -118,7 +121,7 @@ public class PluginMain implements ProjectComponent {
         HighlightInfo.Builder builder = HighlightInfo.newHighlightInfo(HighlightInfoType.WARNING)
                 .range(range)
                 .severity(HighlightSeverity.ERROR)
-                .textAttributes(attributes.TextAttributes.CRITICAL);
+                .textAttributes(tmt.attributes.TextAttributes.CRITICAL);
 
         if (message != null && !message.isEmpty() && !"...".equals(message)) {
             builder.descriptionAndTooltip("SonarLint: " + message);

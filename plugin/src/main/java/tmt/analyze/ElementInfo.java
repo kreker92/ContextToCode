@@ -1,5 +1,6 @@
+package tmt.analyze;
+
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiJavaCodeReferenceCodeFragment;
 import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.impl.source.PsiTypeElementImpl;
 import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;

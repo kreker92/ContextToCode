@@ -1,4 +1,4 @@
-package analyzer;
+package tmt.analyze;
 
 import com.google.gson.internal.LinkedTreeMap;
 import com.intellij.ide.DataManager;
@@ -32,7 +32,7 @@ import javax.swing.*;
 
 import org.jdesktop.swingx.VerticalLayout;
 import org.jdesktop.swingx.prompt.PromptSupport;
-import util.Actions;
+import tmt.util.Actions;
 
 /**
  * ContextHelper's side panel.

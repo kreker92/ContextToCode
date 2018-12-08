@@ -12,21 +12,21 @@
 
 
 
- <!-- <application-components>
-    <component>
-      <implementation-class>MyApplicationComponent</implementation-class>
-    </component>
-  </application-components>
+  <!--<application-components>-->
+    <!--<component>-->
+      <!--<implementation-class>MyApplicationComponent</implementation-class>-->
+    <!--</component>-->
+  <!--</application-components>-->
 
     <project-components>
         <component>
-            <implementation-class>MyProjectComponent</implementation-class>
+            <implementation-class>tmt.PluginMain</implementation-class>
         </component>
-    </project-components>-->
+    </project-components>
 
   <extensions defaultExtensionNs="com.intellij">
       <!--<preloadingActivity implementation="MyPreloadingActivity"/>-->
-      <annotator language="JAVA" implementationClass="SimpleAnnotator"/>
+      <!--<annotator language="JAVA" implementationClass="SimpleAnnotator"/>-->
       <!--<postStartupActivity implementation="MyPostStartupActivity"/>-->
   </extensions>
 </idea-plugin>
