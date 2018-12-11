@@ -52,7 +52,6 @@ public class Parser {
         }
       }
     }
-
     if (res.size() > 1 && sequence.get(sequence.size()-1).equals("1")) {
       commands.addAll(commands_local);
       return res.toArray(new Vector[res.size()]);

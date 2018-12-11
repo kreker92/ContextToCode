@@ -20,14 +20,13 @@ public class Pumpkin {
   HashMap<Integer, InnerClass> stabs = new HashMap<>();
   private ArrayList<HashMap<Integer, Step>> context;
 
-  public Pumpkin(int[] res, ArrayList<HashMap<Integer, Step>> context_, ArrayList<Classifier> ts) {
+  public Pumpkin(int[] res, ArrayList<HashMap<Integer, Step>> context_, Classifier ts) {
     for (int r : res)
       if (r != 1)
         candidates.add(r);
     
-    for (Classifier t : ts)
-      for (InnerClass c : t.classes)
-        stabs.put(Integer.parseInt(c.executor_command), c);
+    for (InnerClass c : ts.classes)
+      stabs.put(Integer.parseInt(c.executor_command), c);
     
     lines = new ArrayList(context_.get(0).keySet());
     Collections.sort(lines, Collections.reverseOrder());
@@ -41,7 +40,7 @@ public class Pumpkin {
       if (stabs.containsKey(c))
         fill(stabs.get(c), snippets);
     
-    System.err.println(new Gson().toJson(snippets));
+    System.err.println(new Gson().toJson(snippets)+" - "+candidates);
     return snippets;
   }
 
@@ -74,7 +73,8 @@ public class Pumpkin {
     for (HashMap<Integer, Step> cs : context)
       for (Integer l : lines)
         for (ElementInfo el : (ArrayList<ElementInfo>)cs.get(l).additional_info.get("el")) 
-          if (el.ast_type != null && !el.ast_type.isEmpty() && type.equals(el.ast_type)) 
+          if (el.ast_type != null && !el.ast_type.isEmpty() && type.equals(el.ast_type) && 
+          (!el.text.equals("TextView") && !el.text.equals("View") && !el.text.equals("Cursor") && !el.text.equals("TextView"))) 
             return el.text;
     return "";
   }

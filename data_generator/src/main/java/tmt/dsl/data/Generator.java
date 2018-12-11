@@ -120,7 +120,7 @@ public class Generator  {
 	  bad_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("../output/conf/bad_types"), String[].class)) );
   }
 
-  public static ArrayList<HashMap<Integer, Step>> setTrainAndTest(InnerClass[] data, ArrayList<Classifier> templates) throws Exception{
+  public static ArrayList<HashMap<Integer, Step>> setTrainAndTest(InnerClass[] data, Classifier t) throws Exception{
     String filename = root+"context.json";
     File f_ = new File(filename);
     f_.createNewFile();
@@ -133,35 +133,33 @@ public class Generator  {
 
         int max = 0;
 
-        for ( Classifier t : templates )
-        {
-        	HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
-        	//      BufferedReader br = new BufferedReader(new FileReader(vectors));
-        	//  for(String line; (line = br.readLine()) != null; ) {
-        	//    for (Vector v : new Gson().fromJson(line, Vector[].class)) {
+        HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
+        //      BufferedReader br = new BufferedReader(new FileReader(vectors));
+        //  for(String line; (line = br.readLine()) != null; ) {
+        //    for (Vector v : new Gson().fromJson(line, Vector[].class)) {
 
-        	for (Vector v : t.vs) {
-        		if (!sequences.containsKey(v.parent_id)) {
-        			ArrayList<Vector> tmp = new ArrayList<>();
-        			sequences.put(v.parent_id, tmp);
-        		}
+        for (Vector v : t.vs) {
+          if (!sequences.containsKey(v.parent_id)) {
+            ArrayList<Vector> tmp = new ArrayList<>();
+            sequences.put(v.parent_id, tmp);
+          }
 
-        		for (Integer n : v.vector)
-        			if (n > max)
-        				max = n;
+          for (Integer n : v.vector)
+            if (n > max)
+              max = n;
 
-        		sequences.get(v.parent_id).add(v);
-        	}
-        	//  }
-        	ContextDSL cntx_dsl = null;
-        	//      br.close();
-
-        	for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
-        	  cntx_dsl = new ContextDSL(s.getValue(), root);  
-        	  cntx_dsl.execute();
-        	  output.addAll(cntx_dsl.getData());
-        	}
+          sequences.get(v.parent_id).add(v);
         }
+        //  }
+        ContextDSL cntx_dsl = null;
+        //      br.close();
+
+        for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
+          cntx_dsl = new ContextDSL(s.getValue(), root);  
+          cntx_dsl.execute();
+          output.addAll(cntx_dsl.getData());
+        }
+        
         DSL.send(new Gson().toJson(output), "", filename);
 
       System.err.println("max: "+max+" time: "+(System.currentTimeMillis() - start1)+" size: "+output.size());
@@ -172,7 +170,7 @@ public class Generator  {
     return output;
   }
 
-  public static ArrayList<HashMap<String, String>> filter_through_npi(ArrayList<HashMap<Integer, Step>> context, ArrayList<Classifier> templates) throws NumberFormatException, Exception {
+  public static ArrayList<HashMap<String, String>> filter_through_npi(ArrayList<HashMap<Integer, Step>> context, Classifier t) throws NumberFormatException, Exception {
 //    StringBuffer sb = new StringBuffer();
 //
 //    Process p = Runtime.getRuntime().exec("python3 /root/ContextToCode/predictor/main.py --do_inference");
@@ -187,8 +185,9 @@ public class Generator  {
 //    }
 
     HashMap<Integer, Step> st = context.get(context.size()-1);
-    System.err.println(st.get(st.keySet().size()-1).program);
-    Pumpkin pmp = new Pumpkin(new Gson().fromJson(Utils.sendPost(new Gson().toJson(context), "http://78.46.103.68:8081/"), int[].class), context, templates);
+    System.err.println(st.get(st.keySet().size()-1).program+" ^ "+st.get(st.keySet().size()-1).additional_info.get("path")
+        +" ^ "+st.get(st.keySet().size()-1).additional_info.get("line")+" ^ "+st.get(st.keySet().size()-1).additional_info.get("text"));
+    Pumpkin pmp = new Pumpkin(new Gson().fromJson(Utils.sendPost(new Gson().toJson(context), "http://78.46.103.68:8081/"), int[].class), context, t);
     return pmp.snippetize();
   }
 

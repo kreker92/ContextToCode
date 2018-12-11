@@ -48,7 +48,13 @@ public class Analyzer {
             String request = new Gson().toJson(output_elements);
             System.err.println(request);
 
-            ArrayList<LinkedTreeMap<String, String>> res = new Gson().fromJson(act.send(request), ArrayList.class);
+            ArrayList<LinkedTreeMap<String, String>> res = new ArrayList<>();
+            try {
+                res = new Gson().fromJson(act.send(request), ArrayList.class);
+            }
+            catch (Exception e) {
+                System.err.println("Classifier returned 500 code");
+            }
             helperComponent.setQueryingStatus(res);
 
             for ( LinkedTreeMap<String, String> sugg : res) {

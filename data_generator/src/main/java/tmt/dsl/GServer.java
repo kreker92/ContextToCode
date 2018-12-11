@@ -50,24 +50,22 @@ public class GServer {
     ArrayList<Classifier> templates = getTemplates();
 
     if (swtch == LEARN) {
-    	for (Classifier template : templates) 
-    		g.loadCodeSearch(null, g.ASC, 3, template, null);
+      g.loadCodeSearch(null, g.ASC, 3, templates.get(0), null);
     	
-    	g.setTrainAndTest(null, templates);
+      g.setTrainAndTest(null, templates.get(0));
     }
 //    else if (swtch == EVAL) {
 //      res = g.eval();
 //    }
     else if (swtch == PATTERN) {
-      for (Classifier template : templates) 
-        g.loadCodeSearch(null, g.ASC, 6, template, null);
+      g.loadCodeSearch(null, g.ASC, 6, templates.get(0), null);
 
-      ArrayList<HashMap<Integer, Step>> out_raw = g.setTrainAndTest(null, templates);
+      ArrayList<HashMap<Integer, Step>> out_raw = g.setTrainAndTest(null, templates.get(0));
       ArrayList<HashMap<Integer, Step>> out = new ArrayList<>();
       
       for (int i = 20; i > 10; i--) {
         out.add(out_raw.get(i));
-        res = g.filter_through_npi(out, templates);
+        res = g.filter_through_npi(out, templates.get(1));
         out.clear();
       }
     }
@@ -76,16 +74,15 @@ public class GServer {
 //      if (data != null) {
 //        code = new Gson().fromJson(data, InnerClass[].class);
 //      }
-
-    	for ( InnerClass c : code )
-    		c.executor_command = "1";
+        
+      for ( InnerClass c : code )
+        c.executor_command = "1";
     		
-      for (Classifier template : templates) 
-          g.loadCodeSearch(code, g.ASC, 6, template, null);
+      g.loadCodeSearch(code, g.ASC, 4, templates.get(0), null);
       
-      ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(code, templates);
+      ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(code, templates.get(0));
       
-      res = g.filter_through_npi(out, templates);
+      res = g.filter_through_npi(out, templates.get(1));
     }
 
     return res;
@@ -116,6 +113,8 @@ public class GServer {
 
 	  Classifier t1 = new Classifier("android_crossvalidation/ast");
 	  
+	  Classifier t2 = new Classifier("android_crossvalidation/ast");
+	  
 	  InnerClass ic = new InnerClass("falsekey", "2");
 	  ic.elements.add(new ElementInfo("ast_type", "PsiType:String", null));
       ic.elements.add(new ElementInfo("ast_type", "PsiIdentifier:equals", null)); 
@@ -128,11 +127,11 @@ public class GServer {
       ic2.elements.add(new ElementInfo("ast_type", "PsiType:PrintWriter", null));
       ic2.elements.add(new ElementInfo("ast_type", "PsiIdentifier:print", null));
       
-      InnerClass ic3 = new InnerClass("falsekey", "5");
+      InnerClass ic3 = new InnerClass("truekey", "5");
       ic3.elements.add(new ElementInfo("type", "NEW_EXPRESSION", "new Intent("));
       ic3.elements.add(new ElementInfo("type", "JAVA_CODE_REFERENCE", "Intent"));
       
-      InnerClass ic4 = new InnerClass("falsekey", "6"); 
+      InnerClass ic4 = new InnerClass("truekey", "6"); 
       ic4.elements.add(new ElementInfo("ast_type", "PsiType:View", null));
       ic4.elements.add(new ElementInfo("ast_type", "PsiIdentifier:findViewById", null));
       LinkedHashMap<String, String> temp4_1 = new LinkedHashMap<>();
@@ -140,9 +139,9 @@ public class GServer {
       temp4_1.put("stab_req","PsiType:View");
       temp4_1.put("literal2",".findViewById(int id))");
       ic4.scheme.add(temp4_1);
-      ic4.description = "Finds the first descendant view with the given ID, the view itself if the ID matches getId(), or null if the ID is invalid (< 0) or there is no matching view in the hierarchy.";
+      ic4.description = " Finds the first descendant view with the given ID, the view itself if the ID matches getId(), or null if the ID is invalid (< 0) or there is no matching view in the hierarchy.";
       
-      InnerClass ic5 = new InnerClass("falsekey", "7"); 
+      InnerClass ic5 = new InnerClass("truekey", "7"); 
       ic5.elements.add(new ElementInfo("ast_type", "PsiType:TextView", null));
       ic5.elements.add(new ElementInfo("ast_type", "PsiIdentifier:findViewById", null));
       LinkedHashMap<String, String> temp5_1 = new LinkedHashMap<>();
@@ -150,7 +149,7 @@ public class GServer {
       temp5_1.put("stab_req","PsiType:TextView");
       temp5_1.put("literal2",".findViewById(int id))");
       ic5.scheme.add(temp5_1);
-      ic5.description = "Finds the first descendant view with the given ID, the view itself if the ID matches getId(), or null if the ID is invalid (< 0) or there is no matching view in the hierarchy.";
+      ic5.description = " Finds the first descendant view with the given ID, the view itself if the ID matches getId(), or null if the ID is invalid (< 0) or there is no matching view in the hierarchy.";
 
       InnerClass ic6 = new InnerClass("truekey", "8"); 
       ic6.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
@@ -160,7 +159,7 @@ public class GServer {
       temp6_1.put("stab_req","PsiType:Cursor");
       temp6_1.put("literal2",".getString(int id))");
       ic6.scheme.add(temp6_1);
-      ic6.description = "Finds the first descendant view with the given ID, the view itself if the ID matches getId(), or null if the ID is invalid (< 0) or there is no matching view in the hierarchy.";
+      ic6.description = " Returns the value of the requested column as a String. ";
 
       
       InnerClass ic7 = new InnerClass("truekey", "9"); 
@@ -170,27 +169,30 @@ public class GServer {
       temp7_1.put("stab_req","PsiType:TextView");
       temp7_1.put("literal1",".setText(int id))");
       ic7.scheme.add(temp7_1);
-      ic7.description = "Finds the first descendant view with the given ID, the view itself if the ID matches getId(), or null if the ID is invalid (< 0) or there is no matching view in the hierarchy.";
+      ic7.description = " Sets the text to be displayed using a string resource identifier. ";
 
       InnerClass ic8 = new InnerClass("truekey", "10"); 
       ic8.elements.add(new ElementInfo("ast_type", "PsiType:Context", null));
       ic8.elements.add(new ElementInfo("ast_type", "PsiIdentifier:getResources", null));
       LinkedHashMap<String, String> temp8_1 = new LinkedHashMap<>();
       temp8_1.put("literal1","Resources mResource = ");
-      temp8_1.put("stab_req","PsiType:TextView");
+      temp8_1.put("stab_req","PsiType:Context");
       temp8_1.put("literal2",".getResources())");
       ic8.scheme.add(temp8_1);
-      ic8.description = "Finds the first descendant view with the given ID, the view itself if the ID matches getId(), or null if the ID is invalid (< 0) or there is no matching view in the hierarchy.";
+      ic8.description = " Returns a Resources instance for the application's package. ";
 
-//      t1.classes.add(ic4);
+      t2.classes.add(ic4);
+      t2.classes.add(ic3);
+      t2.classes.add(ic1);
+      t2.classes.add(ic6);
+      t2.classes.add(ic7);
+      t2.classes.add(ic5);
+      t2.classes.add(ic8);
+      
 //      t1.classes.add(ic3);
- //     t1.classes.add(ic1);
- //     t1.classes.add(ic6);
-//	  t1.classes.add(ic7);
-//	  t1.classes.add(ic6);
-//	  t1.classes.add(ic5);
 	  
 	  res.add(t1);
+	  res.add(t2);
       
       /*Template t2 = new Template("Retrieve the general action to be performed, such as ACTION_VIEW", "database/ast2/");
 	  
