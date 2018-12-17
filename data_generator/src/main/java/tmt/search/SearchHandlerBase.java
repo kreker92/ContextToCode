@@ -1,5 +1,6 @@
 package tmt.search;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -32,12 +33,15 @@ public abstract class SearchHandlerBase extends HandlerBase {
     } catch (IOException ioe) {
     } catch (ResponseException re) {
     }
-
+    
     try {
-      response = new Gson().toJson(GServer.router(GServer.INFERENCE, new Gson().fromJson(files.get("postData")+"",  InnerClass[].class))).getBytes();
+      ArrayList<InnerClass> arrayList = new ArrayList<InnerClass>(Arrays.asList(new Gson().fromJson(files.get("postData")+"",  InnerClass[].class))); 
+      arrayList.add(new Gson().fromJson(Utils.readFile("../data/datasets/stab.json"),  InnerClass.class));
+
+      response = new Gson().toJson(GServer.router(GServer.INFERENCE, arrayList.toArray(new InnerClass[arrayList.size()]))).getBytes();
 
     } catch (Exception e) {
-      
+      e.printStackTrace();
     }
 
     return NanoHTTPD.newFixedLengthResponse(

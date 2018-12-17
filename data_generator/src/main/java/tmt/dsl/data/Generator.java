@@ -23,6 +23,7 @@ import java.util.Map;
 import java.nio.charset.Charset;
 import java.util.Map.Entry;
 
+import tmt.conf.Utils;
 import tmt.dsl.executor.Executor;
 
 import java.nio.file.Files;
@@ -105,9 +106,9 @@ public class Generator  {
 
 //  public static int limit = 15000;
 
-  public static Gson gson = new Gson();
-  
-  public static String root = "../data/datasets/";
+  private static Gson gson = new Gson();
+  public final String root = "../data/datasets/";
+  private InnerClass[] code;
 
   public static ArrayList<String> good_types;
   public static ArrayList<String> bad_types;
@@ -120,7 +121,7 @@ public class Generator  {
 	  bad_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("../output/conf/bad_types"), String[].class)) );
   }
 
-  public static ArrayList<HashMap<Integer, Step>> setTrainAndTest(InnerClass[] data, Classifier t) throws Exception{
+  public ArrayList<HashMap<Integer, Step>> setTrainAndTest(Classifier t) throws Exception{
     String filename = root+"context.json";
     File f_ = new File(filename);
     f_.createNewFile();
@@ -170,7 +171,7 @@ public class Generator  {
     return output;
   }
 
-  public static ArrayList<HashMap<String, String>> filter_through_npi(ArrayList<HashMap<Integer, Step>> context, Classifier t) throws NumberFormatException, Exception {
+  public static ArrayList<HashMap<String, String>> filter_through_npi(ArrayList<HashMap<Integer, Step>> context, Classifier t, String executor_command) throws NumberFormatException, Exception {
 //    StringBuffer sb = new StringBuffer();
 //
 //    Process p = Runtime.getRuntime().exec("python3 /root/ContextToCode/predictor/main.py --do_inference");
@@ -183,15 +184,22 @@ public class Generator  {
 //    while ((line = reader.readLine())!= null) {
 //      sb.append(line+"\n");
 //    }
+    ArrayList<HashMap<String, String>> snippets = new ArrayList<>();
 
-    HashMap<Integer, Step> st = context.get(context.size()-1);
-    System.err.println(st.get(st.keySet().size()-1).program+" ^ "+st.get(st.keySet().size()-1).additional_info.get("path")
-        +" ^ "+st.get(st.keySet().size()-1).additional_info.get("line")+" ^ "+st.get(st.keySet().size()-1).additional_info.get("text"));
-    Pumpkin pmp = new Pumpkin(new Gson().fromJson(Utils.sendPost(new Gson().toJson(context), "http://78.46.103.68:8081/"), int[].class), context, t);
-    return pmp.snippetize();
+    if ( context.size() > 0) {
+      System.err.println("In");
+      //    HashMap<Integer, Step> st = context.get(context.size()-1);
+      //    System.err.println(st.get(st.keySet().size()-1).program.get("id").getValue()+" ^ "+st.get(st.keySet().size()-1).additional_info.get("path")
+      //        +" ^ "+st.get(st.keySet().size()-1).additional_info.get("line")+" ^ "+st.get(st.keySet().size()-1).additional_info.get("text"));
+      Pumpkin pmp = new Pumpkin(new Gson().fromJson(Utils.sendPost(new Gson().toJson(context), "http://78.46.103.68:8081/"), int[].class), context, t);
+      return pmp.snippetize(executor_command, snippets);
+    } else {
+      System.err.println(context);
+      return snippets;
+    }
   }
 
-  public int eval() throws Exception {
+/*  public int eval() throws Exception {
 	  Classifier t = new Classifier();//(key_, description_, folder_, executor_comand_);
     loadCodeSearch(null, ASC, 2, t, null);
 
@@ -221,100 +229,30 @@ public class Generator  {
     //    TF tf = new TF(output, model);
     //    return tf.eval();
     return 0;
-  }
+  }*/
 
-  public void loadCodeSearch(InnerClass[] data, int direction, int limit, Classifier t, Integer sample_size) throws JsonSyntaxException, IOException, InterruptedException {
-    //      ArrayList<String> code = new ArrayList<String>(Arrays.asList(Utils.readFile("/root/toCode/output/cs/66533677").split("\n")));
-    ArrayList<Vector[]> res = new ArrayList<>();
-    HashSet<String> commands = new HashSet<>();
-    HashMap<String, Double> hot_ecnoding = new HashMap<>();
-    PopularCounter popular = new PopularCounter(bad_types);
-    
-    System.err.println("!"+root+t.folder);
-    File file = new File(root+"/context.json"); 
-    file.delete();
-    file = new File(root+"/log.json"); 
-    file.delete();
-    file = new File(root+"/pop_comm"); 
-    file.delete();
-    file = new File(root+"/pop_lines"); 
-    file.delete();
-    int file_num = 0;
-
-    int count = 0;
-    int top = 0;
-    int all = 0;
-
-    if (data == null) {
-      File[] files = new File(root+t.folder).listFiles();
-      for (File f : files) {
-        if (sample_size != null && file_num > sample_size)
-          break;
-        // if (f.getPath().contains("psi") || key != null) {
-        //      System.err.println(f.getPath());
-
-        InnerClass[] code = gson.fromJson(Utils.readFile(f.getPath()), InnerClass[].class);
-
-        if ( direction == DESC )
-          ArrayUtils.reverse(code);
-        for ( InnerClass c : code ) {
-          if (c.matches(t.classes)) {
-            for (InnerClass key : t.classes)
-              if (c.hasElements(key)) {
-                if (key.type.equals("truekey"))
-                  c.executor_command = key.executor_command;
-                else
-                  c.executor_command = "1";
-              }
-          } else {
-            c.executor_command = Executor.NOT_CONNECT;
+  public void loadCode(InnerClass[] data, int direction, Classifier t) throws JsonSyntaxException, IOException, InterruptedException {
+    if ( direction == DESC )
+      ArrayUtils.reverse(data);
+    for ( InnerClass c : data ) {
+      if (c.matches(t.classes)) {
+        for (InnerClass key : t.classes)
+          if (c.hasElements(key)) {
+            if (key.type.equals("truekey"))
+              c.executor_command = key.executor_command;
+            else
+              c.executor_command = "1";
           }
-            
-          
-//          if (!c.elements.isEmpty() && c.line_text.toLowerCase().contains("import")) {
-            //  if (t.equals("catch remoteexception e"))
-            //          System.err.println(c.line_text);              
-            popular.add(c);
-//          }
-        }
-        //      }
-        iterateCode(code, t, f.getPath(), commands, res, limit);
-        file_num += 1;
-      }
-    } else {
-      InnerClass[] code = data;
-      iterateCode(code, t, "", commands, res, limit);
-    }
-    int counter = 0;
-//    System.exit(1);
-   /* for (Entry<PopularType, Integer> c : popular.items.entrySet()) {
-      counter ++;
-      if (c.getValue() > 1)
-        count += 1;
-      if (counter < 50)
-        top += c.getValue();
-      all += c.getValue();
-    }*/
-
-    Utils.writeFile1(sortByValue(popular.ast_types).toString(), root+"/pop_lines", false);
-    Utils.writeFile1(sortByValue(popular.commands).toString(), root+"/pop_comm", false);
-    
-    //Files.write(root+root_key+"/pop_lines", sortByValue(popular_lines).toString(), Charset.forName("UTF-8"));
-    System.err.println(top+" * "+count+" * "+res.size());
-    hot_ecnoding = hotEncode(commands, root+"hots");
-
-     for (Vector[] c : res) {
-      for (Vector v : c) {
-        v.vectorize(hot_ecnoding);
-        t.vs.add(v);
+      } else {
+        c.executor_command = Executor.NOT_CONNECT;
       }
     }
+    code = data;
   }
   
   public void iterateCode(InnerClass[] code, Classifier t, String path, HashSet<String> commands, ArrayList<Vector[]> res, int limit) {
 	  for (int line = code.length-1; line >= 0; line --) {
-	    if (code[line].matches(t.classes) || t.classes.isEmpty())
-	      if ( (t.classes.isEmpty() && line == code.length-1) || (/*TRIN*/!t.classes.isEmpty()  && code[line].matches(t.classes)) ) {
+		  if ( (!t.blocking && line == code.length-1) || (/*TRIN*/t.blocking  && code[line].matches(t.classes)) ) {
 			  Vector[] snip = Parser.getSnippet(line, code, commands, path, t.classes, good_types, bad_types, limit);
 			  if (snip.length > 0) {
 				  res.add(snip);
@@ -330,27 +268,9 @@ public class Generator  {
 //    }
 //  };
 
-  private static <K, V> HashMap<K, V> sortByValue(Map<K, V> map) {
-    List<Entry<K, V>> list = new LinkedList<>(map.entrySet());
-    Collections.sort(list, new Comparator<Object>() {
-      @SuppressWarnings("unchecked")
-      public int compare(Object o1, Object o2) {
-        return ((Comparable<V>) ((Map.Entry<K, V>) (o2)).getValue()).compareTo(((Map.Entry<K, V>) (o1)).getValue());
-      }
-    });
-
-    HashMap<K, V> result = new LinkedHashMap<>();
-    for (Iterator<Entry<K, V>> it = list.iterator(); it.hasNext();) {
-      Map.Entry<K, V> entry = (Map.Entry<K, V>) it.next();
-      result.put(entry.getKey(), entry.getValue());
-    }
-
-    return result;
-  }
-
-  private static HashMap<String, Double> hotEncode(HashSet<String> commands, String hots) throws IOException {
+  public void hotEncode(HashSet<String> commands, String hots, ArrayList<Vector[]> res, Classifier t) throws IOException {
     HashMap<String, Double> hot_ecnoding = new HashMap<>();
-
+System.err.println(res);
     Double count = 0.0;
     File f = new File(hots);
     if(f.exists() && !f.isDirectory()) { 
@@ -364,7 +284,13 @@ public class Generator  {
       }
     }
     Utils.saveJsonFile(hots, hot_ecnoding);
-    return hot_ecnoding;
+    
+    for (Vector[] c : res) {
+      for (Vector v : c) {
+        v.vectorize(hot_ecnoding);
+        t.vs.add(v);
+      }
+    }
   }
 
   public void snippetize() throws JsonSyntaxException, IOException {
@@ -411,46 +337,12 @@ public class Generator  {
           if (p.getValue() > 5)
             s.put(p.getKey(), p.getValue());
 
-        snippet.put(ps.getKey(), sortByValue(s));
+        snippet.put(ps.getKey(), Utils.sortByValue(s));
       }
       
       Utils.writeFile1(new Gson().toJson(snippet), root+"/pre_snippet", false);
     } catch (Exception e) {
       e.printStackTrace();
-    } 
-    System.err.println(summ);
-    System.exit(1);
-  }
-}
-
-
-class PopularCounter {
-  public HashMap<String, Integer> ast_types = new HashMap<>();
-  public HashMap<String, Integer> commands = new HashMap<>();
-  public ArrayList<String> bad_types;
-
-  public PopularCounter(ArrayList<String> bad_types_) {
-    bad_types = bad_types_;
-  }
-
-  public void add(InnerClass c) {
-    String prev_type = "";
-    for (ElementInfo e : c.elements ) {
-      if (e.ast_type != null && !e.ast_type.isEmpty()) {
-        //        PopularType t1 = new PopularType(c, bad_types);
-        if (e.ast_type.contains("PsiType:")) {
-          prev_type = e.ast_type;
-          if (ast_types.containsKey(e.ast_type)) 
-            ast_types.put(e.ast_type, ast_types.get(e.ast_type)+1);
-          else 
-            ast_types.put(e.ast_type, 1);
-        } else if (e.ast_type.contains("PsiIdentifier:") && !prev_type.isEmpty()) {
-          if (commands.containsKey(prev_type+"*#*"+e.ast_type))
-            commands.put(prev_type+"*#*"+e.ast_type, commands.get(prev_type+"*#*"+e.ast_type)+1);
-          else
-            commands.put(prev_type+"*#*"+e.ast_type, 1);
-        }
-      }
     }
   }
 }

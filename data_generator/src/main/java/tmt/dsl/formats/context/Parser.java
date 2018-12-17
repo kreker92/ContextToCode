@@ -52,7 +52,8 @@ public class Parser {
         }
       }
     }
-    if (res.size() > 1 && sequence.get(sequence.size()-1).equals("1")) {
+
+    if (res.size() > 1 && seqToPass(sequence)) {
       commands.addAll(commands_local);
       return res.toArray(new Vector[res.size()]);
     }
@@ -60,6 +61,14 @@ public class Parser {
       return new Vector[0];
   }
   
+  private static boolean seqToPass(ArrayList<String> sequence) {
+     if (sequence.get(sequence.size()-1).equals("1") 
+         || sequence.size() == 2 && sequence.get(sequence.size()-2).equals("1"))
+       return true;
+     else
+       return false;
+}
+
   private static boolean withContext(ArrayList<String> sequence, int limit, int count) {
     if (sequence.size() >= limit 
         && sequence.get(count-2).equals("1") 

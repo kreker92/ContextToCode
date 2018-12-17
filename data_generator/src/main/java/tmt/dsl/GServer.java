@@ -1,5 +1,6 @@
 package tmt.dsl;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.PrintStream;
@@ -7,12 +8,13 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 import com.google.gson.Gson;
 
+import tmt.conf.Utils;
 import tmt.dsl.data.Generator;
-import tmt.dsl.data.Utils;
 import tmt.dsl.executor.info.Step;
 import tmt.dsl.formats.context.Vector;
 import tmt.dsl.formats.context.in.ElementInfo;
@@ -31,8 +33,8 @@ public class GServer {
     else if (args[0].equals("eval"))
       router(EVAL, null);
     else if (args[0].equals("inference")) {
-        InnerClass[] code = new Gson().fromJson(Utils.readFile("/root/ContextToCode/data/datasets/post"), InnerClass[].class);
-        router(INFERENCE, code);
+      InnerClass[] code = new Gson().fromJson(Utils.readFile("/root/ContextToCode/data/datasets/post"), InnerClass[].class);
+      router(INFERENCE, code);
     }
     else if (args[0].equals("pattern"))
       router(PATTERN, null);
@@ -49,44 +51,116 @@ public class GServer {
     
     ArrayList<Classifier> templates = getTemplates();
 
-    if (swtch == LEARN) {
-      g.loadCodeSearch(null, g.ASC, 3, templates.get(0), null);
-    	
-      g.setTrainAndTest(null, templates.get(0));
-    }
-//    else if (swtch == EVAL) {
-//      res = g.eval();
-//    }
+    if (swtch == LEARN) 
+      doLearn(g, templates.get(0));
+    else if (swtch == EVAL) 
+      doEval(g, templates.get(0));
+//    	g.loadCode(null, g.ASC, 3, templates.get(0), null);
+//
+//    	ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(templates.get(0));
+//
+//    	res = g.filter_through_npi(out, templates.get(1));
+    
     else if (swtch == PATTERN) {
-      g.loadCodeSearch(null, g.ASC, 6, templates.get(0), null);
-
-      ArrayList<HashMap<Integer, Step>> out_raw = g.setTrainAndTest(null, templates.get(0));
-      ArrayList<HashMap<Integer, Step>> out = new ArrayList<>();
-      
-      for (int i = 20; i > 10; i--) {
-        out.add(out_raw.get(i));
-        res = g.filter_through_npi(out, templates.get(1));
-        out.clear();
-      }
+//      doPattern(g, templates.get(0));
     }
-    else if (swtch == INFERENCE) {
-//      InnerClass[] code = null;
-//      if (data != null) {
-//        code = new Gson().fromJson(data, InnerClass[].class);
-//      }
-        
-      for ( InnerClass c : code )
-        c.executor_command = "1";
-    		
-      g.loadCodeSearch(code, g.ASC, 4, templates.get(0), null);
-      
-      ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(code, templates.get(0));
-      
-      res = g.filter_through_npi(out, templates.get(1));
-    }
+    else if (swtch == INFERENCE) 
+      doInference(g, templates.get(0));    
+//      for ( InnerClass c : code )
+//        c.executor_command = "1";
+//    		
+//      g.loadCode(code, g.ASC, 4, templates.get(0), null);
+//      
+//      ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(templates.get(0));
+//      
+//      res = g.filter_through_npi(out, templates.get(1));
+    
 
     return res;
   }
+  
+  private static void doInference(Generator g, Classifier classifier) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  private static void doEval(Generator g, Classifier t) throws Exception {
+    
+    t.blocking = false;
+    
+    File[] files = new File(g.root+t.folder).listFiles();
+    int count = 0;
+    
+    for (File f : files) {
+      System.err.println(f.getPath());
+
+      InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getPath()), InnerClass[].class);
+      g.loadCode(code, g.ASC, t);
+      
+      for (int line = code.length-1; line >= 0; line --) {
+        ArrayList<Vector[]> res = new ArrayList<>();
+        HashSet<String> commands = new HashSet<>();
+        t.clear();
+        if (!code[line].executor_command.equals("1") && line == 165) {
+          System.err.println(line+"@");
+          g.iterateCode(Arrays.copyOfRange(code, 0, line), t, f.getPath(), commands, res, 5);
+          g.hotEncode(commands, g.root+"hots", res, t);
+
+          ArrayList<HashMap<Integer, Step>> info = g.setTrainAndTest(t);
+          System.err.println(res+"@");
+          ArrayList<HashMap<String, String>> output = g.filter_through_npi(info, t, code[line].executor_command);
+
+          count ++;
+
+         // if (count > 21)
+            System.exit(1);
+        }
+      }
+    }
+  }
+
+  private static void doLearn(Generator g, Classifier t) throws Exception {
+    ArrayList<Vector[]> res = new ArrayList<>();
+    HashSet<String> commands = new HashSet<>();
+    PopularCounter popular = new PopularCounter(g.bad_types);
+    
+    File file = new File(g.root+"/context.json"); 
+    file.delete();
+    file = new File(g.root+"/log.json"); 
+    file.delete();
+    file = new File(g.root+"/pop_comm"); 
+    file.delete();
+    file = new File(g.root+"/pop_lines"); 
+    file.delete();
+    
+    File[] files = new File(g.root+t.folder).listFiles();
+    for (File f : files) {
+      System.err.println(f.getPath());
+
+      InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getPath()), InnerClass[].class);
+      g.loadCode(code, g.ASC, t);
+      
+      g.iterateCode(code, t, f.getPath(), commands, res, 3);
+
+      for ( InnerClass c : code )
+        popular.add(c);
+    }
+    
+    g.hotEncode(commands, g.root+"hots", res, t);
+    
+    Utils.writeFile1(Utils.sortByValue(popular.ast_types).toString(), g.root+"/pop_lines", false);
+    Utils.writeFile1(Utils.sortByValue(popular.commands).toString(), g.root+"/pop_comm", false);
+
+    g.setTrainAndTest(t);
+//    ArrayList<HashMap<Integer, Step>> out = new ArrayList<>();
+//    
+//    for (int i = 20; i > 10; i--) {
+//      out.add(out_raw.get(i));
+//      res = g.filter_through_npi(out, templates.get(1));
+//      out.clear();
+//    }
+  }
+
   
   /**
   
@@ -113,7 +187,7 @@ public class GServer {
 
 	  Classifier t1 = new Classifier("android_crossvalidation/ast");
 	  
-	  Classifier t2 = new Classifier("android_crossvalidation/ast");
+	  Classifier t2 = new Classifier("android/ast1");
 	  
 	  InnerClass ic = new InnerClass("falsekey", "2");
 	  ic.elements.add(new ElementInfo("ast_type", "PsiType:String", null));
@@ -162,7 +236,7 @@ public class GServer {
       ic6.description = " Returns the value of the requested column as a String. ";
 
       
-      InnerClass ic7 = new InnerClass("truekey", "9"); 
+      InnerClass ic7 = new InnerClass("falsekey", "9"); 
       ic7.elements.add(new ElementInfo("ast_type", "PsiType:TextView", null));
       ic7.elements.add(new ElementInfo("ast_type", "PsiIdentifier:setText", null));
       LinkedHashMap<String, String> temp7_1 = new LinkedHashMap<>();
@@ -170,6 +244,15 @@ public class GServer {
       temp7_1.put("literal1",".setText(int id))");
       ic7.scheme.add(temp7_1);
       ic7.description = " Sets the text to be displayed using a string resource identifier. ";
+      
+      InnerClass ic9 = new InnerClass("truekey", "9"); 
+      ic9.elements.add(new ElementInfo("ast_type", "PsiType:TextView", null));
+      ic9.elements.add(new ElementInfo("ast_type", "PsiIdentifier:setText", null));
+      LinkedHashMap<String, String> temp9_1 = new LinkedHashMap<>();
+      temp9_1.put("stab_req","PsiType:TextView");
+      temp9_1.put("literal1",".setText(int id))");
+      ic9.scheme.add(temp7_1);
+      ic9.description = " Sets the text to be displayed using a string resource identifier. ";
 
       InnerClass ic8 = new InnerClass("truekey", "10"); 
       ic8.elements.add(new ElementInfo("ast_type", "PsiType:Context", null));
@@ -182,16 +265,19 @@ public class GServer {
       ic8.description = " Returns a Resources instance for the application's package. ";
 
       t2.classes.add(ic4);
-      t2.classes.add(ic3);
-      t2.classes.add(ic1);
-      t2.classes.add(ic6);
-      t2.classes.add(ic7);
-      t2.classes.add(ic5);
-      t2.classes.add(ic8);
-      
+//      t2.classes.add(ic3);
+//      t2.classes.add(ic1);
+//      t2.classes.add(ic6);
+//      t2.classes.add(ic7);
+//      t2.classes.add(ic5);
+//      t2.classes.add(ic8);
+//      t2.classes.add(ic);
+//      
 //      t1.classes.add(ic3);
+//      t1.classes.add(ic5);
+//      t1.classes.add(ic9);
 	  
-	  res.add(t1);
+//	  res.add(t1);
 	  res.add(t2);
       
       /*Template t2 = new Template("Retrieve the general action to be performed, such as ACTION_VIEW", "database/ast2/");
@@ -233,3 +319,35 @@ public class GServer {
 	  return res;
   }
 }
+
+    
+    class PopularCounter {
+      public HashMap<String, Integer> ast_types = new HashMap<>();
+      public HashMap<String, Integer> commands = new HashMap<>();
+      public ArrayList<String> bad_types;
+
+      public PopularCounter(ArrayList<String> bad_types_) {
+        bad_types = bad_types_;
+      }
+
+      public void add(InnerClass c) {
+        String prev_type = "";
+        for (ElementInfo e : c.elements ) {
+          if (e.ast_type != null && !e.ast_type.isEmpty()) {
+            //        PopularType t1 = new PopularType(c, bad_types);
+            if (e.ast_type.contains("PsiType:")) {
+              prev_type = e.ast_type;
+              if (ast_types.containsKey(e.ast_type)) 
+                ast_types.put(e.ast_type, ast_types.get(e.ast_type)+1);
+              else 
+                ast_types.put(e.ast_type, 1);
+            } else if (e.ast_type.contains("PsiIdentifier:") && !prev_type.isEmpty()) {
+              if (commands.containsKey(prev_type+"*#*"+e.ast_type))
+                commands.put(prev_type+"*#*"+e.ast_type, commands.get(prev_type+"*#*"+e.ast_type)+1);
+              else
+                commands.put(prev_type+"*#*"+e.ast_type, 1);
+            }
+          }
+        }
+      }
+    }

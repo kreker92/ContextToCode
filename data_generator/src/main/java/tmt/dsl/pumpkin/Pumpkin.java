@@ -34,13 +34,12 @@ public class Pumpkin {
     context = context_;
   }
 
-  public ArrayList<HashMap<String, String>> snippetize() {
-    ArrayList<HashMap<String, String>> snippets = new ArrayList<>();
+  public ArrayList<HashMap<String, String>> snippetize(String command, ArrayList<HashMap<String, String>> snippets) {
     for (Integer c : candidates)
       if (stabs.containsKey(c))
         fill(stabs.get(c), snippets);
     
-    System.err.println(new Gson().toJson(snippets)+" - "+candidates);
+    System.err.println(command+" - "+new Gson().toJson(snippets)+" - "+candidates);
     return snippets;
   }
 

@@ -17,6 +17,8 @@ import json
 from tasks.env.config import DSL_DATA_PATH
 from pprint import pprint
 import collections
+from random import shuffle
+
 
 def explode (str):
     return str.replace(':', ' ').replace(', ', ' ').replace('-', ' ').split(' ')
@@ -44,12 +46,16 @@ def generate_addition( ):
 
     with open(DSL_DATA_PATH, 'r') as handle:
         parsed = json.load(handle)
-
+    shuffle(parsed)
     # times = pd.date_range('2000-10-01', end='2017-12-31', freq='5min').tolist()
     #
     train_data = []
     test_data = []
     count = 0
+
+    progs = {};
+    progs["target"] = 0;
+    progs["nontarget"] = 0;
     # dates = []
     # members_set = set()
     # for i in np.random.choice(times, size=num_examples, replace=False):
@@ -71,13 +77,23 @@ def generate_addition( ):
     # members_list = list(members_set)
     # count = 0
     for row_r in parsed:
-        count += 1
+        temp = []
+        pr = transform(row_r, temp)
 
-        if (count % 5 == 0):
-            transform(row_r, test_data)
-        else:
-            transform(row_r, train_data)
+        if pr != "1" or progs["target"] > (progs["nontarget"]*5):
+            count += 1
+            if pr == "1":
+                progs["nontarget"] += 1;
+            else:
+                progs["target"] += 1;
+            if (count % 20 == 0):
+                test_data = test_data + temp
+            else:
+                train_data = train_data + temp
+ 
 
+    print(progs)
+    print("##"+str(count))
     with open('tasks/env/data/test.pik', 'wb') as f:
         pickle.dump(test_data, f)
     with open('tasks/env/data/train.pik', 'wb') as f:
@@ -89,6 +105,7 @@ def generate_addition( ):
 def transform(row_r, dataset):
     row = collections.OrderedDict(sorted(row_r.items()))
     trace = []
+    cur_prog = 0
     for key, values in row.items():
         step = {}
         # count += 1
@@ -126,11 +143,14 @@ def transform(row_r, dataset):
                         program['program'] = e_v.get('value')
                     if e_k == 'id':
                         program['id'] = e_v.get('value')
+                        cur_prog = e_v.get('value')
 
                 step['program'] = program
             elif k == 'additional_info':
                 step['addinfo'] = v
         trace.append(step)
-    print(trace)
+   # print(trace)
     # ({"command": "MOVE_PTR", "id": P["MOVE_PTR"], "arg": [OUT_PTR, LEFT], "terminate": False})
     dataset.append(trace)
+	
+    return cur_prog
