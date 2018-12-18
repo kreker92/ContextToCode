@@ -8,6 +8,7 @@ import time
 from tasks.generate_data import generate_addition
 from tasks.eval import evaluate_addition, multiclass_eval
 from tasks.train import train_addition
+from tasks.data import data
 from tasks.env.config import CONFIG
 
 
@@ -22,6 +23,7 @@ tf.app.flags.DEFINE_boolean("do_train", False, "Boolean whether to continue trai
 tf.app.flags.DEFINE_boolean("do_eval", False, "Boolean whether to perform model evaluation.")
 tf.app.flags.DEFINE_boolean("do_multiclass_eval", False, "Boolean whether to perform model evaluation.")
 tf.app.flags.DEFINE_boolean("do_inference", False, "Boolean whether to perform model evaluation.")
+tf.app.flags.DEFINE_boolean("data", False, "Boolean whether to perform model evaluation.")
 tf.app.flags.DEFINE_integer("num_epochs",  1, "Number of training epochs to perform.")
 tf.app.flags.DEFINE_integer("start_epoch", 0, "Number of training epochs to perform.")
 tf.app.flags.DEFINE_integer("start_step", 0, "Number of training epochs to perform.")
@@ -74,6 +76,10 @@ def main(_):
         # Evaluate Model
         if FLAGS.do_multiclass_eval:
             multiclass_eval()
+			
+        # Evaluate Model
+        if FLAGS.data:
+            data()
 			
         #if FLAGS.do_inference:
          #   inference()

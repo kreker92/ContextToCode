@@ -132,7 +132,7 @@ public class Generator  {
     try {
         long start1 = System.currentTimeMillis();
 
-        int max = 0;
+//        int max = 0;
 
         HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
         //      BufferedReader br = new BufferedReader(new FileReader(vectors));
@@ -145,9 +145,9 @@ public class Generator  {
             sequences.put(v.parent_id, tmp);
           }
 
-          for (Integer n : v.vector)
-            if (n > max)
-              max = n;
+//          for (Integer n : v.strings)
+//            if (n > max)
+//              max = n;
 
           sequences.get(v.parent_id).add(v);
         }
@@ -162,8 +162,7 @@ public class Generator  {
         }
         
         DSL.send(new Gson().toJson(output), "", filename);
-
-      System.err.println("max: "+max+" time: "+(System.currentTimeMillis() - start1)+" size: "+output.size());
+//      System.err.println("max: "+max+" time: "+(System.currentTimeMillis() - start1)+" size: "+output.size());
     } catch (Exception e) {
       e.printStackTrace();
     } 
@@ -171,7 +170,7 @@ public class Generator  {
     return output;
   }
 
-  public static ArrayList<HashMap<String, String>> filter_through_npi(ArrayList<HashMap<Integer, Step>> context, Classifier t, String executor_command) throws NumberFormatException, Exception {
+  public ArrayList<HashMap<String, String>> filter_through_npi(ArrayList<HashMap<Integer, Step>> context, Classifier t) throws NumberFormatException, Exception {
 //    StringBuffer sb = new StringBuffer();
 //
 //    Process p = Runtime.getRuntime().exec("python3 /root/ContextToCode/predictor/main.py --do_inference");
@@ -187,14 +186,13 @@ public class Generator  {
     ArrayList<HashMap<String, String>> snippets = new ArrayList<>();
 
     if ( context.size() > 0) {
-      System.err.println("In");
+//      System.err.println("In"+context.size());
       //    HashMap<Integer, Step> st = context.get(context.size()-1);
       //    System.err.println(st.get(st.keySet().size()-1).program.get("id").getValue()+" ^ "+st.get(st.keySet().size()-1).additional_info.get("path")
       //        +" ^ "+st.get(st.keySet().size()-1).additional_info.get("line")+" ^ "+st.get(st.keySet().size()-1).additional_info.get("text"));
       Pumpkin pmp = new Pumpkin(new Gson().fromJson(Utils.sendPost(new Gson().toJson(context), "http://78.46.103.68:8081/"), int[].class), context, t);
-      return pmp.snippetize(executor_command, snippets);
+      return pmp.snippetize(snippets);
     } else {
-      System.err.println(context);
       return snippets;
     }
   }
@@ -259,6 +257,10 @@ public class Generator  {
 			  }
 		  }
 	  }
+	  
+      for (Vector[] c : res) 
+        for (Vector v : c) 
+          t.vs.add(v);
   }
 
 //  public static Comparator<PopularItem> comparator_desc = new Comparator<PopularItem>() {
@@ -267,31 +269,6 @@ public class Generator  {
 //      return c;
 //    }
 //  };
-
-  public void hotEncode(HashSet<String> commands, String hots, ArrayList<Vector[]> res, Classifier t) throws IOException {
-    HashMap<String, Double> hot_ecnoding = new HashMap<>();
-System.err.println(res);
-    Double count = 0.0;
-    File f = new File(hots);
-    if(f.exists() && !f.isDirectory()) { 
-      hot_ecnoding = new Gson().fromJson(new FileReader(hots), HashMap.class);
-      count = hot_ecnoding.values().size()*1.0;
-    }
-    for (String comm : commands) {
-      if (!hot_ecnoding.containsKey(comm)) {
-        hot_ecnoding.put(comm, count);
-        count++;
-      }
-    }
-    Utils.saveJsonFile(hots, hot_ecnoding);
-    
-    for (Vector[] c : res) {
-      for (Vector v : c) {
-        v.vectorize(hot_ecnoding);
-        t.vs.add(v);
-      }
-    }
-  }
 
   public void snippetize() throws JsonSyntaxException, IOException {
     int summ = 0;

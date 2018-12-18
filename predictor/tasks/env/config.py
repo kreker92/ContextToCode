@@ -9,29 +9,36 @@ Embedding Information, etc.
 import numpy as np
 import tensorflow as tf
 
-DATA_PATH_TRAIN = "log/network_dimension_research/multyonehot/train.pik"
-DATA_PATH_TEST = "log/network_dimension_research/multyonehot/test.pik"
+DATA_PATH_TRAIN = "tasks/env/data/train.pik"
+DATA_PATH_TEST = "tasks/env/data/test.pik"
+DATA_PATH_ENCODE_MASK = "tasks/env/data/test.pik"
 LOG_PATH = "log/"
-CKPT_PATH = "log/1class/StringBuilder_append/multyonehot/model-0008.ckpt"
-CKPT_PATH_CLASS1 = "log/1class/StringBuilder_append/multyonehot/model-0008.ckpt"
-CKPT_PATH_CLASS3 = "log/1class/View_findViewById/multyonehot/model-0008.ckpt"
-CKPT_PATH_CLASS2 = "log/1class/New_intent/multyonehot/model-0008.ckpt"
-CKPT_PATH_CLASS4 = "log/1class/PrintWriter_print/multyonehot/model-0008.ckpt"
+CKPT_PATH = "log/1class/Context_getRecources/multyonehot/model-0008.ckpt"
+CKPT_PATH_CLASS1 = "log/1class/Context_getRecources/multyonehot/model-0008.ckpt"
+MASK_PATH_CLASS1 = "log/1class/Context_getRecources/hots"
+CKPT_PATH_CLASS3 = "log/1class/View_findViewById/multyonehot/model-0007.ckpt"
+MASK_PATH_CLASS3 = "log/1class/View_findViewById/hots"
+CKPT_PATH_CLASS2 = "log/1class/Cursor_getString/multyonehot/model-0006.ckpt"
+MASK_PATH_CLASS2 = "log/1class/Cursor_getString/hots"
+CKPT_PATH_CLASS4 = "log/1class/TextView_setText/multyonehot/model-0008.ckpt"
+MASK_PATH_CLASS4 = "log/1class/TextView_setText/hots"
+CKPT_PATH_CLASS5 = "log/1class/TextView_findViewById/multyonehot/model-0008.ckpt"
+MASK_PATH_CLASS5 = "log/1class/TextView_findViewById/hots"
 DSL_DATA_PATH = "/root/ContextToCode/data/datasets/context.json"
 TEST_CHUNK_PATH = "dsl/data/test.json"
-EVAL_LIMIT = 5
+EVAL_LIMIT = 500
 
 CONFIG = {
     "ENVIRONMENT_ROW": 9,         # Input 1, Input 2, Carry, Output
     "ENVIRONMENT_COL": 9,         # 10-Digit Maximum for Addition Task
-    "ENVIRONMENT_DEPTH": 61225,      # Size of each element vector => One-Hot, Options: 0-9
+    "ENVIRONMENT_DEPTH": 104969,      # Size of each element vector => One-Hot, Options: 0-9
 
     "ARGUMENT_NUM": 1,            # Maximum Number of Program Arguments
     "ARGUMENT_DEPTH": 75,         # Size of Argument Vector => One-Hot, Options 0-9, Default (10)
     "DEFAULT_ARG_VALUE": 74,      # Default Argument Value
 
-    "PROGRAM_NUM": 10,             # Maximum Number of Subroutines
-    "PROGRAM_KEY_SIZE": 10,        # Size of the Program Keys
+    "PROGRAM_NUM": 11,             # Maximum Number of Subroutines
+    "PROGRAM_KEY_SIZE": 11,        # Size of the Program Keys
     "PROGRAM_EMBEDDING_SIZE": 13  # Size of the Program Embeddings
 }
 

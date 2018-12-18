@@ -14,7 +14,7 @@ import datetime
 import tensorflow as tf
 import re
 import json
-from tasks.env.config import DSL_DATA_PATH
+from tasks.env.config import DSL_DATA_PATH, DATA_PATH_ENCODE_MASK
 from pprint import pprint
 import collections
 from random import shuffle
@@ -78,7 +78,7 @@ def generate_addition( ):
     # count = 0
     for row_r in parsed:
         temp = []
-        pr = transform(row_r, temp)
+        pr = transform(row_r, temp, DATA_PATH_ENCODE_MASK)
 
         if pr != "1" or progs["target"] > (progs["nontarget"]*5):
             count += 1
@@ -102,10 +102,12 @@ def generate_addition( ):
     #     for c in train_data:
     #         f.write(str(c))
 
-def transform(row_r, dataset):
+def transform(row_r, dataset, mask_file):
     row = collections.OrderedDict(sorted(row_r.items()))
     trace = []
     cur_prog = 0
+    with open(mask_file) as f:
+        mask = json.load(f)
     for key, values in row.items():
         step = {}
         # count += 1
@@ -127,7 +129,10 @@ def transform(row_r, dataset):
             if k == 'supervised_env':
                 environment = {}
                 for e_k, e_v in v.items():
-                    environment[e_k] = int(e_v.get('value'))
+                    if e_v.get('value') in mask:
+                        environment[e_k] = int(float(mask.get(e_v.get('value'))))
+                    else:
+                        environment[e_k] = -1
                 environment['terminate'] = "false"
                 step['environment'] = environment
             elif k == 'argument':

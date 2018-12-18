@@ -10,7 +10,7 @@ import tmt.dsl.formats.context.in.InnerClass;
 public class Vector {
   public ArrayList<Integer> vector = new ArrayList<>();
   public ArrayList<String> strings = new ArrayList<>();
-  private Integer row = null;
+  public Integer row = null;
   private Integer level = null;
   private String origin;
   private String node;
@@ -41,7 +41,7 @@ public class Vector {
   
   public Vector(InnerClass c, HashSet<String> commands, int i, String line, boolean b, int level_, String path_, int line_num_, ArrayList<String> goodTypes, ArrayList<String> badTypes) {
     origin = line;//.toLowerCase().replaceAll("[^a-z]", " ").replaceAll(" +", " ").trim();;
-    line_num = line_num_;
+    line_num = c.line_num;
     path = path_;
 
     if (b)
@@ -91,15 +91,6 @@ public class Vector {
   
   public int getLevel() {
     return level;
-  }
-
-  public void vectorize(HashMap<String, Double> hot_ecnoding) {
-    for (String s : strings) {
-	  int val = -1;
-	  if (hot_ecnoding.containsKey(s) && hot_ecnoding.get(s) < 104969)
-		val = ((Double)hot_ecnoding.get(s)).intValue();
-      vector.add(val);
-    }
   }
 
   public String toString() {
