@@ -9,19 +9,8 @@ no context: 0, yes context: 2618, class: 2618, correct: 1260, incorrect1358 by c
 
 **All lines:** ~ 300000
 
-**Current scope** top popular Android libraries,  PsiType:Context=6427,
- PsiType:Parcel=4981,
- PsiType:View=4748,
- PsiType:Rect=3946,
- PsiType:Intent=3406,
- PsiType:Bitmap=2933,
- PsiType:Paint=2280
- PsiType:StringBuilder=2116,
- PsiType:PrintWriter=2022,
- PsiType:Bundle=2017,
- PsiType:Canvas=1944,
- PsiType:Point=1619,
- PsiType:Cursor=1585
+**Current scope** top popular Android libraries, 40024 rows (PsiType:Context=6427, PsiType:Parcel=4981, PsiType:View=4748,
+PsiType:Rect=3946, PsiType:Intent=3406, PsiType:Bitmap=2933, PsiType:Paint=2280, PsiType:StringBuilder=2116, PsiType:PrintWriter=2022,   PsiType:Bundle=2017, PsiType:Canvas=1944, PsiType:Point=1619, PsiType:Cursor=1585
 
 **Current predicting coverage**: 3%, 1200 rows 
 
