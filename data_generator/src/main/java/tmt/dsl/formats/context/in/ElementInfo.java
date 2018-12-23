@@ -12,12 +12,23 @@ public class ElementInfo {
   public String ast_type = "";
   public String parent;
   public String child;
+  public String class_method;
+  public String comparing_method;
   
   public ElementInfo(String type, String value, String text_key) {
-    if (type.equals("ast_type"))
-      ast_type = value;
-    if (type.equals("type"))
+    if (type.equals("ast_type")) {
+      this.ast_type = value;
+      this.comparing_method = "ast_type";
+    }
+    else if (type.equals("type")) {
       this.type = value;
+      this.comparing_method = "type";
+    }
+    else if (type.equals("class_method")) {
+    	this.class_method = value;
+        this.comparing_method = "class_method";
+    }
+    	
     if (text_key != null)
       text = text_key;
   }
@@ -29,9 +40,11 @@ public class ElementInfo {
       return true;
     if (!(o2 instanceof ElementInfo)) 
       return false;
-    if ( !ast_type.isEmpty() )
-      return Utils.compare(ast_type, ((ElementInfo)o2).ast_type);
-    else if ( !type.isEmpty() )
+    if ( comparing_method.equals("class_method") || ((ElementInfo)o2).equals("class_method") )
+    	return Utils.compare(class_method, ((ElementInfo)o2).class_method);
+    else if ( comparing_method.equals("ast_type") || ((ElementInfo)o2).equals("ast_type") )
+    	return Utils.compare(ast_type, ((ElementInfo)o2).ast_type);
+    else if ( comparing_method.equals("type") || ((ElementInfo)o2).equals("type") )
       if (Utils.compare(type, ((ElementInfo)o2).type)) 
         if ( !text.isEmpty() ) 
           return ((ElementInfo)o2).text.contains(text);

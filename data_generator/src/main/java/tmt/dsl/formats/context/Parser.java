@@ -30,9 +30,8 @@ public class Parser {
     return res.toArray(new Vector[res.size()]);
   } */
   
-  public static Vector[] getSnippet(int line_num, InnerClass[] code, HashSet<String> commands, String path, ArrayList<InnerClass> keys, ArrayList<String> goodTypes, ArrayList<String> badTypes, int  limit) {
+  public static Vector[] getSnippet(int line_num, InnerClass[] code, String path, ArrayList<InnerClass> keys, ArrayList<String> goodTypes, ArrayList<String> badTypes, int  limit) {
     ArrayList<Vector> res = new ArrayList<Vector>();
-    HashSet<String> commands_local = new HashSet<>();
     ArrayList<String> sequence = new ArrayList<>();
 
     int count = 0;
@@ -44,7 +43,7 @@ public class Parser {
       String line_clean = clean(line);
 //      System.err.println(i+"!"+path);
       if (hasSense(line_clean)) {
-        Vector v = new Vector(code[i], commands_local, i, line, i == line_num, count, path, line_num, goodTypes, badTypes);
+        Vector v = new Vector(code[i], i, line, i == line_num, count, path, line_num, goodTypes, badTypes);
         if (!v.isEmpty()) {
           res.add(0, v);
           sequence.add(code[i].executor_command);
@@ -53,10 +52,8 @@ public class Parser {
       }
     }
 
-    if (res.size() > 1 && seqToPass(sequence)) {
-      commands.addAll(commands_local);
+    if (res.size() > 1 && seqToPass(sequence)) 
       return res.toArray(new Vector[res.size()]);
-    }
     else
       return new Vector[0];
   }
@@ -78,7 +75,7 @@ public class Parser {
       return false;
 }
 
-  private static String clean(String line_raw) {
+  public static String clean(String line_raw) {
     String line = "";
     if (line_raw.contains("//"))
       line = line.split("//")[0];
@@ -87,7 +84,7 @@ public class Parser {
     return line.trim().replaceAll("\"([^\"]*)\"", " ").replaceAll("(?:--|[\\[\\]{}()+/\\\\])", " ").replace(",", " ").replace(".", " ").replace("=", " ").replace(";", " ");
   }
 
-  private static boolean hasSense(String line) {
+  public static boolean hasSense(String line) {
     if (line.equals("}") || line.equals("{") || line.isEmpty())
       return false;
     else

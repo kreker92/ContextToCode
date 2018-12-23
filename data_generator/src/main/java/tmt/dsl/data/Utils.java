@@ -75,7 +75,11 @@ public class Utils {
   }
   
   public static boolean compare(String str1, String str2) {
-    return (str1 == null ? str2 == null : str1.equals(str2));
+	  if (str2 != null && str1 != null && str1.contains("*"))
+		  return str2.contains(str1.replace("*", ""));
+	  if (str1 != null && str2 != null && str2.contains("*"))
+		  return str2.contains(str2.replace("*", ""));
+	  return (str1 == null ? str2 == null : str1.equals(str2));
   }
   
 

@@ -11,7 +11,7 @@ import tensorflow as tf
 
 DATA_PATH_TRAIN = "tasks/env/data/train.pik"
 DATA_PATH_TEST = "tasks/env/data/test.pik"
-DATA_PATH_ENCODE_MASK = "tasks/env/data/test.pik"
+DATA_PATH_ENCODE_MASK = "log/1class/hots"
 LOG_PATH = "log/"
 CKPT_PATH = "log/1class/Context_getRecources/multyonehot/model-0008.ckpt"
 CKPT_PATH_CLASS1 = "log/1class/Context_getRecources/multyonehot/model-0008.ckpt"

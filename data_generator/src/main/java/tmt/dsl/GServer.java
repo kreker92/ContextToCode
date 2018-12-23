@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -102,7 +103,6 @@ public class GServer {
     int count = 0;
 
     for (File f : files) {
-      //      if (f.getPath().contains("98379615")) {
 //      System.err.println(f.getPath());
 
       InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getPath()), InnerClass[].class);
@@ -110,11 +110,10 @@ public class GServer {
 
       //      for (int line = code.length-1; line >= 0; line --) {
       ArrayList<Vector[]> res = new ArrayList<>();
-      HashSet<String> commands = new HashSet<>();
       t.clear();
 
       //        if (!code[line].executor_command.equals("1")) {
-      g.iterateCode(code, t, f.getPath(), commands, res, 5);
+      g.iterateCode(code, t, f.getPath(), res, 5);
 
       ArrayList<HashMap<Integer, Step>> info = g.setTrainAndTest(t);
 
@@ -128,7 +127,7 @@ public class GServer {
       count ++;
       
       System.err.println("count: "+count);
-      if (count > 1000) {
+      if (count > 10) {
         System.err.println(c);
         System.exit(1);
       }
@@ -150,10 +149,9 @@ public class GServer {
       g.loadCode(code, g.ASC, t);
 
       ArrayList<Vector[]> res = new ArrayList<>();
-      HashSet<String> commands = new HashSet<>();
       t.clear();
 
-      g.iterateCode(code, t, f, commands, res, 5);
+      g.iterateCode(code, t, f, res, 5);
       
       ArrayList<HashMap<Integer, Step>> info = g.setTrainAndTest(t);
 
@@ -213,8 +211,6 @@ public class GServer {
   }
 
   private static void doLearn(Generator g, Classifier t) throws Exception {
-    ArrayList<Vector[]> res = new ArrayList<>();
-    HashSet<String> commands = new HashSet<>();
     PopularCounter popular = new PopularCounter(g.bad_types);
 
     File file = new File(g.root+"/context.json"); 
@@ -225,22 +221,49 @@ public class GServer {
     file.delete();
     file = new File(g.root+"/pop_lines"); 
     file.delete();
+    
+    ArrayList<Vector[]> res = new ArrayList<>();
+    
+    int count = 0;
 
     File[] files = new File(g.root+t.folder).listFiles();
     for (File f : files) {
+//        if (f.getPath().contains("97827446")) {
+
       System.err.println(f.getPath());
+      t.clear();
 
       InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getPath()), InnerClass[].class);
       g.loadCode(code, g.ASC, t);
 
-      g.iterateCode(code, t, f.getPath(), commands, res, 3);
+      g.iterateCode(code, t, f.getPath(), res, 3);
 
       for ( InnerClass c : code )
-        popular.add(c);
+    	  if(c.matches(t.classes))
+    	  		popular.add(c);
+      
+      count ++;
+      
+      System.err.println("count: "+count);
+//      if (count > 1000) 
+//    	  break;  
+////        }
     }
 
     //    g.hotEncode(commands, g.root+"hots", res, t);
 
+    Set<String> programs = Utils.sortByValue(popular.commands).keySet();
+    HashMap<String, String> temp = new HashMap<>();
+    int count1 = 1;
+    
+//    for (String p : programs) 
+//      if (count1 < 10){
+//        temp.put(p, count1+"");
+//        count1 ++;  
+//      }
+//    
+//    Utils.saveJsonFile("/root/ContextToCode/data/datasets/hots", temp);
+    
     Utils.writeFile1(Utils.sortByValue(popular.ast_types).toString(), g.root+"/pop_lines", false);
     Utils.writeFile1(Utils.sortByValue(popular.commands).toString(), g.root+"/pop_comm", false);
 
@@ -279,9 +302,9 @@ public class GServer {
 
     Classifier t1 = new Classifier("android_crossvalidation/ast");
 
-    Classifier t2 = new Classifier("android/ast1");
+    Classifier t2 = new Classifier("android/ast");
 
-    InnerClass ic = new InnerClass("falsekey", "2");
+    /*InnerClass ic = new InnerClass("falsekey", "2");
     ic.elements.add(new ElementInfo("ast_type", "PsiType:String", null));
     ic.elements.add(new ElementInfo("ast_type", "PsiIdentifier:equals", null)); 
 
@@ -317,17 +340,6 @@ public class GServer {
     ic5.scheme.add(temp5_1);
     ic5.description = " Finds the first descendant view with the given ID, the view itself if the ID matches getId(), or null if the ID is invalid (< 0) or there is no matching view in the hierarchy.";
 
-    InnerClass ic6 = new InnerClass("truekey", "8"); 
-    ic6.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
-    ic6.elements.add(new ElementInfo("ast_type", "PsiIdentifier:getString", null));
-    LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
-    temp6_1.put("literal1","String mCursorString = ");
-    temp6_1.put("stab_req","PsiType:Cursor");
-    temp6_1.put("literal2",".getString(int id))");
-    ic6.scheme.add(temp6_1);
-    ic6.description = " Returns the value of the requested column as a String. ";
-
-
     InnerClass ic7 = new InnerClass("truekey", "9"); 
     ic7.elements.add(new ElementInfo("ast_type", "PsiType:TextView", null));
     ic7.elements.add(new ElementInfo("ast_type", "PsiIdentifier:setText", null));
@@ -354,15 +366,25 @@ public class GServer {
     temp8_1.put("stab_req","PsiType:Context");
     temp8_1.put("literal2",".getResources())");
     ic8.scheme.add(temp8_1);
-    ic8.description = " Returns a Resources instance for the application's package. ";
+    ic8.description = " Returns a Resources instance for the application's package. "; */
+    
+    InnerClass ic6 = new InnerClass("truekey"); 
+    ic6.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
+    ic6.elements.add(new ElementInfo("class_method", "PsiType:Cursor#PsiIdentifier:*", null));
+    LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
+    temp6_1.put("literal1","String mCursorString = ");
+    temp6_1.put("stab_req","PsiType:Cursor");
+    temp6_1.put("literal2",".getString(int id))");
+    ic6.scheme.add(temp6_1);
+    ic6.description = " Returns the value of the requested column as a String. ";
 
 //    t2.classes.add(ic4);
 //          t2.classes.add(ic3);
 //          t2.classes.add(ic1);
           t2.classes.add(ic6);
-          t2.classes.add(ic7);
-          t2.classes.add(ic5);
-          t2.classes.add(ic4);
+//          t2.classes.add(ic7);
+//          t2.classes.add(ic5);
+//          t2.classes.add(ic4);
 //          t2.classes.add(ic);
     //      
     //      t1.classes.add(ic3);
@@ -372,42 +394,6 @@ public class GServer {
     //	  res.add(t1);
     res.add(t2);
 
-    /*Template t2 = new Template("Retrieve the general action to be performed, such as ACTION_VIEW", "database/ast2/");
-
-	  InnerContext ic1 = new InnerContext("truekey", "4");
-	  ic1.elements.add(new ElementInfo("ast_type", "PsiReferenceExpression:DriverManager"));
-	  ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:getConnection"));
-
-	  InnerContext ic1 = new InnerContext("truekey", "4");
-      ic1.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
-      ic1.elements.add(new ElementInfo("ast_type", "PsiIdentifier:startActivity"));
-
-	  t2.keys.add(ic1);
-	  //t1.keys.add(ic1);
-
-	  res.add(t2);*/
-
-    /*  Template t2 = new Template("Retrieve the general action to be performed, such as ACTION_VIEW", "android.content.intent/ast/");
-
-	  InnerContext ic2 = new InnerContext("falsekey", "2");
-	  ic2.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
-	  ic2.elements.add(new ElementInfo("ast_type", "PsiIdentifier:getAction"));
-
-	  InnerContext ic3 = new InnerContext("truekey", "4");
-	  ic3.elements.add(new ElementInfo("ast_type", "PsiType:Intent"));
-	  ic3.elements.add(new ElementInfo("ast_type", "PsiIdentifier:startActivity"));
-
-	  t2.keys.add(ic2);
-	  t2.keys.add(ic3);
-
-	  res.add(t2); */
-
-    //  res.add(new Template( new ArrayList<String>(Arrays.asList("PsiReferenceExpression:DriverManager", "PsiIdentifier:getConnection")), "Retrieve the general action to be performed, such as ACTION_VIEW", "database/ast2/", "3"));
-    //  res.add(new Template( new ArrayList<String>(Arrays.asList("PsiType:Intent", "PsiIdentifier:getAction")), new ArrayList<String>(Arrays.asList("PsiType:Intent", "PsiIdentifier:startActivity")), "Retrieve the general action to be performed, such as ACTION_VIEW", "android.content.intent/ast/", "4"));
-    /*	  res.add(new Template(".startActivity(", "Launch a new activity", "android.app.activity/ast/", "9"));
-	  res.add(new Template(".putExtra(", "Launch a new activity", "android.content.intent/ast/", "10"));
-      res.add(new Template("activity.finish()", "Launch a new activity", "android.app.activity/ast/", "11"));
-      res.add(new Template("new Intent()", "Launch a new activity", "android.content.intent/ast/", "12"));*/ 
     return res;
   }
 }
@@ -434,10 +420,10 @@ class PopularCounter {
           else 
             ast_types.put(e.ast_type, 1);
         } else if (e.ast_type.contains("PsiIdentifier:") && !prev_type.isEmpty()) {
-          if (commands.containsKey(prev_type+"*#*"+e.ast_type))
-            commands.put(prev_type+"*#*"+e.ast_type, commands.get(prev_type+"*#*"+e.ast_type)+1);
+          if (commands.containsKey(prev_type+"#"+e.ast_type))
+            commands.put(prev_type+"#"+e.ast_type, commands.get(prev_type+"#"+e.ast_type)+1);
           else
-            commands.put(prev_type+"*#*"+e.ast_type, 1);
+            commands.put(prev_type+"#"+e.ast_type, 1);
         }
       }
     }

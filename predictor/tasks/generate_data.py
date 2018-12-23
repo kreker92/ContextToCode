@@ -56,6 +56,8 @@ def generate_addition( ):
     progs = {};
     progs["target"] = 0;
     progs["nontarget"] = 0;
+	
+    mask = {}
     # dates = []
     # members_set = set()
     # for i in np.random.choice(times, size=num_examples, replace=False):
@@ -78,7 +80,7 @@ def generate_addition( ):
     # count = 0
     for row_r in parsed:
         temp = []
-        pr = transform(row_r, temp, DATA_PATH_ENCODE_MASK)
+        pr = transform(row_r, temp, "", mask)
 
         if pr != "1" or progs["target"] > (progs["nontarget"]*5):
             count += 1
@@ -98,16 +100,23 @@ def generate_addition( ):
         pickle.dump(test_data, f)
     with open('tasks/env/data/train.pik', 'wb') as f:
         pickle.dump(train_data, f)
+    with open(DATA_PATH_ENCODE_MASK, 'w') as outfile:
+       json.dump(mask, outfile)
     # with open('tasks/env/data/train.pik1', 'a') as f:
     #     for c in train_data:
     #         f.write(str(c))
 
-def transform(row_r, dataset, mask_file):
+def transform(row_r, dataset, mask_file, mask):
     row = collections.OrderedDict(sorted(row_r.items()))
+    with_mask_file = False
     trace = []
     cur_prog = 0
-    with open(mask_file) as f:
-        mask = json.load(f)
+    if mask_file:
+        with_mask_file = True
+        with open(mask_file) as f:
+            mask = json.load(f)
+    else:
+        one_hot_count = 1
     for key, values in row.items():
         step = {}
         # count += 1
@@ -130,9 +139,13 @@ def transform(row_r, dataset, mask_file):
                 environment = {}
                 for e_k, e_v in v.items():
                     if e_v.get('value') in mask:
-                        environment[e_k] = int(float(mask.get(e_v.get('value'))))
-                    else:
+                        environment[e_k] = mask.get(e_v.get('value'))
+                    elif with_mask_file:
                         environment[e_k] = -1
+                    else:
+                        one_hot_count += 1
+                        mask[e_v.get('value')] = one_hot_count
+                        environment[e_k] = one_hot_count
                 environment['terminate'] = "false"
                 step['environment'] = environment
             elif k == 'argument':

@@ -39,7 +39,7 @@ public class Vector {
     parent_id = parent_id_;
   }*/
   
-  public Vector(InnerClass c, HashSet<String> commands, int i, String line, boolean b, int level_, String path_, int line_num_, ArrayList<String> goodTypes, ArrayList<String> badTypes) {
+  public Vector(InnerClass c, int i, String line, boolean b, int level_, String path_, int line_num_, ArrayList<String> goodTypes, ArrayList<String> badTypes) {
     origin = line;//.toLowerCase().replaceAll("[^a-z]", " ").replaceAll(" +", " ").trim();;
     line_num = c.line_num;
     path = path_;
@@ -57,14 +57,10 @@ public class Vector {
         strings.add(s.ast_type.trim());
         parent = s.parent;
         node = s.node;
-//        commands.add(s.node+" * "+s.parent+" * "+s.text.trim());
-        commands.add(s.ast_type.trim());
       } else if (goodTypes.contains(s.node) && !badTypes.contains(s.parent)) {
         strings.add(s.text.trim());
         parent = s.parent;
         node = s.node;
-//        commands.add(s.node+" * "+s.parent+" * "+s.text.trim());
-        commands.add(s.text.trim());
       }
     }
     row = i;
