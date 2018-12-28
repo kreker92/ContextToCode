@@ -1,0 +1,9 @@
+19 dec 2018
+no context: 0, yes context: 2618, class: 2618, correct: 1260, incorrect 1358 by class, {0={false=0, true=0}, 1={false=0, true=0},
+2={false=0, true=0}, 3={false=0, true=0}, 4={false=0, true=0}, 5={false=0, true=0}, 6={false=689, true=166}, 7={false=268, true=97},
+8={false=111, true=434}, 9={false=290, true=563}}
+
+28 dec 2018
+no context: 0, yes context: 1833, class: 1072, correct: 837, incorrect 235 by class, {0={false=0, true=0}, 1={false=0, true=0},
+2={false=78, true=220}, 3={false=60, true=144}, 4={false=35, true=211}, 5={false=21, true=148}, 6={false=41, true=114},
+7={false=0, true=0}, 8={false=0, true=0}, 9={false=0, true=0}}, first_counter{0=0, 1=0, 2=92, 3=87, 4=71, 5=69, 6=38, 7=0, 8=0, 9=0}
