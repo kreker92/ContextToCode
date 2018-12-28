@@ -3,7 +3,7 @@ Context based technology that suggest you code completions
 
 [![SCREENCAST](https://img.youtube.com/vi/lCiYBMB9cvM/hqdefault.jpg)](https://www.youtube.com/watch?v=lCiYBMB9cvM&t)
 
-[Current prediction metrics](../blob/master/data/patterns/metrics)
+[Current prediction metrics](../master/data/patterns/metrics)
 
 **All lines:** ~ 300000
 
