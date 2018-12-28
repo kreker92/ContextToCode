@@ -4,21 +4,22 @@ addition.py
 Core task-specific model definition file. Sets up encoder model, program embeddings, argument
 handling.
 """
-from tasks.env.config import CONFIG, get_incoming_shape
+from tasks.env.config import get_incoming_shape
 import tensorflow as tf
 import tflearn
 import numpy as np
 
 
 class AdditionCore():
-    def __init__(self, hidden_dim=100, state_dim=128, batch_size=1):
+    def __init__(self, config, hidden_dim=100, state_dim=128, batch_size=1):
         """
         Instantiate an Addition Core object, with the necessary hyperparameters.
         """
+        self.config = config
         self.hidden_dim, self.state_dim, self.bsz = hidden_dim, state_dim, batch_size
-        self.env_dim = CONFIG["ENVIRONMENT_ROW"] * CONFIG["ENVIRONMENT_DEPTH"]  # 4 * 10 = 40
-        self.arg_dim = CONFIG["ARGUMENT_NUM"] * CONFIG["ARGUMENT_DEPTH"]        # 3 * 10 = 30
-        self.program_dim = CONFIG["PROGRAM_EMBEDDING_SIZE"]
+        self.env_dim = config["ENVIRONMENT_ROW"] * config["ENVIRONMENT_DEPTH"]  # 4 * 10 = 40
+        self.arg_dim = config["ARGUMENT_NUM"] * config["ARGUMENT_DEPTH"]        # 3 * 10 = 30
+        self.program_dim = config["PROGRAM_EMBEDDING_SIZE"]
 
         # Setup Environment Input Layer
         self.env_in = tf.placeholder(tf.float32, shape=[self.bsz, self.env_dim], name="Env_Input")
@@ -33,9 +34,10 @@ class AdditionCore():
         self.state_encoding = self.build_encoder()
 
         # Build Program Matrices
-        self.program_key = tflearn.variable(name='Program_Keys', shape=[CONFIG["PROGRAM_NUM"],
-                                                                        CONFIG["PROGRAM_KEY_SIZE"]],
+        self.program_key = tflearn.variable(name='Program_Keys', shape=[config["PROGRAM_NUM"],
+                                                                        config["PROGRAM_KEY_SIZE"]],
                                             initializer='truncated_normal')
+		
         self.program_embedding = self.build_program_store()
 
     def build_encoder(self):
@@ -114,6 +116,6 @@ class AdditionCore():
 
         Reference: Reed, de Freitas [4]
         """
-        embedding = self.embedding(self.prg_in, CONFIG["PROGRAM_NUM"],
-                                      CONFIG["PROGRAM_EMBEDDING_SIZE"], name="Program_Embedding")
+        embedding = self.embedding(self.prg_in, self.config["PROGRAM_NUM"],
+                                      self.config["PROGRAM_EMBEDDING_SIZE"], name="Program_Embedding")
         return embedding

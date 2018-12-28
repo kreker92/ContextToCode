@@ -11,34 +11,105 @@ import tensorflow as tf
 
 DATA_PATH_TRAIN = "tasks/env/data/train.pik"
 DATA_PATH_TEST = "tasks/env/data/test.pik"
-DATA_PATH_ENCODE_MASK = "log/1class/hots"
+DATA_PATH_ENCODE_MASK = "tasks/env/data/mask"
 LOG_PATH = "log/"
 CKPT_PATH = "log/1class/Context_getRecources/multyonehot/model-0008.ckpt"
-CKPT_PATH_CLASS1 = "log/1class/Context_getRecources/multyonehot/model-0008.ckpt"
-MASK_PATH_CLASS1 = "log/1class/Context_getRecources/hots"
-CKPT_PATH_CLASS3 = "log/1class/View_findViewById/multyonehot/model-0007.ckpt"
-MASK_PATH_CLASS3 = "log/1class/View_findViewById/hots"
-CKPT_PATH_CLASS2 = "log/1class/Cursor_getString/multyonehot/model-0006.ckpt"
-MASK_PATH_CLASS2 = "log/1class/Cursor_getString/hots"
-CKPT_PATH_CLASS4 = "log/1class/TextView_setText/multyonehot/model-0008.ckpt"
-MASK_PATH_CLASS4 = "log/1class/TextView_setText/hots"
-CKPT_PATH_CLASS5 = "log/1class/TextView_findViewById/multyonehot/model-0008.ckpt"
-MASK_PATH_CLASS5 = "log/1class/TextView_findViewById/hots"
+CKPT_PATH_CLASS1 = "log/1class/Cursor_getColumnIndex/models/model-0010.ckpt"
+MASK_PATH_CLASS1 = "log/1class/Cursor_getColumnIndex/mask"
+CKPT_PATH_CLASS3 = "log/1class/Cursor_close/models/model-0010.ckpt"
+MASK_PATH_CLASS3 = "log/1class/Cursor_close/mask"
+CKPT_PATH_CLASS2 = "log/1class/Cursor_getString/models/model-0010.ckpt"
+MASK_PATH_CLASS2 = "log/1class/Cursor_getString/mask"
+CKPT_PATH_CLASS4 = "log/1class/Cursor_getLong/models/model-0010.ckpt"
+MASK_PATH_CLASS4 = "log/1class/Cursor_getLong/mask"
+CKPT_PATH_CLASS5 = "log/1class/Cursor_getInt/models/model-0010.ckpt"
+MASK_PATH_CLASS5 = "log/1class/Cursor_getInt/mask"
 DSL_DATA_PATH = "/root/ContextToCode/data/datasets/context.json"
+DSL_DOMAIN_PATH = "/root/ContextToCode/data/datasets/domain.json"
 TEST_CHUNK_PATH = "dsl/data/test.json"
 EVAL_LIMIT = 500
 
 CONFIG = {
     "ENVIRONMENT_ROW": 9,         # Input 1, Input 2, Carry, Output
     "ENVIRONMENT_COL": 9,         # 10-Digit Maximum for Addition Task
-    "ENVIRONMENT_DEPTH": 104969,      # Size of each element vector => One-Hot, Options: 0-9
+    "ENVIRONMENT_DEPTH": 10000,      # Size of each element vector => One-Hot, Options: 0-9
 
     "ARGUMENT_NUM": 1,            # Maximum Number of Program Arguments
     "ARGUMENT_DEPTH": 75,         # Size of Argument Vector => One-Hot, Options 0-9, Default (10)
     "DEFAULT_ARG_VALUE": 74,      # Default Argument Value
 
-    "PROGRAM_NUM": 11,             # Maximum Number of Subroutines
-    "PROGRAM_KEY_SIZE": 11,        # Size of the Program Keys
+    "PROGRAM_NUM": 10,             # Maximum Number of Subroutines
+    "PROGRAM_KEY_SIZE": 10,        # Size of the Program Keys
+    "PROGRAM_EMBEDDING_SIZE": 13  # Size of the Program Embeddings
+}
+
+CONFIG1 = {
+    "ENVIRONMENT_ROW": 9,         # Input 1, Input 2, Carry, Output
+    "ENVIRONMENT_COL": 9,         # 10-Digit Maximum for Addition Task
+    "ENVIRONMENT_DEPTH": 4409,      # Size of each element vector => One-Hot, Options: 0-9
+
+    "ARGUMENT_NUM": 1,            # Maximum Number of Program Arguments
+    "ARGUMENT_DEPTH": 75,         # Size of Argument Vector => One-Hot, Options 0-9, Default (10)
+    "DEFAULT_ARG_VALUE": 74,      # Default Argument Value
+
+    "PROGRAM_NUM": 10,             # Maximum Number of Subroutines
+    "PROGRAM_KEY_SIZE": 10,        # Size of the Program Keys
+    "PROGRAM_EMBEDDING_SIZE": 13  # Size of the Program Embeddings
+}
+
+CONFIG2 = {
+    "ENVIRONMENT_ROW": 9,         # Input 1, Input 2, Carry, Output
+    "ENVIRONMENT_COL": 9,         # 10-Digit Maximum for Addition Task
+    "ENVIRONMENT_DEPTH": 8629,      # Size of each element vector => One-Hot, Options: 0-9
+
+    "ARGUMENT_NUM": 1,            # Maximum Number of Program Arguments
+    "ARGUMENT_DEPTH": 75,         # Size of Argument Vector => One-Hot, Options 0-9, Default (10)
+    "DEFAULT_ARG_VALUE": 74,      # Default Argument Value
+
+    "PROGRAM_NUM": 10,             # Maximum Number of Subroutines
+    "PROGRAM_KEY_SIZE": 10,        # Size of the Program Keys
+    "PROGRAM_EMBEDDING_SIZE": 13  # Size of the Program Embeddings
+}
+
+CONFIG3 = {
+    "ENVIRONMENT_ROW": 9,         # Input 1, Input 2, Carry, Output
+    "ENVIRONMENT_COL": 9,         # 10-Digit Maximum for Addition Task
+    "ENVIRONMENT_DEPTH": 4285,      # Size of each element vector => One-Hot, Options: 0-9
+
+    "ARGUMENT_NUM": 1,            # Maximum Number of Program Arguments
+    "ARGUMENT_DEPTH": 75,         # Size of Argument Vector => One-Hot, Options 0-9, Default (10)
+    "DEFAULT_ARG_VALUE": 74,      # Default Argument Value
+
+    "PROGRAM_NUM": 10,             # Maximum Number of Subroutines
+    "PROGRAM_KEY_SIZE": 10,        # Size of the Program Keys
+    "PROGRAM_EMBEDDING_SIZE": 13  # Size of the Program Embeddings
+}
+
+CONFIG4 = {
+    "ENVIRONMENT_ROW": 9,         # Input 1, Input 2, Carry, Output
+    "ENVIRONMENT_COL": 9,         # 10-Digit Maximum for Addition Task
+    "ENVIRONMENT_DEPTH": 4245,      # Size of each element vector => One-Hot, Options: 0-9
+
+    "ARGUMENT_NUM": 1,            # Maximum Number of Program Arguments
+    "ARGUMENT_DEPTH": 75,         # Size of Argument Vector => One-Hot, Options 0-9, Default (10)
+    "DEFAULT_ARG_VALUE": 74,      # Default Argument Value
+
+    "PROGRAM_NUM": 10,             # Maximum Number of Subroutines
+    "PROGRAM_KEY_SIZE": 10,        # Size of the Program Keys
+    "PROGRAM_EMBEDDING_SIZE": 13  # Size of the Program Embeddings
+}
+
+CONFIG5 = {
+    "ENVIRONMENT_ROW": 9,         # Input 1, Input 2, Carry, Output
+    "ENVIRONMENT_COL": 9,         # 10-Digit Maximum for Addition Task
+    "ENVIRONMENT_DEPTH": 5321,      # Size of each element vector => One-Hot, Options: 0-9
+
+    "ARGUMENT_NUM": 1,            # Maximum Number of Program Arguments
+    "ARGUMENT_DEPTH": 75,         # Size of Argument Vector => One-Hot, Options 0-9, Default (10)
+    "DEFAULT_ARG_VALUE": 74,      # Default Argument Value
+
+    "PROGRAM_NUM": 10,             # Maximum Number of Subroutines
+    "PROGRAM_KEY_SIZE": 10,        # Size of the Program Keys
     "PROGRAM_EMBEDDING_SIZE": 13  # Size of the Program Embeddings
 }
 

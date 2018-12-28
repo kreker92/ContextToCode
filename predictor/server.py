@@ -6,13 +6,15 @@ from tasks.eval import repl
 from model.npi import NPI
 from tasks.generate_data import transform
 from tasks.env.addition import AdditionCore
-from tasks.env.config import CONFIG, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH_CLASS3, CKPT_PATH_CLASS2, CKPT_PATH_CLASS4, CKPT_PATH_CLASS5, CKPT_PATH_CLASS1, MASK_PATH_CLASS3, MASK_PATH_CLASS2, MASK_PATH_CLASS4, MASK_PATH_CLASS5, MASK_PATH_CLASS1, TEST_CHUNK_PATH
+from tasks.env.config import CONFIG, CONFIG3, CONFIG4, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH_CLASS3, CKPT_PATH_CLASS2, CKPT_PATH_CLASS4, CKPT_PATH_CLASS5, CKPT_PATH_CLASS1, MASK_PATH_CLASS3, MASK_PATH_CLASS2, MASK_PATH_CLASS4, MASK_PATH_CLASS5, MASK_PATH_CLASS1, TEST_CHUNK_PATH
 from tasks.env.config import get_env
 import numpy as np
 import pickle
 import tensorflow as tf
 from tensorflow.python.platform import gfile
 import json
+import tflearn
+from tfsess import tf_sess 
 from urllib.parse import unquote
 
 class test:
@@ -21,29 +23,20 @@ class test:
       self.sess2 = tf.Session()
       self.sess3 = tf.Session()
       self.sess4 = tf.Session()
-      self.sess5 = tf.Session()
+      self.sess5 = tf.Session() 	  
 
-
-       # Initialize Addition Core
-      core = AdditionCore()
+	  # Initialize Addition Core
+      core = AdditionCore(CONFIG)
  
-         # Initialize NPI Model
+      # Initialize NPI Model
       self.npi = NPI(core, CONFIG, LOG_PATH)
- 
-         # Restore from Checkpoint
+      # Restore from Checkpoint
       saver = tf.train.Saver()
       saver.restore(self.sess1, CKPT_PATH_CLASS1)
-      saver.restore(self.sess2, CKPT_PATH_CLASS2)
-      saver.restore(self.sess3, CKPT_PATH_CLASS3)
-      saver.restore(self.sess4, CKPT_PATH_CLASS4)
       saver.restore(self.sess5, CKPT_PATH_CLASS5)
-
- 
-      f = open('/root/ContextToCode/predictor/log/prog_produced.txt', 'r+')
-      f.truncate()
-
-      f = open('/root/ContextToCode/predictor/log/prog_orig.txt', 'r+')
-      f.truncate()
+      saver.restore(self.sess3, CKPT_PATH_CLASS3)
+      saver.restore(self.sess2, CKPT_PATH_CLASS2)
+      saver.restore(self.sess4, CKPT_PATH_CLASS4)
 
 class http_server:
     def __init__(self, t1):
@@ -58,17 +51,12 @@ class myHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 		
-    def get_predictions(self, sess, mask, res, data, dataset):
+    def get_predictions(self, sess, mask, res, data):
         predict = {};
-		
-        transform(data, dataset, mask)
+        dataset = []
+        transform(data, dataset, mask, "")
 
-       # res.append(int(repl(self.t1.sess1, self.t1.npi, dataset, 0, predict)[-1]))
         res.append(int(repl(sess, self.t1.npi, dataset, 0, predict)[-1]))
-        #res.append(int(repl(self.t1.sess3, self.t1.npi, dataset, 0, predict)[-1]))
-        #res.append(int(repl(self.t1.sess4, self.t1.npi, dataset, 0, predict)[-1]))
-        #res.append(int(repl(self.t1.sess5, self.t1.npi, dataset, 0, predict)[-1]))
-
 
     def __init__(self, t1, *args):
         self.t1 = t1
@@ -82,10 +70,10 @@ class myHandler(BaseHTTPRequestHandler):
         with open("/root/ContextToCode/data/datasets/context.json", 'r') as handle:
           data = json.load(handle)
 		  
-        self.get_predictions(self.t1.sess2, MASK_PATH_CLASS2, res, data[3], dataset)	
-        self.get_predictions(self.t1.sess3, MASK_PATH_CLASS3, res, data[3], dataset)	
-        self.get_predictions(self.t1.sess4, MASK_PATH_CLASS4, res, data[3], dataset)	
-        self.get_predictions(self.t1.sess5, MASK_PATH_CLASS5, res, data[3], dataset)	
+       # self.get_predictions(self.t1.sess2, MASK_PATH_CLASS2, res, data[3])	
+       # self.get_predictions(self.t1.sess, MASK_PATH_CLASS3, res, data[3])	
+       # self.get_predictions(self.t1.sess4, MASK_PATH_CLASS4, res, data[3])	
+        self.get_predictions(self.t1.sess5, MASK_PATH_CLASS5, res, data[3])	
 
         self.wfile.write(bytes(json.dumps(res), 'utf-8'))		
         return
@@ -96,19 +84,18 @@ class myHandler(BaseHTTPRequestHandler):
         post_data = self.rfile.read(content_length) # <--- Gets the data itself
         self._set_headers()
 
-        dataset = []
         res = []
 
         context_ = post_data.decode("utf-8").split("=")[1]
         context = unquote(context_)	
         data = json.loads(context)
         
-        self.get_predictions(self.t1.sess2, MASK_PATH_CLASS2, res, json.loads(context)[0], dataset)
-        self.get_predictions(self.t1.sess3, MASK_PATH_CLASS3, res, json.loads(context)[0], dataset)	
-        self.get_predictions(self.t1.sess4, MASK_PATH_CLASS4, res, json.loads(context)[0], dataset)	
-        self.get_predictions(self.t1.sess5, MASK_PATH_CLASS5, res, json.loads(context)[0], dataset)	
+        self.get_predictions(self.t1.sess3, MASK_PATH_CLASS3, res, json.loads(context)[0])
+        self.get_predictions(self.t1.sess5, MASK_PATH_CLASS5, res, json.loads(context)[0])
+        self.get_predictions(self.t1.sess2, MASK_PATH_CLASS2, res, json.loads(context)[0])
+        self.get_predictions(self.t1.sess4, MASK_PATH_CLASS4, res, json.loads(context)[0])		
+        self.get_predictions(self.t1.sess1, MASK_PATH_CLASS1, res, json.loads(context)[0])		
 
-        print(res)
         self.wfile.write(bytes(json.dumps(res), 'utf-8'))			
 
 class main:

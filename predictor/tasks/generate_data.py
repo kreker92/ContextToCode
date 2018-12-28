@@ -46,6 +46,8 @@ def generate_addition( ):
 
     with open(DSL_DATA_PATH, 'r') as handle:
         parsed = json.load(handle)
+    with open(DSL_DOMAIN_PATH, 'r') as handle:
+        domain_data = json.load(handle)
     shuffle(parsed)
     # times = pd.date_range('2000-10-01', end='2017-12-31', freq='5min').tolist()
     #
@@ -96,12 +98,15 @@ def generate_addition( ):
 
     print(progs)
     print("##"+str(count))
-    with open('tasks/env/data/test.pik', 'wb') as f:
+    with open(domain_data+'/test.pik', 'wb') as f:
         pickle.dump(test_data, f)
-    with open('tasks/env/data/train.pik', 'wb') as f:
+    with open(domain_data+'/train.pik', 'wb') as f:
         pickle.dump(train_data, f)
-    with open(DATA_PATH_ENCODE_MASK, 'w') as outfile:
-       json.dump(mask, outfile)
+    if mask:
+        with open(domain_data+'/mask', 'w') as outfile:
+            json.dump(mask, outfile)
+    with open(domain_data+'/test', 'w') as outfile:
+       json.dump(test_data, outfile)
     # with open('tasks/env/data/train.pik1', 'a') as f:
     #     for c in train_data:
     #         f.write(str(c))
@@ -116,24 +121,14 @@ def transform(row_r, dataset, mask_file, mask):
         with open(mask_file) as f:
             mask = json.load(f)
     else:
-        one_hot_count = 1
+        one_hot_count = len(mask)+1
     for key, values in row.items():
         step = {}
-        # count += 1
-        # key_list = []
-        # value_list = []
-        # for k in explode(d["k"]):
-        #     key_list.append(members_list.index(k))
-        #
-        # for v in explode(d["v"]):
-        #     value_list.append(members_list.index(v))
-        #
-        # trace = exec_( key_list, value_list )
-        #
-        # if debug and count % debug_every == 0:
-        #     print(trace)
-        #     if (k == "terminate"):
-        #     print(key)
+        for k, v in values.items():
+            if k == 'program':
+                for e_k, e_v in v.items():
+                    if e_k == 'id':
+                        cur_prog = e_v.get('value')
         for k, v in values.items():
             if k == 'supervised_env':
                 environment = {}
@@ -141,8 +136,8 @@ def transform(row_r, dataset, mask_file, mask):
                     if e_v.get('value') in mask:
                         environment[e_k] = mask.get(e_v.get('value'))
                     elif with_mask_file:
-                        environment[e_k] = -1
-                    else:
+                        environment[e_k] = 0
+                    elif cur_prog != "1":
                         one_hot_count += 1
                         mask[e_v.get('value')] = one_hot_count
                         environment[e_k] = one_hot_count
@@ -161,14 +156,13 @@ def transform(row_r, dataset, mask_file, mask):
                         program['program'] = e_v.get('value')
                     if e_k == 'id':
                         program['id'] = e_v.get('value')
-                        cur_prog = e_v.get('value')
+                        #cur_prog = e_v.get('value')
 
                 step['program'] = program
             elif k == 'additional_info':
                 step['addinfo'] = v
         trace.append(step)
-   # print(trace)
-    # ({"command": "MOVE_PTR", "id": P["MOVE_PTR"], "arg": [OUT_PTR, LEFT], "terminate": False})
+
     dataset.append(trace)
 	
     return cur_prog
