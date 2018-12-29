@@ -49,7 +49,7 @@ public class SuggestGenerate implements ProblemDescriptor {
     @NotNull
     @Override
     public ProblemHighlightType getHighlightType() {
-        return null;
+        return ProblemHighlightType.WARNING;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class SuggestGenerate implements ProblemDescriptor {
     @NotNull
     @Override
     public String getDescriptionTemplate() {
-        return null;
+        return "";
     }
 
     @Nullable

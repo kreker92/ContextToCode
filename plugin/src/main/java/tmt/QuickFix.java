@@ -1,6 +1,8 @@
 package tmt;
 
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction;
+import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -23,7 +25,7 @@ class QuickFix extends BaseIntentionAction {
     @NotNull
     @Override
     public String getText() {
-        return "Generate next line: "+code_line;
+        return "Generate next line: " + code_line;
     }
 
     @NotNull
@@ -42,5 +44,4 @@ class QuickFix extends BaseIntentionAction {
             IncorrectOperationException {
         act.insert(code_line, line_num);
     }
-
 }

@@ -1,5 +1,6 @@
 package tmt;
 
+import org.jetbrains.annotations.NotNull;
 import tmt.analyze.ContextHelperPanel;
 import tmt.analyze.ElementInfo;
 import tmt.analyze.InnerContext;
@@ -18,10 +19,11 @@ import com.intellij.psi.PsiFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import tmt.util.Actions;
 
-public class Analyzer {
+class Analyzer {
     private ArrayList<SuggestGenerate> suggests = new ArrayList<>();
     private Project project;
     private Editor ed;
@@ -29,16 +31,16 @@ public class Analyzer {
     private Actions act;
     private int scope;
 
-    public Analyzer(PsiFile file_, int sc_, Editor ed) {
+    Analyzer(PsiFile file_, int sc_, Editor ed) {
         project = file_.getProject();
         fi = file_;
         act = new Actions(project);
         scope = sc_;
-        this.ed = FileEditorManager.getInstance(fi.getProject()).getSelectedTextEditor();
+        this.ed = ed;
     }
 
-    public void analyze(InspectionManager manager) {
-        ContextHelperPanel helperComponent = new ContextHelperPanel(project, act);
+    void analyze() {
+        ContextHelperPanel helperComponent = ContextHelperPanel.getPanel(project);
 
         try {
             ArrayList<InnerContext> output_elements = new ArrayList<>();
@@ -47,32 +49,39 @@ public class Analyzer {
 
             String request = new Gson().toJson(output_elements);
             System.err.println(request);
+            //System.err.println("Request sent.");
 
             ArrayList<LinkedTreeMap<String, String>> res = new ArrayList<>();
             try {
-                res = new Gson().fromJson(act.send(request), ArrayList.class);
-            }
-            catch (Exception e) {
+                String responce = act.send(request);
+                System.err.println("Responce got." + responce);
+                res = new Gson().fromJson(responce, ArrayList.class);
+                /*int times = new Random().nextInt(4);
+                for(int i = 0; i < times; i++) {
+                    LinkedTreeMap<String, String> res_buf = new LinkedTreeMap<>();
+                    res_buf.put("documentation", "Documentation string" + i);
+                    res_buf.put("prediction", "Predicted string" + i);
+                    res.add(res_buf);
+                }*/
+            } catch (Exception e) {
                 System.err.println("Classifier returned 500 code");
             }
             helperComponent.setQueryingStatus(res);
 
-            for ( LinkedTreeMap<String, String> sugg : res) {
+            for (LinkedTreeMap<String, String> sugg : res) {
                 suggests.add(new SuggestGenerate(scope, sugg.get("documentation"), sugg.get("prediction")));
             }
-
         } catch (Exception e) {
-            Messages.showMessageDialog(project, e.getMessage(), "Greeting", Messages.getInformationIcon());
+            Messages.showMessageDialog(project, e.getMessage(), "Error Occurred", Messages.getInformationIcon());
             e.printStackTrace();
         }
     }
 
-    public ArrayList<SuggestGenerate> getSuggests() {
+    ArrayList<SuggestGenerate> getSuggests() {
         return suggests;
     }
 
-
-    private void parseFile(PsiFile psf, ArrayList<InnerContext> output_elements, String text, Integer end) {
+    private void parseFile(PsiFile psf, ArrayList<InnerContext> output_elements, @NotNull String text, Integer end) {
         SelectionContextExtractor contextExtractor = new SelectionContextExtractor(psf);
         String word = "\n";
         ArrayList<Integer> ends = new ArrayList<>();
@@ -86,11 +95,11 @@ public class Analyzer {
         int line = 0;
 
         for (int e : ends) {
-            SelectionContext context = contextExtractor.extractContext(previous, e+1, line, text.substring(previous, e+1));
+            SelectionContext context = contextExtractor.extractContext(previous, e + 1, line, text.substring(previous, e + 1));
             SelectionContextQueryBuilder queryBuilder = new SelectionContextQueryBuilder(context);
             queryBuilder.buildQuery();
-            previous = e+1;
-            line ++;
+            previous = e + 1;
+            line++;
             output_elements.add(context.ic);
         }
     }
@@ -99,7 +108,7 @@ public class Analyzer {
 class SelectionContext {
 
     private final List<PsiElement> psiElements;
-    public InnerContext ic = new InnerContext();
+    InnerContext ic = new InnerContext();
 
     SelectionContext(List<PsiElement> psiElements, int selectionStartOffset, int selectionEndOffset, int line, String text) {
         this.psiElements = psiElements;
@@ -118,13 +127,11 @@ class SelectionContextExtractor {
 
     private final PsiFile psiFile;
 
-    public SelectionContextExtractor(PsiFile psiFile) {
-//            this.selectionStartOffset = editor.getSelectionModel().getSelectionStart();
-//            this.selectionEndOffset = editor.getSelectionModel().getSelectionEnd();
+    SelectionContextExtractor(PsiFile psiFile) {
         this.psiFile = psiFile;
     }
 
-    public SelectionContext extractContext(int selectionStartOffset, int selectionEndOffset, int line, String text) {
+    SelectionContext extractContext(int selectionStartOffset, int selectionEndOffset, int line, String text) {
         List<PsiElement> psiElements = new ArrayList<>();
         SyntaxUtils.traversePsiElement(psiFile, psiElements, selectionStartOffset, selectionEndOffset);
         return new SelectionContext(psiElements, selectionStartOffset, selectionEndOffset, line, text);
@@ -132,128 +139,22 @@ class SelectionContextExtractor {
 }
 
 class SelectionContextQueryBuilder {
-    private final int MAX_WORDS_FOR_QUERY = 5;
-
     private final SelectionContext context;
 
-    public SelectionContextQueryBuilder(SelectionContext context) {
+    SelectionContextQueryBuilder(SelectionContext context) {
         this.context = context;
     }
 
-    public void buildQuery() {
+    void buildQuery() {
         List<PsiElement> psiElements = context.getPsiElements();
-        ArrayList<String> bad_types = new ArrayList<String>();
-
-        bad_types.add("PsiJavaToken");
-        bad_types.add("PsiDocToken");
-        bad_types.add("PsiElement(BAD_CHARACTER)");
-        bad_types.add("PsiModifierList");
-        bad_types.add("PsiField");
-        bad_types.add("PsiTypeElement");
-//            bad_types.add("PsiReferenceExpression");
-        bad_types.add("PsiParameter");
-
         for (PsiElement psiElement : psiElements) {
             ElementInfo el = new ElementInfo(psiElement, context.ic.line_num);
 
             if (SyntaxUtils.meaninglessForContextTokenTypes.contains(psiElement.getNode().getElementType())) {
                 continue;
             }
-/*                if (psiElement.getChildren().length > 0) {
-                    // This is an abstract node, while for bag-of-words model we are only concerned with
-                    // concrete nodes.
-                    continue;
-                }
-                if (psiElement.getTextLength() == 0) {
-                    // The node's text representation is empty: won't help us with forming the query. E.g.
-                    // REFERENCE_PARAMETER_LIST is present in PSI trie but its text may be empty.
-                    continue;
-                } */
 
             context.ic.elements.add(el);
-//                if (!bad_types.contains(el.parent)) {
-//                    context.ic.clean_line_text += psiElement.getText().toLowerCase() + " ";
-//                }
         }
-
-//            List<WordInfo> words =
-//                    wordCountMap.entrySet()
-//                            .stream()
-//                            .map(entry -> new WordInfo(entry.getKey(), entry.getValue()))
-//                            .sorted(WordInfo.COMPARATOR_BY_TIMES_ENCOUNTERED)
-//                            .collect(Collectors.toList());
-//             return words.stream()
-//                    .limit(MAX_WORDS_FOR_QUERY)
-//                    .map(WordInfo::getText)
-//                    .collect(Collectors.joining(" "));
     }
-
-//        private class WordInfo {
-//            final Comparator<? super WordInfo> COMPARATOR_BY_TIMES_ENCOUNTERED =
-//                    Comparator.comparing(WordInfo::getTimesEncountered).reversed();
-//
-//            private String text;
-//
-//            private int timesEncountered;
-//
-//            WordInfo(String text, int timesEncountered) {
-//                this.text = text;
-//                this.timesEncountered = timesEncountered;
-//            }
-//
-//            String getText() {
-//                return text;
-//            }
-//
-//            int getTimesEncountered() {
-//                return timesEncountered;
-//            }
-//        }
-
 }
-
-//class NullShaderFileType extends LanguageFileType {
-//
-//    public final NullShaderFileType INSTANCE = new NullShaderFileType();
-//
-//    protected NullShaderFileType() {
-//        super(NullShaderLanguage.INSTANCE);
-//    }
-//
-//    @NotNull
-//    @Override
-//    public String getName() {
-//        return "Null Shader";
-//    }
-//
-//    @NotNull
-//    @Override
-//    public String getDescription() {
-//        return "Null Engine shader";
-//    }
-//
-//    @NotNull
-//    @Override
-//    public String getDefaultExtension() {
-//        return "ns";
-//    }
-//
-//    @Nullable
-//    @Override
-//    public Icon getIcon() {
-//        return Icons.NULL_SHADER_ICON;
-//    }
-//}
-//
-//class Icons {
-//    public final Icon NULL_SHADER_ICON = IconLoader.getIcon("/icons/cube.png");
-//}
-//
-//class NullShaderLanguage extends Language {
-//
-//    public final NullShaderLanguage INSTANCE = new NullShaderLanguage();
-//
-//    protected NullShaderLanguage() {
-//        super("NullShader");
-//    }
-//}

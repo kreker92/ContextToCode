@@ -1,5 +1,6 @@
 package tmt;
 
+import com.intellij.openapi.editor.CaretModel;
 import tmt.analyze.filter.Filter;
 import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.LocalInspectionTool;
@@ -20,21 +21,29 @@ public class GenerateInspection extends LocalInspectionTool {
                                          final boolean isOnTheFly) {
 
         Editor ed = FileEditorManager.getInstance(psiFile.getProject()).getSelectedTextEditor();
-        int current_scope = ed.getCaretModel().getLogicalPosition().line;
-        String current_text = psiFile.getText().substring(ed.getDocument().getLineStartOffset(current_scope), ed.getDocument().getLineEndOffset(current_scope));
+
+        if (ed == null) {
+            System.out.println("No editor.");
+            return new ProblemDescriptor[0];
+        }
+
+        int current_scope = ed.getCaretModel().getPrimaryCaret().getLogicalPosition().line;
+        String current_text;
+        if (ed.getDocument().getLineEndOffset(current_scope) != ed.getDocument().getTextLength()) {
+            current_text = psiFile.getText().substring(ed.getDocument().getLineStartOffset(current_scope), ed.getDocument().getLineEndOffset(current_scope));
+        } else {
+            return new ProblemDescriptor[0];
+        }
 
         ArrayList<SuggestGenerate> suggests = new ArrayList<>();
 
         if (Filter.pass(psiFile, current_scope, ed)) {
             Analyzer an = new Analyzer(psiFile, current_scope, ed);
-            an.analyze(manager);
+            an.analyze();
             suggests = Filter.removeDoubles(an.getSuggests(), current_text);
         }
-        return suggests.toArray(new ProblemDescriptor[suggests.size()]);
-    }
 
-    private boolean isStatic(PsiField field) {
-        return field.getModifierList() != null && field.getModifierList().hasExplicitModifier("static");
+        return suggests.toArray(new ProblemDescriptor[0]);
     }
 
     @Nls
@@ -56,5 +65,5 @@ public class GenerateInspection extends LocalInspectionTool {
     public String getDisplayName() {
         return "Instance field count";
     }
-    
+
 }
