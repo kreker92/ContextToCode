@@ -16,6 +16,8 @@ public class Classifier {
 
   public ArrayList<Vector> vs = new ArrayList<>();
 
+  public String domain;
+
   public Classifier(String folder_) {
     folder = folder_;
   }
@@ -27,5 +29,9 @@ public class Classifier {
   public void clear() { 
     vs.clear();
     vectors = "";
+  }
+  
+  public String toString() {
+    return "Domain: "+domain+", vs: "+vs;
   }
 }

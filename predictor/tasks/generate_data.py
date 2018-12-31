@@ -13,6 +13,7 @@ from dsl.dsl import DSL
 import datetime
 import tensorflow as tf
 import re
+import os
 import json
 from tasks.env.config import DSL_DATA_PATH, DATA_PATH_ENCODE_MASK
 from pprint import pprint
@@ -35,7 +36,7 @@ def exec_ (orig, formatted):
         dsl.true_ans, trace_ans, orig, formatted)
     return dsl.trace
 
-def generate_addition( ):
+def generate_addition( dir ):
     """
     Generates addition data with the given string prefix (i.e. 'train', 'test') and the specified
     number of examples.
@@ -44,10 +45,10 @@ def generate_addition( ):
     :param num_examples: Number of examples to generate.
     """
 
-    with open(DSL_DATA_PATH, 'r') as handle:
+    with open(DSL_DATA_PATH+dir+"/context.json", 'r') as handle:
         parsed = json.load(handle)
-    with open(DSL_DOMAIN_PATH, 'r') as handle:
-        domain_data = json.load(handle)
+    with open(DSL_DATA_PATH+dir+"/domain.json", 'r') as handle:
+        domain_path = "log/pipeline/"+json.load(handle)
     shuffle(parsed)
     # times = pd.date_range('2000-10-01', end='2017-12-31', freq='5min').tolist()
     #
@@ -98,14 +99,15 @@ def generate_addition( ):
 
     print(progs)
     print("##"+str(count))
-    with open(domain_data+'/test.pik', 'wb') as f:
+    os.mkdir( domain_path );
+    with open(domain_path+'/test.pik', 'wb') as f:
         pickle.dump(test_data, f)
-    with open(domain_data+'/train.pik', 'wb') as f:
+    with open(domain_path+'/train.pik', 'wb') as f:
         pickle.dump(train_data, f)
     if mask:
-        with open(domain_data+'/mask', 'w') as outfile:
+        with open(domain_path+'/mask', 'w') as outfile:
             json.dump(mask, outfile)
-    with open(domain_data+'/test', 'w') as outfile:
+    with open(domain_path+'/test', 'w') as outfile:
        json.dump(test_data, outfile)
     # with open('tasks/env/data/train.pik1', 'a') as f:
     #     for c in train_data:
@@ -123,12 +125,13 @@ def transform(row_r, dataset, mask_file, mask):
     else:
         one_hot_count = len(mask)+1
     for key, values in row.items():
-        step = {}
         for k, v in values.items():
             if k == 'program':
                 for e_k, e_v in v.items():
                     if e_k == 'id':
                         cur_prog = e_v.get('value')
+    for key, values in row.items():
+        step = {}
         for k, v in values.items():
             if k == 'supervised_env':
                 environment = {}

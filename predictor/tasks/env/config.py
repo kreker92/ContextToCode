@@ -24,8 +24,8 @@ CKPT_PATH_CLASS4 = "log/1class/Cursor_getLong/models/model-0010.ckpt"
 MASK_PATH_CLASS4 = "log/1class/Cursor_getLong/mask"
 CKPT_PATH_CLASS5 = "log/1class/Cursor_getInt/models/model-0010.ckpt"
 MASK_PATH_CLASS5 = "log/1class/Cursor_getInt/mask"
-DSL_DATA_PATH = "/root/ContextToCode/data/datasets/context.json"
-DSL_DOMAIN_PATH = "/root/ContextToCode/data/datasets/domain.json"
+DSL_DATA_PATH = "/root/ContextToCode/data/datasets/classifiers/"
+#DSL_DOMAIN_PATH = "/root/ContextToCode/data/datasets/domain.json"
 TEST_CHUNK_PATH = "dsl/data/test.json"
 EVAL_LIMIT = 500
 

@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.internal.LinkedTreeMap;
 
 import tmt.conf.Utils;
@@ -32,7 +33,7 @@ public class GServer {
   public static final int LEARN = 1;
   public static final int EVAL  = 2;
   public static final int INFERENCE  = 3;
-  public static final int DATA_MASK  = 4;
+  public static final int USE_CASES  = 4;
 
   public static void main(String[] args) throws Exception{
     if (args[0].equals("learn")) 
@@ -43,8 +44,8 @@ public class GServer {
       InnerClass[] code = new Gson().fromJson(Utils.readFile("/root/ContextToCode/data/datasets/post"), InnerClass[].class);
       router(INFERENCE, code);
     }
-    else if (args[0].equals("data_mask"))
-      router(DATA_MASK, null);
+    else if (args[0].equals("case_creation"))
+      router(USE_CASES, null);
   }
 
   public static ArrayList<HashMap<String, String>> router(int swtch, InnerClass[] code) throws Exception {
@@ -56,10 +57,26 @@ public class GServer {
         new FileOutputStream("../log/log.txt", true)); 
     System.setOut(fileStream);
 
-    ArrayList<Classifier> templates = getTemplates();
+    Classifier t1 = new Classifier("android/ast");
+    //getTemplates();
+    ArrayList<Classifier> templates = new ArrayList<>();
 
-    if (swtch == LEARN) 
-      doLearn(g, templates.get(0));
+    if (swtch == LEARN) {
+      
+      InnerClass background_class = new InnerClass("falsekey", "1");
+      background_class.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
+      background_class.elements.add(new ElementInfo("class_method", "PsiType:Cursor#PsiIdentifier:*", null));
+      LinkedHashMap<String, String> temp7_1 = new LinkedHashMap<>();
+      temp7_1.put("literal1","String mCursorString = ");
+      temp7_1.put("stab_req","PsiType:Cursor");
+      temp7_1.put("literal2",".getString(int id))");
+      background_class.scheme.add(temp7_1);
+      background_class.description = " Returns the value of the requested column as a String. ";
+      
+      createUseCases(g, templates, background_class);
+      for ( Classifier t : templates )
+        doLearn(g, t);
+    }
     else if (swtch == EVAL) 
       //      doEval(g, templates.get(0));
       doEval(g, templates.get(0));
@@ -71,7 +88,8 @@ public class GServer {
     //
     //    	res = g.filter_through_npi(out, templates.get(1));
 
-    else if (swtch == DATA_MASK) {
+    else if (swtch == USE_CASES) {
+      //      createUseCases(g);
       //      doDataMask(g, templates.get(0));
       //      doPattern(g, templates.get(0));
     }
@@ -90,8 +108,38 @@ public class GServer {
     return res;
   }
 
+  private static void createUseCases(Generator g, ArrayList<Classifier> templates, InnerClass background_class) throws JsonSyntaxException, IOException {
+    HashMap<String, Double> ast_types = new Gson().fromJson(Utils.readFile(g.root+"/pop_lines"), HashMap.class);
+    HashMap<String, Double> commands = new Gson().fromJson(Utils.readFile(g.root+"/pop_comm"), HashMap.class);
+    System.err.println(ast_types.get("PsiType:Cursor"));
+    
+    LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
+    temp6_1.put("literal1","String mCursorString = ");
+    temp6_1.put("stab_req","PsiType:Cursor");
+    temp6_1.put("literal2",".getString(int id))");
+    
+    int count = 2;
+    for (Entry<String, Double> com : commands.entrySet()) 
+      if (com.getKey().contains("PsiType:Cursor") && com.getValue() > 4000) {
+        Classifier t1 = new Classifier("android/ast");
+        
+        InnerClass ic = new InnerClass("truekey", count+"");
+        ic.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
+        ic.elements.add(new ElementInfo("class_method", com.getKey(), null));
+        ic.scheme.add(temp6_1);
+        ic.description = " Returns the value of the requested column as a String. ";
+        
+        t1.classes.add(ic);
+        t1.classes.add(background_class);
+        System.err.println(com.getKey());
+        t1.domain = com.getKey().split("PsiIdentifier:")[1];
+        templates.add(t1);
+        count ++;
+      }
+    System.err.println(templates);
+  }
+
   private static void doInference(Generator g, Classifier classifier) {
-    // TODO Auto-generated method stub
 
   }
 
@@ -123,7 +171,7 @@ public class GServer {
       count ++;
       
       System.err.println("count: "+count);
-      if (count > 100) {
+      if (count > 1000) {
         System.err.println(c);
         System.exit(1);
       }
@@ -159,7 +207,7 @@ public class GServer {
       g.iterateCode(code, t, f.getPath(), res, 3);
 
       for ( InnerClass c : code )
-        if(c.matches(t.classes))
+      //  if(c.matches(t.classes))
     	    popular.add(c);
       
       count ++;
@@ -170,31 +218,10 @@ public class GServer {
 ////        }
     }
 
-    //    g.hotEncode(commands, g.root+"hots", res, t);
-
-//    Set<String> programs = Utils.sortByValue(popular.commands).keySet();
-//    HashMap<String, String> temp = new HashMap<>();
-//    int count1 = 2;
-//    
-//    for (String p : programs) 
-//      if (count1 < 3){
-//        temp.put(p, count1+"");
-//        count1 ++;  
-//      }
-//    
-//    Utils.saveJsonFile("/root/ContextToCode/data/datasets/hots", temp);
-    
-    Utils.writeFile1(Utils.sortByValue(popular.ast_types).toString(), g.root+"/pop_lines", false);
-    Utils.writeFile1(Utils.sortByValue(popular.commands).toString(), g.root+"/pop_comm", false);
+    Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), g.root+"/pop_lines", false);
+    Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.commands)), g.root+"/pop_comm", false);
 
     g.setTrainAndTest(t);
-    //    ArrayList<HashMap<Integer, Step>> out = new ArrayList<>();
-    //    
-    //    for (int i = 20; i > 10; i--) {
-    //      out.add(out_raw.get(i));
-    //      res = g.filter_through_npi(out, templates.get(1));
-    //      out.clear();
-    //    }
   }
   
   /**
@@ -220,9 +247,9 @@ public class GServer {
     //      g.root_key = "ast/";
     //	   res.add(new Template("DriverManager.getConnection", "Open DB connection", "database/ast/parsed/", "8"));
 
-    Classifier t1 = new Classifier("android_crossvalidation/ast");
+    Classifier t1 = new Classifier("android/ast");
 
-    Classifier t2 = new Classifier("android_crossvalidation/ast");
+    Classifier t2 = new Classifier("android/ast");
 
     /*InnerClass ic = new InnerClass("falsekey", "2");
     ic.elements.add(new ElementInfo("ast_type", "PsiType:String", null));
@@ -341,8 +368,11 @@ public class GServer {
 //    t2.classes.add(ic5);
     t2.classes.add(ic8);
     t2.classes.add(ic10);
+    t2.classes.add(ic9);
+    t2.classes.add(ic5);
     t2.classes.add(ic7);
-    
+    t2.classes.add(ic6);
+
 //          t2.classes.add(ic5);
 //          t2.classes.add(ic4);
 //          t2.classes.add(ic);

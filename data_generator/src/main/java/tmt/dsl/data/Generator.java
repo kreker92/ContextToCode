@@ -70,7 +70,9 @@ public class Generator  {
   }
 
   public ArrayList<HashMap<Integer, Step>> setTrainAndTest(Classifier t) throws Exception{
-    String filename = root+"context.json";
+    new File(root+"/classifiers/"+t.domain).mkdir();
+    String filename = root+"/classifiers/"+t.domain+"/context.json";
+    String domain_info = root+"/classifiers/"+t.domain+"/domain.json";
     File f_ = new File(filename);
     f_.createNewFile();
     new FileOutputStream(f_, false);
@@ -105,6 +107,7 @@ public class Generator  {
       }
 
       DSL.send(new Gson().toJson(output), "", filename);
+      Utils.writeFile1(new Gson().toJson(t.domain), domain_info, false);
     } catch (Exception e) {
       e.printStackTrace();
     } 

@@ -16,11 +16,11 @@ public class InnerClass {
   public ArrayList<LinkedHashMap<String, String>> scheme = new ArrayList<LinkedHashMap<String, String>>();
   public String description;
   
-  public InnerClass(String type_) {
+  public InnerClass(String type_, String executor_command_) {
     type = type_;
     
-//    if (executor_command_ != null)
-//      executor_command = executor_command_;
+    if (executor_command_ != null)
+      executor_command = executor_command_;
   }
 
 

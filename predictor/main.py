@@ -4,6 +4,7 @@ main.py
 import tensorflow as tf
 # from tasks.env.config
 import time
+import os
 
 from tasks.generate_data import generate_addition
 from tasks.eval import evaluate_addition, multiclass_eval
@@ -59,7 +60,10 @@ def main(_):
     if FLAGS.task == "addition":
         # Generate Data (if necessary)
         if FLAGS.generate:
-            generate_addition()
+            for subdir, dirs, files in os.walk("/root/ContextToCode/data/datasets/classifiers"):
+                for sub in dirs:
+                    generate_addition(sub)
+            #generate_addition()
 
         # if FLAGS.split:
         #     split()
