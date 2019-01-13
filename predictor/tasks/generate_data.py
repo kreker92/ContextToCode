@@ -54,6 +54,7 @@ def generate_addition( dir ):
     #
     train_data = []
     test_data = []
+    count_ = []	
     count = 0
 
     progs = {};
@@ -83,7 +84,7 @@ def generate_addition( dir ):
     # count = 0
     for row_r in parsed:
         temp = []
-        pr = transform(row_r, temp, "", mask)
+        pr = transform(row_r, temp, "", mask, count_)
 
         if pr != "1" or progs["target"] > (progs["nontarget"]*5):
             count += 1
@@ -109,15 +110,18 @@ def generate_addition( dir ):
             json.dump(mask, outfile)
     with open(domain_path+'/test', 'w') as outfile:
        json.dump(test_data, outfile)
+    with open(domain_path+'/info', 'w') as outfile:
+       json.dump(progs, outfile)
     # with open('tasks/env/data/train.pik1', 'a') as f:
     #     for c in train_data:
     #         f.write(str(c))
 
-def transform(row_r, dataset, mask_file, mask):
+def transform(row_r, dataset, mask_file, mask, count_):
     row = collections.OrderedDict(sorted(row_r.items()))
     with_mask_file = False
     trace = []
     cur_prog = 0
+
     if mask_file:
         with_mask_file = True
         with open(mask_file) as f:
@@ -141,6 +145,8 @@ def transform(row_r, dataset, mask_file, mask):
                     elif with_mask_file:
                         environment[e_k] = 0
                     elif cur_prog != "1":
+                        count_.append(1)
+                        print(len(count_))
                         one_hot_count += 1
                         mask[e_v.get('value')] = one_hot_count
                         environment[e_k] = one_hot_count

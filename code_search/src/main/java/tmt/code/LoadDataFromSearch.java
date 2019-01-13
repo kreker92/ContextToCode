@@ -34,18 +34,22 @@ public class LoadDataFromSearch {
   public static void main(String[] args) throws JsonSyntaxException, IOException, InterruptedException, KeyManagementException, NoSuchAlgorithmException  {
     gson = new Gson();
     //createBaseFromSO();
-    dataFromCodeSearch();
+    
+    // create new file
+    File train = new File("/root/ContextToCode/data/datasets/android-copy/cs/");
+                            
+    // array of files and directory
+    ArrayList<String> trains = new ArrayList<String>(Arrays.asList(train.list()));
+    for (String t : trains ) {
+    	System.err.println(t);
+    	dataFromCodeSearch(trains, t);
+    }
 //          loadCodeSearch();
   }
 
-  private static void dataFromCodeSearch() throws JsonSyntaxException, IOException, InterruptedException, KeyManagementException, NoSuchAlgorithmException {
-    File file = new File(Conf.root+Conf.root_key);        
-    if(!file.exists()){
-      file.mkdir();
-    }
-
-    
-    String[] queries_raw = Utils.readFile("/root/ContextToCode/data/datasets/android/cs/1515272").split(";");
+  private static void dataFromCodeSearch(ArrayList<String> files, String file) throws JsonSyntaxException, IOException, InterruptedException, KeyManagementException, NoSuchAlgorithmException {
+   
+    String[] queries_raw = Utils.readFile("/root/ContextToCode/data/datasets/android-copy/cs/"+file).split(";");
     String check = Utils.readFile("../log/queries.txt");
     
     PrintStream fileStream = new PrintStream(
@@ -69,7 +73,17 @@ public class LoadDataFromSearch {
           for ( Result r : resp.getResults()) {
             r.url = r.url.replace("view", "raw");
             String str = Utils.readStringFromURL(r.url);
-            Utils.savePlainFile(Conf.root+Conf.root_key+"/"+r.id, str);
+            
+            boolean found = false;
+            for (String f : files)
+            	if (f.contains(r.id+""))
+            		found = true;
+            		
+            if (!found) {
+            	Utils.savePlainFile(Conf.root+Conf.root_key+"/"+r.id, str);
+//                System.err.println(r.id);
+            }
+            
             TimeUnit.SECONDS.sleep(1);
           }
 

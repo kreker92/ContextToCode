@@ -121,6 +121,7 @@ public class GServer {
     int count = 2;
     for (Entry<String, Double> com : commands.entrySet()) 
       if (com.getKey().contains("PsiType:Cursor") && com.getValue() > 4000) {
+        System.err.println(com);
         Classifier t1 = new Classifier("android/ast");
         
         InnerClass ic = new InnerClass("truekey", count+"");
@@ -131,8 +132,7 @@ public class GServer {
         
         t1.classes.add(ic);
         t1.classes.add(background_class);
-        System.err.println(com.getKey());
-        t1.domain = com.getKey().split("PsiIdentifier:")[1];
+        t1.domain = com.getKey().replace("#PsiIdentifier:", "_").replace("PsiType:", "");
         templates.add(t1);
         count ++;
       }
