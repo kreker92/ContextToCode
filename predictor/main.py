@@ -26,6 +26,7 @@ tf.app.flags.DEFINE_boolean("do_multiclass_eval", False, "Boolean whether to per
 tf.app.flags.DEFINE_boolean("do_inference", False, "Boolean whether to perform model evaluation.")
 tf.app.flags.DEFINE_boolean("data", False, "Boolean whether to perform model evaluation.")
 tf.app.flags.DEFINE_integer("num_epochs",  1, "Number of training epochs to perform.")
+tf.app.flags.DEFINE_string("sub", "", "Number of training epochs to perform.")
 tf.app.flags.DEFINE_integer("start_epoch", 0, "Number of training epochs to perform.")
 tf.app.flags.DEFINE_integer("start_step", 0, "Number of training epochs to perform.")
 
@@ -62,6 +63,7 @@ def main(_):
         if FLAGS.generate:
             for subdir, dirs, files in os.walk("/root/ContextToCode/data/datasets/classifiers"):
                 for sub in dirs:
+#                    if "getString" in sub:				
                     generate_addition(sub)
             #generate_addition()
 
@@ -70,7 +72,7 @@ def main(_):
 
         # Train Model (if necessary)
         if FLAGS.do_train:
-            train_addition(FLAGS.num_epochs, FLAGS.start_epoch, FLAGS.start_step)
+            train_addition(FLAGS.num_epochs, FLAGS.start_epoch, FLAGS.start_step, FLAGS.sub.replace("log/", "").replace("/", ""))
             print("--- %s seconds ---" % (time.time() - start_time))
 
         # Evaluate Model
