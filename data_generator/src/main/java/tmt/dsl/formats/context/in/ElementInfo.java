@@ -60,7 +60,7 @@ public class ElementInfo {
   }
   
   public String toString() {
-    return type+" "+ast_type+" "+parent+" "+node+" "+text;
+    return type+" "+ast_type+" "+parent+" "+node+" "+text +" "+class_method;
   }
 //
 //

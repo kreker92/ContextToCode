@@ -32,6 +32,6 @@ public class Classifier {
   }
   
   public String toString() {
-    return "Domain: "+domain+", vs: "+vs;
+    return "Domain: "+domain+", vs: "+vs+", classes: "+classes;
   }
 }

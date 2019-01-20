@@ -60,4 +60,8 @@ public class InnerClass {
     }
     return true;
   }
+  
+  public String toString() {
+    return " elements: "+elements;
+  }
 }

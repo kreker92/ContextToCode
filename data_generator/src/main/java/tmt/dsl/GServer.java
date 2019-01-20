@@ -16,6 +16,8 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.internal.LinkedTreeMap;
@@ -64,11 +66,11 @@ public class GServer {
     if (swtch == LEARN) {
       
       InnerClass background_class = new InnerClass("falsekey", "1");
-      background_class.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
-      background_class.elements.add(new ElementInfo("class_method", "PsiType:Cursor#PsiIdentifier:*", null));
+      background_class.elements.add(new ElementInfo("ast_type", "PsiType:Parcel", null));
+      background_class.elements.add(new ElementInfo("class_method", "PsiType:Parcel#PsiIdentifier:*", null));
       LinkedHashMap<String, String> temp7_1 = new LinkedHashMap<>();
       temp7_1.put("literal1","String mCursorString = ");
-      temp7_1.put("stab_req","PsiType:Cursor");
+      temp7_1.put("stab_req","PsiType:Parcel");
       temp7_1.put("literal2",".getString(int id))");
       background_class.scheme.add(temp7_1);
       background_class.description = " Returns the value of the requested column as a String. ";
@@ -77,8 +79,8 @@ public class GServer {
       for ( Classifier t : templates )
         doLearn(g, t);
     }
-    else if (swtch == EVAL) 
-      //      doEval(g, templates.get(0));
+    else if (swtch == EVAL) {
+      createEvalCases(g, templates);
       doEval(g, templates.get(0));
 
 
@@ -87,7 +89,7 @@ public class GServer {
     //    	ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(templates.get(0));
     //
     //    	res = g.filter_through_npi(out, templates.get(1));
-
+    }
     else if (swtch == USE_CASES) {
       //      createUseCases(g);
       //      doDataMask(g, templates.get(0));
@@ -111,32 +113,73 @@ public class GServer {
   private static void createUseCases(Generator g, ArrayList<Classifier> templates, InnerClass background_class) throws JsonSyntaxException, IOException {
     HashMap<String, Double> ast_types = new Gson().fromJson(Utils.readFile(g.root+"/pop_lines"), HashMap.class);
     HashMap<String, Double> commands = new Gson().fromJson(Utils.readFile(g.root+"/pop_comm"), HashMap.class);
-    System.err.println(ast_types.get("PsiType:Cursor"));
+    System.err.println(ast_types.get("PsiType:Parcel"));
     
     LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
     temp6_1.put("literal1","String mCursorString = ");
-    temp6_1.put("stab_req","PsiType:Cursor");
+    temp6_1.put("stab_req","PsiType:Parcel");
     temp6_1.put("literal2",".getString(int id))");
     
-    int count = 2;
+    int count = 16;
     for (Entry<String, Double> com : commands.entrySet()) 
-      if (com.getKey().contains("PsiType:Cursor") && com.getValue() > 4000) {
-        System.err.println(com);
+      if (com.getKey().contains("PsiType:Parcel") && com.getValue() > 6000) {
         Classifier t1 = new Classifier("android/ast");
         
+        String folder = com.getKey().replace("#PsiIdentifier:", "_").replace("PsiType:", "");
+        
+        File f = new File("/root/ContextToCode/predictor/log/1class/"+folder+"/info");
+        
+        if(f.exists()) {
+          String info = Utils.readFile("/root/ContextToCode/predictor/log/1class/"+folder+"/info");
+          count = Integer.parseInt(StringUtils.substringsBetween(info, "\"prog\": \"", "\"")[0]);
+        }
+
         InnerClass ic = new InnerClass("truekey", count+"");
-        ic.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
+        ic.elements.add(new ElementInfo("ast_type", "PsiType:Parcel", null));
         ic.elements.add(new ElementInfo("class_method", com.getKey(), null));
         ic.scheme.add(temp6_1);
         ic.description = " Returns the value of the requested column as a String. ";
         
         t1.classes.add(ic);
         t1.classes.add(background_class);
-        t1.domain = com.getKey().replace("#PsiIdentifier:", "_").replace("PsiType:", "");
+        t1.domain = folder;
         templates.add(t1);
         count ++;
       }
     System.err.println(templates);
+  }
+  
+  private static void createEvalCases(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
+
+    
+    Classifier t1 = new Classifier("android_crossvalidation/ast");
+    
+    for (File file : new File("/root/ContextToCode/predictor/log/1class/").listFiles()) {
+      if (file.isDirectory() && file.getName().contains("Cursor_") && !file.getName().contains("Cursor_getLong") && !file.getName().contains("Cursor_close")) {
+        String info = Utils.readFile("/root/ContextToCode/predictor/log/1class/"+file.getName()+"/info");
+        String command = StringUtils.substringsBetween(info, "\"prog\": \"", "\"")[0];
+        String class_method = "PsiType:"+file.getName().replace("_", "#PsiIdentifier:");
+        String type = StringUtils.substringsBetween(class_method, "PsiType:", "#")[0];
+        
+        InnerClass ic = new InnerClass("truekey", command);
+        ic.elements.add(new ElementInfo("ast_type", "PsiType:"+type, null));
+        ic.elements.add(new ElementInfo("class_method", class_method, null));
+        
+        LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
+        temp6_1.put("literal1","String mCursorString = ");
+        temp6_1.put("stab_req","PsiType:"+type);
+        temp6_1.put("literal2",".getString(int id))");
+        ic.scheme.add(temp6_1);
+        
+        ic.description = " Returns the value of the requested column as a String. ";
+        
+        t1.classes.add(ic);
+        t1.domain = file.getName();
+        templates.add(t1);
+      }
+    }
+//    System.err.println(templates);
+//    System.exit(1);
   }
 
   private static void doInference(Generator g, Classifier classifier) {
@@ -171,7 +214,7 @@ public class GServer {
       count ++;
       
       System.err.println("count: "+count);
-      if (count > 1000) {
+      if (count > 500) {
         System.err.println(c);
         System.exit(1);
       }
@@ -185,10 +228,10 @@ public class GServer {
     file.delete();
     file = new File(g.root+"/log.json"); 
     file.delete();
-    file = new File(g.root+"/pop_comm"); 
+   /* file = new File(g.root+"/pop_comm"); 
     file.delete();
     file = new File(g.root+"/pop_lines"); 
-    file.delete();
+    file.delete(); */
     
     ArrayList<Vector[]> res = new ArrayList<>();
     
@@ -206,9 +249,9 @@ public class GServer {
 
       g.iterateCode(code, t, f.getPath(), res, 3);
 
-      for ( InnerClass c : code )
+/*      for ( InnerClass c : code )
       //  if(c.matches(t.classes))
-    	    popular.add(c);
+    	    popular.add(c);*/
       
       count ++;
       
@@ -218,8 +261,8 @@ public class GServer {
 ////        }
     }
 
-    Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), g.root+"/pop_lines", false);
-    Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.commands)), g.root+"/pop_comm", false);
+ /*   Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), g.root+"/pop_lines", false);
+    Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.commands)), g.root+"/pop_comm", false); */
 
     g.setTrainAndTest(t);
   }
@@ -432,7 +475,7 @@ class evalCounter {
 
   
   public evalCounter() {
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 23; i++) {
       HashMap<Boolean, Integer> temp = new HashMap<>();
       temp.put(true, 0);
       temp.put(false, 0);
@@ -443,7 +486,7 @@ class evalCounter {
 
   public void add(ArrayList<HashMap<String, String>> res,
       int executor_command, ArrayList<HashMap<Integer, Step>> info) {
-    System.err.println(res+" * "+executor_command);
+
     if (info.isEmpty())
       lines_without_context+=1;
     else {
@@ -464,6 +507,8 @@ class evalCounter {
         }
         else
           incorrect_prediction += 1;
+    
+        System.err.println(res+" * "+executor_command+" * "+correctness);
         
         classes_counter.get(executor_command).put(correctness, classes_counter.get(executor_command).get(correctness)+1);
       } else 
