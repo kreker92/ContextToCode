@@ -36,8 +36,22 @@ public class GServer {
   public static final int EVAL  = 2;
   public static final int INFERENCE  = 3;
   public static final int USE_CASES  = 4;
+  
+  private static ArrayList<String> bad_types = new ArrayList<>();
 
   public static void main(String[] args) throws Exception{
+    
+    bad_types.add("PsiType:String");
+    bad_types.add("PsiType:StringBuilder");
+    bad_types.add("PsiType:long");
+    bad_types.add("PsiType:View");
+    bad_types.add("PsiType:int");
+    bad_types.add("PsiType:void");
+    bad_types.add("PsiType:boolean"); 
+    bad_types.add("PsiType:HashMap<String, String>");
+    bad_types.add("PsiType:Exception"); 
+    bad_types.add("PsiType:ArrayList<String>"); 
+    
     if (args[0].equals("learn")) 
       router(LEARN, null);
     else if (args[0].equals("eval"))
@@ -65,17 +79,7 @@ public class GServer {
 
     if (swtch == LEARN) {
       
-      InnerClass background_class = new InnerClass("falsekey", "1");
-      background_class.elements.add(new ElementInfo("ast_type", "PsiType:Parcel", null));
-      background_class.elements.add(new ElementInfo("class_method", "PsiType:Parcel#PsiIdentifier:*", null));
-      LinkedHashMap<String, String> temp7_1 = new LinkedHashMap<>();
-      temp7_1.put("literal1","String mCursorString = ");
-      temp7_1.put("stab_req","PsiType:Parcel");
-      temp7_1.put("literal2",".getString(int id))");
-      background_class.scheme.add(temp7_1);
-      background_class.description = " Returns the value of the requested column as a String. ";
-      
-      createUseCases(g, templates, background_class);
+      createUseCases(g, templates);
       for ( Classifier t : templates )
         doLearn(g, t);
     }
@@ -110,43 +114,63 @@ public class GServer {
     return res;
   }
 
-  private static void createUseCases(Generator g, ArrayList<Classifier> templates, InnerClass background_class) throws JsonSyntaxException, IOException {
+  private static void createUseCases(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
     HashMap<String, Double> ast_types = new Gson().fromJson(Utils.readFile(g.root+"/pop_lines"), HashMap.class);
     HashMap<String, Double> commands = new Gson().fromJson(Utils.readFile(g.root+"/pop_comm"), HashMap.class);
-    System.err.println(ast_types.get("PsiType:Parcel"));
-    
-    LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
-    temp6_1.put("literal1","String mCursorString = ");
-    temp6_1.put("stab_req","PsiType:Parcel");
-    temp6_1.put("literal2",".getString(int id))");
-    
-    int count = 16;
+    HashSet<String> types = new HashSet<>();
+
+    int count = 3;
     for (Entry<String, Double> com : commands.entrySet()) 
-      if (com.getKey().contains("PsiType:Parcel") && com.getValue() > 6000) {
-        Classifier t1 = new Classifier("android/ast");
+      if (/*ast_types.com.getKey().contains("PsiType:Cursor") &&*/ com.getValue() > 8000) {
+
+        Classifier t1 = new Classifier("android-copy/ast");
+        String type = com.getKey().split("#")[0];
         
         String folder = com.getKey().replace("#PsiIdentifier:", "_").replace("PsiType:", "");
-        
-        File f = new File("/root/ContextToCode/predictor/log/1class/"+folder+"/info");
-        
-        if(f.exists()) {
-          String info = Utils.readFile("/root/ContextToCode/predictor/log/1class/"+folder+"/info");
-          count = Integer.parseInt(StringUtils.substringsBetween(info, "\"prog\": \"", "\"")[0]);
-        }
+        File f = new File(g.root+"/classifiers/"+folder);
 
-        InnerClass ic = new InnerClass("truekey", count+"");
-        ic.elements.add(new ElementInfo("ast_type", "PsiType:Parcel", null));
-        ic.elements.add(new ElementInfo("class_method", com.getKey(), null));
-        ic.scheme.add(temp6_1);
-        ic.description = " Returns the value of the requested column as a String. ";
-        
-        t1.classes.add(ic);
-        t1.classes.add(background_class);
-        t1.domain = folder;
-        templates.add(t1);
-        count ++;
+        if (!bad_types.contains(type) && !f.exists()) {
+          types.add(type);
+          /* background class */
+          InnerClass background_class = new InnerClass("falsekey", "1");
+          background_class.elements.add(new ElementInfo("ast_type", type, null));
+          background_class.elements.add(new ElementInfo("class_method", type+"#PsiIdentifier:*", null));
+          LinkedHashMap<String, String> temp7_1 = new LinkedHashMap<>();
+          temp7_1.put("literal1","String mCursorString = ");
+          temp7_1.put("stab_req",type);
+          temp7_1.put("literal2",".getString(int id))");
+          background_class.scheme.add(temp7_1);
+          background_class.description = " Returns the value of the requested column as a String. ";
+          /* background class */
+
+          LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
+          temp6_1.put("literal1","String mCursorString = ");
+          temp6_1.put("stab_req",type);
+          temp6_1.put("literal2",".getString(int id))");
+
+//          File f = new File("/root/ContextToCode/predictor/log/1class/"+folder+"/info");
+//
+//          if(f.exists()) {
+//            String info = Utils.readFile("/root/ContextToCode/predictor/log/1class/"+folder+"/info");
+//            count = Integer.parseInt(StringUtils.substringsBetween(info, "\"prog\": \"", "\"")[0]);
+//          }
+
+          InnerClass ic = new InnerClass("truekey", count+"");
+          ic.elements.add(new ElementInfo("ast_type", type, null));
+          ic.elements.add(new ElementInfo("class_method", com.getKey(), null));
+          ic.scheme.add(temp6_1);
+          ic.description = " Returns the value of the requested column as a String. ";
+
+          t1.classes.add(ic);
+          t1.classes.add(background_class);
+          t1.domain = folder;
+          templates.add(t1);
+          count ++;
+        }
       }
-    System.err.println(templates);
+    
+//    System.err.println(count);
+//    System.exit(1);
   }
   
   private static void createEvalCases(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
@@ -155,7 +179,7 @@ public class GServer {
     Classifier t1 = new Classifier("android_crossvalidation/ast");
     
     for (File file : new File("/root/ContextToCode/predictor/log/1class/").listFiles()) {
-      if (file.isDirectory() && file.getName().contains("Cursor_") && !file.getName().contains("Cursor_getLong") && !file.getName().contains("Cursor_close")) {
+      if (file.isDirectory()) {// && file.getName().contains("Context_") && !file.getName().contains("Cursor_getLong") && !file.getName().contains("Cursor_close")) {
         String info = Utils.readFile("/root/ContextToCode/predictor/log/1class/"+file.getName()+"/info");
         String command = StringUtils.substringsBetween(info, "\"prog\": \"", "\"")[0];
         String class_method = "PsiType:"+file.getName().replace("_", "#PsiIdentifier:");
@@ -222,16 +246,16 @@ public class GServer {
   }
 
   private static void doLearn(Generator g, Classifier t) throws Exception {
-    PopularCounter popular = new PopularCounter(g.bad_types);
+/*    PopularCounter popular = new PopularCounter(g.bad_types);
 
     File file = new File(g.root+"/context.json"); 
     file.delete();
     file = new File(g.root+"/log.json"); 
     file.delete();
-   /* file = new File(g.root+"/pop_comm"); 
+    file = new File(g.root+"/pop_comm"); 
     file.delete();
     file = new File(g.root+"/pop_lines"); 
-    file.delete(); */
+    file.delete();*/ 
     
     ArrayList<Vector[]> res = new ArrayList<>();
     
@@ -261,10 +285,11 @@ public class GServer {
 ////        }
     }
 
- /*   Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), g.root+"/pop_lines", false);
-    Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.commands)), g.root+"/pop_comm", false); */
-
+/*    Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), g.root+"/pop_lines", false);
+    Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.commands)), g.root+"/pop_comm", false);*/ 
+    
     g.setTrainAndTest(t);
+    t.clear();
   }
   
   /**
@@ -470,12 +495,13 @@ class evalCounter {
   int lines_with_class = 0;
   int correct_prediction = 0;
   int incorrect_prediction = 0;
+  int given_variants = 0;
   HashMap<Integer, HashMap<Boolean, Integer>> classes_counter = new HashMap<>();
   HashMap<Integer, Integer> first_counter = new HashMap<>();
 
   
   public evalCounter() {
-    for (int i = 0; i < 23; i++) {
+    for (int i = 0; i < 52; i++) {
       HashMap<Boolean, Integer> temp = new HashMap<>();
       temp.put(true, 0);
       temp.put(false, 0);
@@ -491,13 +517,16 @@ class evalCounter {
       lines_without_context+=1;
     else {
       lines_with_context += 1;
-
+      
       boolean correctness = false;
       if (executor_command > 1) {
         lines_with_class += 1; 
 
         for (HashMap<String, String> r : res) {
           int code = Integer.parseInt(r.get("code"));
+          
+          if (code == 12)
+            given_variants += 1;
           if (code == executor_command)
             correctness = true;
         }   
@@ -522,6 +551,6 @@ class evalCounter {
   public String toString() {
     return "no context: " + lines_without_context + ", yes context: "+lines_with_context+", class: " 
         + lines_with_class + ", correct: " + correct_prediction + ", incorrect"  + incorrect_prediction +
-        " by class, "+classes_counter+", first_counter"+first_counter;
+        " by class, "+classes_counter+", first_counter"+first_counter+" № of var.," +given_variants;
   }
 }

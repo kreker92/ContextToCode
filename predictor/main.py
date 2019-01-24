@@ -63,8 +63,8 @@ def main(_):
         if FLAGS.generate:
             for subdir, dirs, files in os.walk("/root/ContextToCode/data/datasets/classifiers"):
                 for sub in dirs:
-#                    if "getString" in sub:				
-                    generate_addition(sub)
+                    if not os.path.exists( "log/1class/"+sub ):				
+                        generate_addition(sub)
             #generate_addition()
 
         # if FLAGS.split:
@@ -72,8 +72,9 @@ def main(_):
 
         # Train Model (if necessary)
         if FLAGS.do_train:
-            train_addition(FLAGS.num_epochs, FLAGS.start_epoch, FLAGS.start_step, FLAGS.sub.replace("log/", "").replace("/", ""))
-            print("--- %s seconds ---" % (time.time() - start_time))
+            if not os.path.exists( "log/"+FLAGS.sub.replace("log/", "").replace("/", "")+"/models/" ):
+                train_addition(FLAGS.num_epochs, FLAGS.start_epoch, FLAGS.start_step, FLAGS.sub.replace("log/", "").replace("/", ""))
+                print("--- %s seconds ---" % (time.time() - start_time))
 
         # Evaluate Model
         if FLAGS.do_eval:

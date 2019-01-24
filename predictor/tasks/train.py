@@ -126,8 +126,11 @@ def train_addition(epochs, start_epoch, start_step, sub, verbose=0):
                     sum += prog_acc / len(x)
                     #with open('log/log_train.txt', "a") as myfile:
                     if i % 1000 == 0:
-                        print("Epoch "+sub+" {0:02d} Step {1:03d} Loss: {2:03f} Term: {3:03f}, Prog: {4:03f} AVG: {5:03f}" \
-                            .format(ep, i, step_def_loss / len(x), term_acc / len(x), prog_acc / len(x), sum / (i - start_step)))
+                        message = "Epoch "+sub+" {0:02d} Step {1:03d} Loss: {2:03f} Term: {3:03f}, Prog: {4:03f} AVG: {5:03f}" \
+                            .format(ep, i, step_def_loss / len(x), term_acc / len(x), prog_acc / len(x), sum / (i - start_step))
+                        print (message)
+                        with open("log/"+sub+"/info", "a") as myfile:
+                             myfile.write(message+"\n")
                     if i % chunk == 0:
                         saver.save(sess, "log/"+sub+"/models/model-{0:04d}-{1:06d}.ckpt".format(ep, i))
                         #if os.path.exists("log/model-{0:04d}-{1:06d}.ckpt.meta".format(ep, i-chunk)):

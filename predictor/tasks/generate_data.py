@@ -85,19 +85,22 @@ def generate_addition( dir ):
     for row_r in parsed:
         temp = []
         pr = transform(row_r, temp, "", mask, count_)
+        if len(mask) > 29995:
+            break
 
-        if pr != "1" or progs["target"] > (progs["nontarget"]*5):
+        if pr != "1" or progs["target"] > (progs["nontarget"]*2.5):
             count += 1
             if pr == "1":
                 progs["nontarget"] += 1;
             else:
                 progs["target"] += 1;
+                progs["prog"] = pr
             if (count % 20 == 0):
                 test_data = test_data + temp
             else:
                 train_data = train_data + temp
  
-
+    progs["mask"] = len(mask)
     print(progs)
     print("##"+str(count))
     os.mkdir( domain_path );
