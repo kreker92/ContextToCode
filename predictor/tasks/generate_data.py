@@ -19,6 +19,7 @@ from tasks.env.config import DSL_DATA_PATH, DATA_PATH_ENCODE_MASK
 from pprint import pprint
 import collections
 from random import shuffle
+import sys
 
 
 def explode (str):
@@ -35,7 +36,18 @@ def exec_ (orig, formatted):
     assert (str(dsl.true_ans) == str(trace_ans)), "%s not equals %s in %s %s" % (
         dsl.true_ans, trace_ans, orig, formatted)
     return dsl.trace
-
+	
+def expect_to_prog( dir, count ):
+    with open("/root/ContextToCode/predictor/log/1class/expect_to_prog", 'r') as handle:
+        parsed = json.load(handle)
+    f = open("/root/ContextToCode/predictor/log/1class/"+dir+"/info", "r")
+    result = re.search('{(.*)}', f.read())
+    info = json.loads("{"+result.group(1)+"}")
+    parsed[count] = {'prog': info['prog'], 'dir': dir, 'key':count}
+    with open("/root/ContextToCode/predictor/log/1class/expect_to_prog", 'w') as handle:
+        json.dump(parsed, handle)
+    
+		
 def generate_addition( dir ):
     """
     Generates addition data with the given string prefix (i.e. 'train', 'test') and the specified

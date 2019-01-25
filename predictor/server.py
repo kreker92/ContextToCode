@@ -6,25 +6,25 @@ from tasks.eval import repl
 from model.npi import NPI
 from tasks.generate_data import transform
 from tasks.env.addition import AdditionCore
-from tasks.env.config import CONFIG, CONFIG3, CONFIG4, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH_CLASS3, CKPT_PATH_CLASS2, CKPT_PATH_CLASS4, CKPT_PATH_CLASS5, CKPT_PATH_CLASS1, MASK_PATH_CLASS3, MASK_PATH_CLASS2, MASK_PATH_CLASS4, MASK_PATH_CLASS5, MASK_PATH_CLASS1, TEST_CHUNK_PATH
+from tasks.env.config import CONFIG, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH
 from tasks.env.config import get_env
 import numpy as np
 import pickle
 import tensorflow as tf
 from tensorflow.python.platform import gfile
 import json
+import sys
 import tflearn
 from tfsess import tf_sess 
 from urllib.parse import unquote
 
 class test:
     def __init__(self):
-      self.sess1 = tf.Session()
-      self.sess2 = tf.Session()
-      self.sess3 = tf.Session()
-      self.sess4 = tf.Session()
-      self.sess5 = tf.Session() 	  
-
+      with open("/root/ContextToCode/predictor/log/1class/expect_to_prog", 'r') as handle:
+          self.sessions = json.load(handle)
+      for key, value in self.sessions.items():
+          value['session'] = tf.Session()
+	  
 	  # Initialize Addition Core
       core = AdditionCore(CONFIG)
  
@@ -32,11 +32,10 @@ class test:
       self.npi = NPI(core, CONFIG, LOG_PATH)
       # Restore from Checkpoint
       saver = tf.train.Saver()
-      saver.restore(self.sess1, CKPT_PATH_CLASS1)
-      saver.restore(self.sess5, CKPT_PATH_CLASS5)
-      saver.restore(self.sess3, CKPT_PATH_CLASS3)
-      saver.restore(self.sess2, CKPT_PATH_CLASS2)
-      saver.restore(self.sess4, CKPT_PATH_CLASS4)
+	  
+      for key, value in self.sessions.items():
+          saver.restore(value['session'], CKPT_PATH+value['dir']+"/models/model-0006.ckpt")
+          print(value)
 
 class http_server:
     def __init__(self, t1):
@@ -51,12 +50,13 @@ class myHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 		
-    def get_predictions(self, sess, mask, res, data):
+    def get_predictions(self, sess, mask, res, data, expected, prog):
         predict = {};
         dataset = []
-        transform(data, dataset, mask, "")
-
-        res.append(int(repl(sess, self.t1.npi, dataset, 0, predict)[-1]))
+        count_ = []	
+        transform(data, dataset, mask, "", count_)
+        if int(repl(sess, self.t1.npi, dataset, 0, predict)[-1]) == expected:
+            res.append(prog)
 
     def __init__(self, t1, *args):
         self.t1 = t1
@@ -90,11 +90,8 @@ class myHandler(BaseHTTPRequestHandler):
         context = unquote(context_)	
         data = json.loads(context)
         
-        self.get_predictions(self.t1.sess3, MASK_PATH_CLASS3, res, json.loads(context)[0])
-        self.get_predictions(self.t1.sess5, MASK_PATH_CLASS5, res, json.loads(context)[0])
-        self.get_predictions(self.t1.sess2, MASK_PATH_CLASS2, res, json.loads(context)[0])
-        self.get_predictions(self.t1.sess4, MASK_PATH_CLASS4, res, json.loads(context)[0])		
-        self.get_predictions(self.t1.sess1, MASK_PATH_CLASS1, res, json.loads(context)[0])		
+        for key, value in self.t1.sessions.items():
+            self.get_predictions(value['session'], CKPT_PATH+value['dir']+"/mask", res, json.loads(context)[0], int(value['prog']), value['key'])
 
         self.wfile.write(bytes(json.dumps(res), 'utf-8'))			
 

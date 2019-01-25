@@ -6,7 +6,7 @@ import tensorflow as tf
 import time
 import os
 
-from tasks.generate_data import generate_addition
+from tasks.generate_data import generate_addition, expect_to_prog
 from tasks.eval import evaluate_addition, multiclass_eval
 from tasks.train import train_addition
 from tasks.data import data
@@ -16,6 +16,7 @@ from tasks.env.config import CONFIG
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string("task", "addition", "Which NPI Task to run - [addition].")
 tf.app.flags.DEFINE_boolean("generate", False, "Boolean whether to generate training/test data.")
+tf.app.flags.DEFINE_boolean("expect_to_prog", False, "Boolean whether to generate training/test data.")
 tf.app.flags.DEFINE_boolean("split", False, "Boolean whether to generate training/test data.")
 tf.app.flags.DEFINE_integer("num_training", 2000, "Number of training examples to generate.")
 tf.app.flags.DEFINE_integer("num_test", 600, "Number of test examples to generate.")
@@ -65,6 +66,13 @@ def main(_):
                 for sub in dirs:
                     if not os.path.exists( "log/1class/"+sub ):				
                         generate_addition(sub)
+
+        if FLAGS.expect_to_prog:
+            count = 1
+            for subdir, dirs, files in os.walk("/root/ContextToCode/predictor/log/1class/"):
+                for sub in dirs:			
+                    expect_to_prog(sub, count)
+                    count += 1
             #generate_addition()
 
         # if FLAGS.split:

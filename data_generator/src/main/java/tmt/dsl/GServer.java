@@ -84,7 +84,8 @@ public class GServer {
         doLearn(g, t);
     }
     else if (swtch == EVAL) {
-      createEvalCases(g, templates);
+      HashMap<String, LinkedTreeMap<String, String>> outputs = new Gson().fromJson(Utils.readFile("/root/ContextToCode/predictor/log/1class/expect_to_prog"), HashMap.class);
+      createEvalCases(g, templates, outputs);
       doEval(g, templates.get(0));
 
 
@@ -173,19 +174,16 @@ public class GServer {
 //    System.exit(1);
   }
   
-  private static void createEvalCases(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
+  private static void createEvalCases(Generator g, ArrayList<Classifier> templates, HashMap<String, LinkedTreeMap<String, String>> outputs) throws JsonSyntaxException, IOException {
 
     
-    Classifier t1 = new Classifier("android_crossvalidation/ast");
+    Classifier t1 = new Classifier("android_crossvalidation2/ast");
     
-    for (File file : new File("/root/ContextToCode/predictor/log/1class/").listFiles()) {
-      if (file.isDirectory()) {// && file.getName().contains("Context_") && !file.getName().contains("Cursor_getLong") && !file.getName().contains("Cursor_close")) {
-        String info = Utils.readFile("/root/ContextToCode/predictor/log/1class/"+file.getName()+"/info");
-        String command = StringUtils.substringsBetween(info, "\"prog\": \"", "\"")[0];
-        String class_method = "PsiType:"+file.getName().replace("_", "#PsiIdentifier:");
+    for ( Entry<String, LinkedTreeMap<String, String>> classes : outputs.entrySet() ) {
+        String class_method = "PsiType:"+classes.getValue().get("dir").replace("_", "#PsiIdentifier:");
         String type = StringUtils.substringsBetween(class_method, "PsiType:", "#")[0];
         
-        InnerClass ic = new InnerClass("truekey", command);
+        InnerClass ic = new InnerClass("truekey", classes.getKey());
         ic.elements.add(new ElementInfo("ast_type", "PsiType:"+type, null));
         ic.elements.add(new ElementInfo("class_method", class_method, null));
         
@@ -198,9 +196,8 @@ public class GServer {
         ic.description = " Returns the value of the requested column as a String. ";
         
         t1.classes.add(ic);
-        t1.domain = file.getName();
+        t1.domain = classes.getValue().get("dir");
         templates.add(t1);
-      }
     }
 //    System.err.println(templates);
 //    System.exit(1);
@@ -238,7 +235,7 @@ public class GServer {
       count ++;
       
       System.err.println("count: "+count);
-      if (count > 500) {
+      if (count > 200) {
         System.err.println(c);
         System.exit(1);
       }
