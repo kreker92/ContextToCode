@@ -177,7 +177,7 @@ public class GServer {
   private static void createEvalCases(Generator g, ArrayList<Classifier> templates, HashMap<String, LinkedTreeMap<String, String>> outputs) throws JsonSyntaxException, IOException {
 
     
-    Classifier t1 = new Classifier("android_crossvalidation2/ast");
+    Classifier t1 = new Classifier("android_crossvalidation2/");
     
     for ( Entry<String, LinkedTreeMap<String, String>> classes : outputs.entrySet() ) {
         String class_method = "PsiType:"+classes.getValue().get("dir").replace("_", "#PsiIdentifier:");
@@ -209,37 +209,121 @@ public class GServer {
 
   private static void doEval(Generator g, Classifier t) throws Exception {
 
-    evalCounter c = new evalCounter();
+    evalCounter c;
 
-    File[] files = new File(g.root+t.folder).listFiles();
+    HashMap<Integer, String> folder1 = new HashMap<>();
+    HashMap<Integer, String> folder2 = new HashMap<>();
+    HashMap<Integer, String> folder3 = new HashMap<>();
+    HashMap<Integer, String> folder4 = new HashMap<>();
+    HashMap<Integer, String> folder5 = new HashMap<>();
+//    HashMap<Integer, ArrayList<ArrayList<Integer>>> results = new HashMap<>();
+//    HashMap<Integer, ArrayList<ArrayList<Integer>>> results1 = new HashMap<>();
+
     int count = 0;
 
-    for (File f : files) {
-      InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getPath()), InnerClass[].class);
-      g.loadCode(code, g.ASC, t);
-
-      ArrayList<Vector[]> res = new ArrayList<>();
-      t.clear();
-
-      g.iterateCode(code, t, f.getPath(), res, 5);
-
-      ArrayList<HashMap<Integer, Step>> info = g.setTrainAndTest(t);
-
-      for (HashMap<Integer, Step> i : info) {
-        ArrayList<HashMap<Integer, Step>> send = new ArrayList<>();
-        send.add(i);
-        c.add(g.filter_through_npi(send, t), Integer.parseInt(i.get(Collections.max(i.keySet())).program.get("id").getValue().toString()), info);
-      }
-      System.err.println(c);
-      
+    for (File f : new File(g.root+t.folder+"folder1").listFiles()) {
+      folder1.put(count, f.getPath());
       count ++;
-      
-      System.err.println("count: "+count);
-      if (count > 200) {
-        System.err.println(c);
-        System.exit(1);
-      }
     }
+    
+    c = new evalCounter();
+    for ( Entry<Integer, String> f : folder1.entrySet() ) {
+      validate_file(f, g, t, c);
+      System.err.println("count: "+f.getKey());
+    }
+    
+    Utils.writeFile1(c.toString(), g.root+"/folder1_validation", true);
+    
+/*    for (File f : new File(g.root+t.folder+"folder2").listFiles()) {
+      folder2.put(count, f.getPath());
+      count ++;
+    }
+    
+    c = new evalCounter();
+    for ( Entry<Integer, String> f : folder2.entrySet() ) {
+      validate_file(f, g, t, c);
+      System.err.println("count: "+f.getKey());
+    }
+    
+    Utils.writeFile1(c.toString(), g.root+"/folder2_validation", true);
+    
+    for (File f : new File(g.root+t.folder+"folder3").listFiles()) {
+      folder3.put(count, f.getPath());
+      count ++;
+    }
+    
+    c = new evalCounter();
+    for ( Entry<Integer, String> f : folder3.entrySet() ) {
+      validate_file(f, g, t, c);
+      System.err.println("count: "+f.getKey());
+    }
+    
+    Utils.writeFile1(c.toString(), g.root+"/folder3_validation", true);*/
+    
+    for (File f : new File(g.root+t.folder+"folder4").listFiles()) {
+      folder4.put(count, f.getPath());
+      count ++;
+    }
+    
+    c = new evalCounter();
+    for ( Entry<Integer, String> f : folder4.entrySet() ) {
+      validate_file(f, g, t, c);
+      System.err.println("count: "+f.getKey());
+    }
+    
+    c = new evalCounter();
+    for ( Entry<Integer, String> f : folder1.entrySet() ) {
+      validate_file(f, g, t, c);
+      System.err.println("count: "+f.getKey());
+    }
+    
+    Utils.writeFile1(c.toString(), g.root+"/folder1_double_validation", true);
+    
+    for (File f : new File(g.root+t.folder+"folder5").listFiles()) {
+      folder5.put(count, f.getPath());
+      count ++;
+    }
+    
+    c = new evalCounter();
+    for ( Entry<Integer, String> f : folder5.entrySet() ) {
+      validate_file(f, g, t, c);
+      System.err.println("count: "+f.getKey());
+    }
+    
+    Utils.writeFile1(c.toString(), g.root+"/folder5_validation", true);
+  }
+  
+  private static void validate_file(Entry<Integer, String> f, Generator g, Classifier t, evalCounter c) throws Exception {
+    InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getValue()), InnerClass[].class);
+    g.loadCode(code, g.ASC, t);
+
+    ArrayList<Vector[]> res = new ArrayList<>();
+    t.clear();
+
+    g.iterateCode(code, t, f.getValue(), res, 5);
+
+    ArrayList<HashMap<Integer, Step>> info = g.setTrainAndTest(t);
+
+//    results.put(f.getKey(), new ArrayList<ArrayList<Integer>>());
+
+    for (HashMap<Integer, Step> i : info) {
+      ArrayList<HashMap<Integer, Step>> send = new ArrayList<>();
+      send.add(i);
+
+      ArrayList<HashMap<String, String>> response = g.filter_through_npi(send, t);
+//      results.get(f.getKey()).add(parse_response(response));
+
+      c.add(g.filter_through_npi(send, t), Integer.parseInt(i.get(Collections.max(i.keySet())).program.get("id").getValue().toString()), info);
+    }
+  }
+
+  private static ArrayList<Integer> parse_response(ArrayList<HashMap<String, String>> response) {
+    ArrayList<Integer> res = new ArrayList<>();
+    
+    for (HashMap<String, String> r : response) 
+      res.add(Integer.parseInt(r.get("code")));
+      
+    return res;
   }
 
   private static void doLearn(Generator g, Classifier t) throws Exception {
@@ -522,8 +606,8 @@ class evalCounter {
         for (HashMap<String, String> r : res) {
           int code = Integer.parseInt(r.get("code"));
           
-          if (code == 12)
-            given_variants += 1;
+//          if (code == 12)
+//            given_variants += 1;
           if (code == executor_command)
             correctness = true;
         }   

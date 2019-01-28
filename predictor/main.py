@@ -70,9 +70,10 @@ def main(_):
         if FLAGS.expect_to_prog:
             count = 1
             for subdir, dirs, files in os.walk("/root/ContextToCode/predictor/log/1class/"):
-                for sub in dirs:			
-                    expect_to_prog(sub, count)
-                    count += 1
+                for sub in dirs:	
+                    if not "!!" in sub:				
+                        expect_to_prog(sub, count)
+                        count += 1
             #generate_addition()
 
         # if FLAGS.split:

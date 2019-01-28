@@ -9,7 +9,6 @@ import pickle
 import pandas as pd
 import numpy as np
 
-from dsl.dsl import DSL
 import datetime
 import tensorflow as tf
 import re
@@ -24,18 +23,6 @@ import sys
 
 def explode (str):
     return str.replace(':', ' ').replace(', ', ' ').replace('-', ' ').split(' ')
-
-def exec_ (orig, formatted):
-    dsl = DSL(orig, formatted)
-    dsl.transform()
-
-    trace_ans = []
-    for i in dsl[2]:
-        trace_ans.insert(0, i)
-
-    assert (str(dsl.true_ans) == str(trace_ans)), "%s not equals %s in %s %s" % (
-        dsl.true_ans, trace_ans, orig, formatted)
-    return dsl.trace
 	
 def expect_to_prog( dir, count ):
     with open("/root/ContextToCode/predictor/log/1class/expect_to_prog", 'r') as handle:
