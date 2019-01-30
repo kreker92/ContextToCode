@@ -103,6 +103,7 @@ public class Generator  {
           scores.put(p, 0);
 
         scores.put(p, scores.get(p)+1);
+        
         System.err.println(scores);
       }
 
@@ -123,8 +124,14 @@ public class Generator  {
       //    HashMap<Integer, Step> st = context.get(context.size()-1);
       //    System.err.println(st.get(st.keySet().size()-1).program.get("id").getValue()+" ^ "+st.get(st.keySet().size()-1).additional_info.get("path")
       //        +" ^ "+st.get(st.keySet().size()-1).additional_info.get("line")+" ^ "+st.get(st.keySet().size()-1).additional_info.get("text"));
-      Pumpkin pmp = new Pumpkin(new Gson().fromJson(Utils.sendPost(new Gson().toJson(context), "http://78.46.103.68:8081/"), int[].class), context, t);
-      return pmp.snippetize(snippets);
+      Pumpkin pmp = new Pumpkin(context, t);
+      
+      if (pmp.is_continue()) {
+        int[] res = new Gson().fromJson(Utils.sendPost(new Gson().toJson(context), "http://78.46.103.68:8081/"), int[].class);
+        return pmp.snippetize(res, snippets);
+      } else {
+        return snippets;
+      }
     } else {
       return snippets;
     }
@@ -206,7 +213,6 @@ public class Generator  {
           res.add(snip);
       }
     }
-
     for (Vector[] c : res) 
       for (Vector v : c) 
         t.vs.add(v);

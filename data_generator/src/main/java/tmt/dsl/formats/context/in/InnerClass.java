@@ -3,6 +3,7 @@ package tmt.dsl.formats.context.in;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 public class InnerClass {
   public ArrayList<ElementInfo> elements = new ArrayList<>();
@@ -19,10 +20,9 @@ public class InnerClass {
   public InnerClass(String type_, String executor_command_) {
     type = type_;
     
-    if (executor_command_ != null)
+    if (executor_command_ != null) 
       executor_command = executor_command_;
   }
-
 
   public String getLine(ArrayList<String> bad_types) {
     String res = "";
@@ -63,5 +63,14 @@ public class InnerClass {
   
   public String toString() {
     return " elements: "+elements;
+  }
+
+  public void addScheme(HashMap<String, String> scheme, String t) {
+    LinkedHashMap<String, String> scheme_ = new LinkedHashMap<>();
+    
+    for (int count = 1; count < scheme.size(); count ++)
+      for (Entry<String, String> s : scheme.entrySet())
+        if (s.getKey().contains(count+"")) 
+          scheme_.put(s.getKey(), s.getValue().replace("*", t));
   }
 }

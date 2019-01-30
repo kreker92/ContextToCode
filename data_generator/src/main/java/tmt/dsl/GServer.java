@@ -84,8 +84,7 @@ public class GServer {
         doLearn(g, t);
     }
     else if (swtch == EVAL) {
-      HashMap<String, LinkedTreeMap<String, String>> outputs = new Gson().fromJson(Utils.readFile("/root/ContextToCode/predictor/log/1class/expect_to_prog"), HashMap.class);
-      createEvalCases(g, templates, outputs);
+      createEvalCases(g, templates);
       doEval(g, templates.get(0));
 
 
@@ -100,18 +99,12 @@ public class GServer {
       //      doDataMask(g, templates.get(0));
       //      doPattern(g, templates.get(0));
     }
-    else if (swtch == INFERENCE) 
-      doInference(g, templates.get(0));    
-    //      for ( InnerClass c : code )
-    //        c.executor_command = "1";
-    //    		
-    //      g.loadCode(code, g.ASC, 4, templates.get(0), null);
-    //      
-    //      ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(templates.get(0));
-    //      
-    //      res = g.filter_through_npi(out, templates.get(1));
-
-
+    else if (swtch == INFERENCE) {
+      createEvalCases(g, templates);
+      templates.get(0).blocking = false;
+      res = doInference(g, templates.get(0), code);
+      System.err.println(res);
+    }
     return res;
   }
 
@@ -174,8 +167,9 @@ public class GServer {
 //    System.exit(1);
   }
   
-  private static void createEvalCases(Generator g, ArrayList<Classifier> templates, HashMap<String, LinkedTreeMap<String, String>> outputs) throws JsonSyntaxException, IOException {
+  private static void createEvalCases(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
 
+    HashMap<String, LinkedTreeMap<String, String>> outputs = new Gson().fromJson(Utils.readFile("/root/ContextToCode/predictor/log/1class/expect_to_prog"), HashMap.class);
     
     Classifier t1 = new Classifier("android_crossvalidation2/");
     
@@ -187,13 +181,10 @@ public class GServer {
         ic.elements.add(new ElementInfo("ast_type", "PsiType:"+type, null));
         ic.elements.add(new ElementInfo("class_method", class_method, null));
         
-        LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
-        temp6_1.put("literal1","String mCursorString = ");
-        temp6_1.put("stab_req","PsiType:"+type);
-        temp6_1.put("literal2",".getString(int id))");
-        ic.scheme.add(temp6_1);
+        HashMap<String, String> scheme_ = new Gson().fromJson(Utils.readFile("/root/ContextToCode/predictor/log/1class/"+classes.getValue().get("dir")+"/scheme"), HashMap.class);
+        ic.addScheme(scheme_, type);
         
-        ic.description = " Returns the value of the requested column as a String. ";
+        ic.description = scheme_.get("description");
         
         t1.classes.add(ic);
         t1.domain = classes.getValue().get("dir");
@@ -203,8 +194,19 @@ public class GServer {
 //    System.exit(1);
   }
 
-  private static void doInference(Generator g, Classifier classifier) {
+  private static ArrayList<HashMap<String, String>> doInference(Generator g, Classifier classifier, InnerClass[] code) throws Exception{
+    for ( InnerClass c : code )
+      c.executor_command = "1";
 
+    ArrayList<Vector[]> res = new ArrayList<>();
+
+    g.loadCode(code, g.ASC, classifier);
+    
+    g.iterateCode(code, classifier, "inference", res, 5);
+    
+    ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(classifier);
+
+    return g.filter_through_npi(out, classifier);
   }
 
   private static void doEval(Generator g, Classifier t) throws Exception {
@@ -220,13 +222,28 @@ public class GServer {
 //    HashMap<Integer, ArrayList<ArrayList<Integer>>> results1 = new HashMap<>();
 
     int count = 0;
-
+    c = new evalCounter();
+    
+    HashMap<String, Integer> counter = new HashMap<>();
+    counter.put("no", 0);
+    counter.put("yes", 0);
+    
     for (File f : new File(g.root+t.folder+"folder1").listFiles()) {
       folder1.put(count, f.getPath());
       count ++;
     }
     
-    c = new evalCounter();
+    for ( Entry<Integer, String> f : folder1.entrySet() ) {
+      t.blocking = false;
+//      if (f.getValue().contains("99993258")) {
+        System.err.println("count: "+f.getValue());
+        validate_line_by_line(f, g, t, counter);
+        System.err.println(counter);
+//      }
+    }
+    
+    System.exit(1);
+    
     for ( Entry<Integer, String> f : folder1.entrySet() ) {
       validate_file(f, g, t, c);
       System.err.println("count: "+f.getKey());
@@ -234,7 +251,7 @@ public class GServer {
     
     Utils.writeFile1(c.toString(), g.root+"/folder1_validation", true);
     
-/*    for (File f : new File(g.root+t.folder+"folder2").listFiles()) {
+    for (File f : new File(g.root+t.folder+"folder2").listFiles()) {
       folder2.put(count, f.getPath());
       count ++;
     }
@@ -258,7 +275,7 @@ public class GServer {
       System.err.println("count: "+f.getKey());
     }
     
-    Utils.writeFile1(c.toString(), g.root+"/folder3_validation", true);*/
+    Utils.writeFile1(c.toString(), g.root+"/folder3_validation", true);
     
     for (File f : new File(g.root+t.folder+"folder4").listFiles()) {
       folder4.put(count, f.getPath());
@@ -272,12 +289,12 @@ public class GServer {
     }
     
     c = new evalCounter();
-    for ( Entry<Integer, String> f : folder1.entrySet() ) {
+    for ( Entry<Integer, String> f : folder4.entrySet() ) {
       validate_file(f, g, t, c);
       System.err.println("count: "+f.getKey());
     }
     
-    Utils.writeFile1(c.toString(), g.root+"/folder1_double_validation", true);
+    Utils.writeFile1(c.toString(), g.root+"/folder4_validation", true);
     
     for (File f : new File(g.root+t.folder+"folder5").listFiles()) {
       folder5.put(count, f.getPath());
@@ -310,11 +327,47 @@ public class GServer {
       ArrayList<HashMap<Integer, Step>> send = new ArrayList<>();
       send.add(i);
 
-      ArrayList<HashMap<String, String>> response = g.filter_through_npi(send, t);
+//      ArrayList<HashMap<String, String>> response = g.filter_through_npi(send, t);
 //      results.get(f.getKey()).add(parse_response(response));
 
       c.add(g.filter_through_npi(send, t), Integer.parseInt(i.get(Collections.max(i.keySet())).program.get("id").getValue().toString()), info);
     }
+  }
+  
+  private static void validate_line_by_line(Entry<Integer, String> f, Generator g, Classifier t, HashMap<String, Integer> counter) throws Exception {
+    InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getValue()), InnerClass[].class);
+    g.loadCode(code, g.ASC, t);
+
+    for (int carret = code.length; carret > 2; carret --) {
+      ArrayList<Vector[]> res = new ArrayList<>();
+      t.clear();
+
+      g.iterateCode(Arrays.copyOfRange(code, 0, carret), t, f.getValue(), res, 5);
+       
+      ArrayList<HashMap<Integer, Step>> info = g.setTrainAndTest(t);
+
+      //    results.put(f.getKey(), new ArrayList<ArrayList<Integer>>());
+
+      for (HashMap<Integer, Step> i : info) {
+        ArrayList<HashMap<Integer, Step>> send = new ArrayList<>();
+        send.add(i);
+
+        ArrayList<HashMap<String, String>> response = g.filter_through_npi(send, t);
+
+  //      c.add(response, Integer.parseInt(i.get(Collections.max(i.keySet())).program.get("id").getValue().toString()), info);
+        if (!response.isEmpty())
+          counter.put("yes", counter.get("yes")+1);
+        else
+          counter.put("no", counter.get("no")+1);
+        
+        System.err.println(counter);
+        
+        if (counter.get("no") > 2820)
+          System.exit(1);
+      }
+    }
+    
+    
   }
 
   private static ArrayList<Integer> parse_response(ArrayList<HashMap<String, String>> response) {

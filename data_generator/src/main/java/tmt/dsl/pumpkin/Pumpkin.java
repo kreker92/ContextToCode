@@ -1,6 +1,7 @@
 package tmt.dsl.pumpkin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -15,35 +16,43 @@ import tmt.dsl.formats.context.in.ElementInfo;
 import tmt.dsl.formats.context.in.InnerClass;
 
 public class Pumpkin {
-  ArrayList<Integer> candidates = new ArrayList<>();
+//  ArrayList<Integer> candidates = new ArrayList<>();
   ArrayList<Integer> lines;
-  HashMap<Integer, InnerClass> stabs = new HashMap<>();
+  HashMap<Integer, HashMap<String, String>> stabs = new HashMap<>();
   private ArrayList<HashMap<Integer, Step>> context;
 
-  public Pumpkin(int[] res, ArrayList<HashMap<Integer, Step>> context_, Classifier ts) {
-    for (int r : res)
-      if (r != 1)
-        candidates.add(r);
-    
-    for (InnerClass c : ts.classes)
-      stabs.put(Integer.parseInt(c.executor_command), c);
+  public Pumpkin(ArrayList<HashMap<Integer, Step>> context_, Classifier ts) {
+    context = context_;
     
     lines = new ArrayList(context_.get(0).keySet());
     Collections.sort(lines, Collections.reverseOrder());
     
-    context = context_;
+    for (InnerClass c : ts.classes) {
+      HashMap<String, String> snpt = fill(c); 
+
+      if (snpt != null)
+        stabs.put(Integer.parseInt(c.executor_command), snpt);
+    }
+  }
+  
+  public boolean is_continue() {
+    System.err.println(!stabs.isEmpty());
+    return !stabs.isEmpty();
   }
 
-  public ArrayList<HashMap<String, String>> snippetize(ArrayList<HashMap<String, String>> snippets) {
-    for (Integer c : candidates)
-      if (stabs.containsKey(c))
-        fill(stabs.get(c), snippets);
+  public ArrayList<HashMap<String, String>> snippetize(int[] res, ArrayList<HashMap<String, String>> snippets) {
+    for (Integer c : res)
+      if (c!= 1 && stabs.containsKey(c))
+        snippets.add(stabs.get(c));
     
 //    System.err.println(command+" - "+new Gson().toJson(snippets)+" - "+candidates);
     return snippets;
   }
+  
+  public void candidates() {
+  }
 
-  private void fill(InnerClass innerClass, ArrayList<HashMap<String, String>> snippets) {
+  private HashMap<String, String> fill(InnerClass innerClass) {
     boolean complete = false;
     String snippet = "";
 
@@ -59,21 +68,24 @@ public class Pumpkin {
           }
         }
       }
+    
     if (complete) {
       HashMap<String, String> temp = new HashMap<>();
       temp.put("prediction", snippet);
       temp.put("code", innerClass.executor_command);
       temp.put("documentation", innerClass.description);
-      snippets.add(temp);
+      return temp;
     }
+    
+    return null;
   }
 
   private String getFirstVar(String type) {
     for (HashMap<Integer, Step> cs : context)
       for (Integer l : lines)
         for (ElementInfo el : (ArrayList<ElementInfo>)cs.get(l).additional_info.get("el")) 
-          if (el.ast_type != null && !el.ast_type.isEmpty() && type.equals(el.ast_type) && 
-          (!el.text.equals("TextView") && !el.text.equals("View") && !el.text.equals("Cursor") && !el.text.equals("TextView"))) 
+          if (el.ast_type != null && !el.ast_type.isEmpty() && type.equals(el.ast_type)) 
+          //&& (!el.text.equals("TextView") && !el.text.equals("View") && !el.text.equals("Cursor") && !el.text.equals("TextView"))) 
             return el.text;
     return "";
   }
