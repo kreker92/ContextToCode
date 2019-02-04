@@ -182,7 +182,7 @@ public class GServer {
         ic.elements.add(new ElementInfo("class_method", class_method, null));
         
         HashMap<String, String> scheme_ = new Gson().fromJson(Utils.readFile("/root/ContextToCode/predictor/log/1class/"+classes.getValue().get("dir")+"/scheme"), HashMap.class);
-        ic.addScheme(scheme_, type);
+        ic.addScheme(scheme_, type, classes.getValue().get("dir")); 
         
         ic.description = scheme_.get("description");
         
@@ -222,7 +222,7 @@ public class GServer {
 //    HashMap<Integer, ArrayList<ArrayList<Integer>>> results1 = new HashMap<>();
 
     int count = 0;
-    c = new evalCounter();
+    c = new evalCounter(t.classes.size()+1);
     
     HashMap<String, Integer> counter = new HashMap<>();
     counter.put("no", 0);
@@ -235,11 +235,11 @@ public class GServer {
     
     for ( Entry<Integer, String> f : folder1.entrySet() ) {
       t.blocking = false;
-//      if (f.getValue().contains("99993258")) {
+      if (f.getValue().contains("99726047")) {
         System.err.println("count: "+f.getValue());
-        validate_line_by_line(f, g, t, counter);
+        validate_line_by_line(f, g, t, counter, c);
         System.err.println(counter);
-//      }
+      }
     }
     
     System.exit(1);
@@ -256,7 +256,7 @@ public class GServer {
       count ++;
     }
     
-    c = new evalCounter();
+    c = new evalCounter(t.classes.size()+1);
     for ( Entry<Integer, String> f : folder2.entrySet() ) {
       validate_file(f, g, t, c);
       System.err.println("count: "+f.getKey());
@@ -269,7 +269,7 @@ public class GServer {
       count ++;
     }
     
-    c = new evalCounter();
+    c = new evalCounter(t.classes.size()+1);
     for ( Entry<Integer, String> f : folder3.entrySet() ) {
       validate_file(f, g, t, c);
       System.err.println("count: "+f.getKey());
@@ -282,13 +282,13 @@ public class GServer {
       count ++;
     }
     
-    c = new evalCounter();
+    c = new evalCounter(t.classes.size()+1);
     for ( Entry<Integer, String> f : folder4.entrySet() ) {
       validate_file(f, g, t, c);
       System.err.println("count: "+f.getKey());
     }
     
-    c = new evalCounter();
+    c = new evalCounter(t.classes.size()+1);
     for ( Entry<Integer, String> f : folder4.entrySet() ) {
       validate_file(f, g, t, c);
       System.err.println("count: "+f.getKey());
@@ -301,7 +301,7 @@ public class GServer {
       count ++;
     }
     
-    c = new evalCounter();
+    c = new evalCounter(t.classes.size()+1);
     for ( Entry<Integer, String> f : folder5.entrySet() ) {
       validate_file(f, g, t, c);
       System.err.println("count: "+f.getKey());
@@ -334,7 +334,7 @@ public class GServer {
     }
   }
   
-  private static void validate_line_by_line(Entry<Integer, String> f, Generator g, Classifier t, HashMap<String, Integer> counter) throws Exception {
+  private static void validate_line_by_line(Entry<Integer, String> f, Generator g, Classifier t, HashMap<String, Integer> counter, evalCounter c) throws Exception {
     InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getValue()), InnerClass[].class);
     g.loadCode(code, g.ASC, t);
 
@@ -354,13 +354,13 @@ public class GServer {
 
         ArrayList<HashMap<String, String>> response = g.filter_through_npi(send, t);
 
-  //      c.add(response, Integer.parseInt(i.get(Collections.max(i.keySet())).program.get("id").getValue().toString()), info);
+        c.add(response, Integer.parseInt(i.get(Collections.max(i.keySet())).program.get("id").getValue().toString()), info);
         if (!response.isEmpty())
           counter.put("yes", counter.get("yes")+1);
         else
           counter.put("no", counter.get("no")+1);
         
-        System.err.println(counter);
+        System.err.println(counter+" * "+c);
         
         if (counter.get("no") > 2820)
           System.exit(1);
@@ -631,16 +631,16 @@ class evalCounter {
   int incorrect_prediction = 0;
   int given_variants = 0;
   HashMap<Integer, HashMap<Boolean, Integer>> classes_counter = new HashMap<>();
-  HashMap<Integer, Integer> first_counter = new HashMap<>();
+  HashMap<Integer, Integer> counter = new HashMap<>();
 
   
-  public evalCounter() {
-    for (int i = 0; i < 52; i++) {
+  public evalCounter(int j) {
+    for (int i = 0; i < j; i++) {
       HashMap<Boolean, Integer> temp = new HashMap<>();
       temp.put(true, 0);
       temp.put(false, 0);
       classes_counter.put(i, temp);
-      first_counter.put(i, 0);
+      counter.put(i, 0);
     }
   }
 
@@ -661,6 +661,7 @@ class evalCounter {
           
 //          if (code == 12)
 //            given_variants += 1;
+ 
           if (code == executor_command)
             correctness = true;
         }   
@@ -671,20 +672,20 @@ class evalCounter {
         else
           incorrect_prediction += 1;
     
-        System.err.println(res+" * "+executor_command+" * "+correctness);
+//        System.err.println(res+" * "+executor_command+" * "+correctness);
         
         classes_counter.get(executor_command).put(correctness, classes_counter.get(executor_command).get(correctness)+1);
-      } else 
-        for (HashMap<String, String> r : res) {
-          int code = Integer.parseInt(r.get("code"));
-          first_counter.put(code, first_counter.get(code)+1);
-        } 
+      } 
+      for (HashMap<String, String> r : res) {
+        int code = Integer.parseInt(r.get("code"));
+        counter.put(code, counter.get(code)+1);
+      } 
     }
   }
 
   public String toString() {
     return "no context: " + lines_without_context + ", yes context: "+lines_with_context+", class: " 
         + lines_with_class + ", correct: " + correct_prediction + ", incorrect"  + incorrect_prediction +
-        " by class, "+classes_counter+", first_counter"+first_counter+" № of var.," +given_variants;
+        " by class, "+classes_counter+", counter"+counter;
   }
 }

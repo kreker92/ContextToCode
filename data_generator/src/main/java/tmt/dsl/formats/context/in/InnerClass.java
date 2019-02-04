@@ -65,12 +65,15 @@ public class InnerClass {
     return " elements: "+elements;
   }
 
-  public void addScheme(HashMap<String, String> scheme, String t) {
-    LinkedHashMap<String, String> scheme_ = new LinkedHashMap<>();
-    
-    for (int count = 1; count < scheme.size(); count ++)
-      for (Entry<String, String> s : scheme.entrySet())
-        if (s.getKey().contains(count+"")) 
-          scheme_.put(s.getKey(), s.getValue().replace("*", t));
+  public void addScheme(HashMap<String, String> scheme_, String t, String string) { 
+    LinkedHashMap<String, String> temp = new LinkedHashMap<>();
+
+    for (int count = 1; count < scheme_.size(); count ++)
+      for (Entry<String, String> s : scheme_.entrySet())
+        if (s.getKey().contains(count+"")) {
+          temp.put(s.getKey(), s.getValue().replace("*", t));
+        }
+    scheme.add(temp);
+//    System.err.println(string+" * "+scheme);
   }
 }
