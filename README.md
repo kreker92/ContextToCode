@@ -11,3 +11,6 @@ Context based technology that suggest you code completions
 PsiType:Rect=3946, PsiType:Intent=3406, PsiType:Bitmap=2933, PsiType:Paint=2280, PsiType:StringBuilder=2116, PsiType:PrintWriter=2022,   PsiType:Bundle=2017, PsiType:Canvas=1944, PsiType:Point=1619, PsiType:Cursor=1585 (**837** lines predicted)
 
 
+https://docs.google.com/forms/d/1ZbX0C5hZOQKNYZT6Bswv__SJBspaQQlWZ5hT_HWwVRI
+
+
