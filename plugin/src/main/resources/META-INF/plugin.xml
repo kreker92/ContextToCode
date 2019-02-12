@@ -18,15 +18,21 @@
     <!--</component>-->
   <!--</application-components>-->
 
-    <project-components>
-        <component>
-            <implementation-class>tmt.PluginMain</implementation-class>
-        </component>
-    </project-components>
+  <!--  <project-components>-->
+   <!--     <component>-->
+    <!--        <implementation-class>tmt.PluginMain</implementation-class>-->
+     <!--   </component>-->
+   <!-- </project-components>-->
 
   <extensions defaultExtensionNs="com.intellij">
       <!--<preloadingActivity implementation="MyPreloadingActivity"/>-->
       <!--<annotator language="JAVA" implementationClass="SimpleAnnotator"/>-->
       <!--<postStartupActivity implementation="MyPostStartupActivity"/>-->
+      <localInspection groupPath="Java" language="JAVA" shortName="tmt.GenerateInspection"
+                       displayName="Instance field count" groupName="GenerateInspection"
+                       bundle="com.siyeh.InspectionGadgetsBundle"
+                       groupBundle="messages.InspectionsBundle" groupKey="group.names.imports" enabledByDefault="true" level="WARNING"
+                       implementationClass="tmt.GenerateInspection"/>
+
   </extensions>
 </idea-plugin>

@@ -1,6 +1,5 @@
 package tmt;
 
-import com.intellij.codeInspection.javaDoc.JavadocHighlightUtil.ProblemHolder;
 import tmt.analyze.ContextHelperPanel;
 import tmt.attributes.TextAttributes;
 import com.intellij.codeInsight.daemon.impl.*;
@@ -30,11 +29,11 @@ public class PluginMain implements ProjectComponent {
      */
     public PluginMain(Project project) {
         this.project = project;
-        PsiManager.getInstance(project).addPsiTreeChangeListener(new PsiTreeChangeAdapter() {
+        /*PsiManager.getInstance(project).addPsiTreeChangeListener(new PsiTreeChangeAdapter() {
             public void beforeChildrenChange(@NotNull PsiTreeChangeEvent event) {
                 runInspectionOnFile(new GenerateInspection(), event.getParent(), event.getFile());
             }
-        }, project);
+        }, project);*/
     }
 
     private void runInspectionOnFile(@NotNull LocalInspectionTool inspectionTool, PsiElement el, PsiFile file) {
@@ -58,13 +57,13 @@ public class PluginMain implements ProjectComponent {
 
                 TextRange range = new TextRange(document.getLineStartOffset(start_line), document.getLineEndOffset(end_line));
 
-                Annotation annotation = annotationHolder.createWarningAnnotation(range, "Suggest for next line:" + p.getAnnotationMessage());
-                annotation.setHighlightType(ProblemHighlightType.INFORMATION);
-                annotation.setTextAttributes(TextAttributes.CRITICAL);
-                annotation.registerFix(new QuickFix(p.getFixMessage(), project, p.getLineNumber()));
+//                Annotation annotation = annotationHolder.createWarningAnnotation(range, "Suggest for next line:" + p.getAnnotationMessage());
+//                annotation.setHighlightType(ProblemHighlightType.INFORMATION);
+//                annotation.setTextAttributes(TextAttributes.CRITICAL);
+             //   annotation.registerFix(new QuickFix(p.getFixMessage(), project, p.getLineNumber()));
 
-                HighlightInfo hl = HighlightInfo.fromAnnotation(annotation);
-                hls.add(hl);
+//                HighlightInfo hl = HighlightInfo.fromAnnotation(annotation);
+//                hls.add(hl);
             }
 
             UpdateHighlightersUtil.setHighlightersToEditor(project, document,

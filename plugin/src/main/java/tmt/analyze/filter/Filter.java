@@ -1,8 +1,10 @@
 package tmt.analyze.filter;
 
+import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.Project;
 import tmt.SuggestGenerate;
 import tmt.analyze.SyntaxUtils;
-import com.intellij.openapi.editor.Editor;
+;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.openapi.editor.Document;
@@ -11,9 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Filter {
-    public static boolean pass(PsiFile psiFile, int current_scope, Editor ed) {
-        Document document = ed.getDocument();
-
+    public static boolean pass(PsiFile psiFile, int current_scope, Document document) {
         List<PsiElement> psiElements = new ArrayList<>();
         SyntaxUtils.traversePsiElement(psiFile, psiElements,
                 document.getLineStartOffset(current_scope),
@@ -37,12 +37,13 @@ public class Filter {
         return true;
     }
 
-    public static ArrayList<SuggestGenerate> removeDoubles(ArrayList<SuggestGenerate> suggests, String current_text) {
+    public static ArrayList<SuggestGenerate> removeDoubles(ArrayList<SuggestGenerate> suggests, String current_text, ProblemsHolder holder, Project project, PsiElement element) {
         ArrayList<SuggestGenerate> res = new ArrayList<>();
 
         for ( SuggestGenerate s : suggests)
-            if (!current_text.contains(s.getFixMessage()))
+            if (!current_text.contains(s.getFixMessage())) {
                 res.add(s);
+            }
 
         return res;
     }

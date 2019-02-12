@@ -1,6 +1,13 @@
 package tmt;
 
+import com.intellij.codeInspection.HintAction;
+import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemHighlightType;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.colors.CodeInsightColors;
+import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import tmt.analyze.ContextHelperPanel;
 import tmt.analyze.ElementInfo;
 import tmt.analyze.InnerContext;
@@ -11,7 +18,6 @@ import com.intellij.codeInspection.InspectionManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-//import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -26,53 +32,56 @@ import tmt.util.Actions;
 class Analyzer {
     private ArrayList<SuggestGenerate> suggests = new ArrayList<>();
     private Project project;
-    private Editor ed;
+    private int end;
     private PsiFile fi;
     private Actions act;
     private int scope;
+    private PsiElement element;
+    private Document document;
 
-    Analyzer(PsiFile file_, int sc_, Editor ed) {
+    Analyzer(PsiFile file_, int sc_, Document document_, PsiElement element_) {
         project = file_.getProject();
         fi = file_;
         act = new Actions(project);
         scope = sc_;
-        this.ed = ed;
+        element = element_;
+        end = document_.getLineEndOffset(sc_);
+        document = document_;
     }
 
     void analyze() {
-        ContextHelperPanel helperComponent = ContextHelperPanel.getPanel(project);
+//        ContextHelperPanel helperComponent = ContextHelperPanel.getPanel(project);
 
         try {
             ArrayList<InnerContext> output_elements = new ArrayList<>();
 
-            parseFile(fi, output_elements, fi.getText(), ed.getSelectionModel().getSelectionEnd());
+            parseFile(fi, output_elements, fi.getText(), end);
 
             String request = new Gson().toJson(output_elements);
-            System.err.println(request);
+            System.err.println("!"+request);
             //System.err.println("Request sent.");
 
             ArrayList<LinkedTreeMap<String, String>> res = new ArrayList<>();
             try {
-                String responce = act.send(request);
-                System.err.println("Responce got." + responce);
-                res = new Gson().fromJson(responce, ArrayList.class);
-                /*int times = new Random().nextInt(4);
-                for(int i = 0; i < times; i++) {
-                    LinkedTreeMap<String, String> res_buf = new LinkedTreeMap<>();
-                    res_buf.put("documentation", "Documentation string" + i);
-                    res_buf.put("prediction", "Predicted string" + i);
-                    res.add(res_buf);
-                }*/
-            } catch (Exception e) {
+                String response = act.send(request);
+                System.err.println("Response got." + response);
+                res = new Gson().fromJson(response, ArrayList.class);
+             } catch (Exception e) {
                 System.err.println("Classifier returned 500 code");
             }
-            helperComponent.setQueryingStatus(res);
+//            helperComponent.setQueryingStatus(res);
 
+            System.err.println("1;"+res);
             for (LinkedTreeMap<String, String> sugg : res) {
-                suggests.add(new SuggestGenerate(scope, sugg.get("documentation"), sugg.get("prediction")));
+//                QuickFix[] qf = {new tmt.QuickFix(sugg.get("prediction"), project, scope, element)};
+//                suggests.add(new SuggestGenerate(element, element, sugg.get("documentation"), qf,
+//                        ProblemHighlightType.INFORMATION,false, new TextRange(document.getLineStartOffset(scope), document.getLineEndOffset(scope)),
+//                true,null,true));
+                suggests.add(new SuggestGenerate(scope, sugg.get("documentation"), sugg.get("prediction"), project, document, element));
             }
+            System.err.println("2;"+suggests);
         } catch (Exception e) {
-            Messages.showMessageDialog(project, e.getMessage(), "Error Occurred", Messages.getInformationIcon());
+         //   Messages.showMessageDialog(project, e.getMessage(), "Error Occurred", Messages.getInformationIcon());
             e.printStackTrace();
         }
     }

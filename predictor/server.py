@@ -6,7 +6,7 @@ from tasks.eval import repl
 from model.npi import NPI
 from tasks.generate_data import transform
 from tasks.env.addition import AdditionCore
-from tasks.env.config import CONFIG, get_args, PROGRAM_SET, LOG_PATH, DATA_PATH_TEST, CKPT_PATH
+from tasks.env.config import CONFIG, get_args, LOG_PATH, DATA_PATH_TEST, CKPT_PATH
 from tasks.env.config import get_env
 import numpy as np
 import pickle
@@ -15,8 +15,8 @@ from tensorflow.python.platform import gfile
 import json
 import sys
 import tflearn
-from tfsess import tf_sess 
 from urllib.parse import unquote
+import threading
 
 class test:
     def __init__(self):
@@ -89,10 +89,31 @@ class myHandler(BaseHTTPRequestHandler):
         context_ = post_data.decode("utf-8").split("=")[1]
         context = unquote(context_)	
         data = json.loads(context)
-        
+      #  for key, value in self.t1.sessions.items():
+       #     thr = threading.Thread(target=self.get_predictions, args=(value['session'], CKPT_PATH+value['dir']+"/mask", res, json.loads(context)[0], int(value['prog']), value['key']), kwargs={})
+        #    thr.start() # Will run "foo"
+        jobs = []
         for key, value in self.t1.sessions.items():
-            self.get_predictions(value['session'], CKPT_PATH+value['dir']+"/mask", res, json.loads(context)[0], int(value['prog']), value['key'])
+            for j in data[0]:
+                if j in value['dir']:
+                    thr = threading.Thread(target=self.get_predictions, args=(value['session'], CKPT_PATH+value['dir']+"/mask", res, data[1][0], int(value['prog']), value['key']), kwargs={})
+                    jobs.append(thr)
 
+	    # Start the threads (i.e. calculate the random number lists)
+        for j in jobs:
+            j.start()
+
+	    # Ensure all of the threads have finished
+        for j in jobs:
+            j.join()
+
+        print ("List processing complete.")
+           # thr.is_alive() # Will return whether foo is running currently
+
+           # thr.join() # Will wait till "foo" is done
+            #result = pool.apply_async(self.get_predictions, (value['session'], CKPT_PATH+value['dir']+"/mask", res, json.loads(context)[0], int(value['prog']), value['key'])) # Evaluate "f(10)" asynchronously calling callback when finished.
+        print (res)
+        #tf.reset_default_graph()
         self.wfile.write(bytes(json.dumps(res), 'utf-8'))			
 
 class main:

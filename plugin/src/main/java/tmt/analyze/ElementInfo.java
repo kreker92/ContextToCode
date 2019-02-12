@@ -11,6 +11,7 @@ public class ElementInfo {
   public String text;
   public String parent;
   public String ast_type;
+  public PsiElement element;
   //public PsiReference  ref;
   //public PsiReference[]  refs;
   //public String original;

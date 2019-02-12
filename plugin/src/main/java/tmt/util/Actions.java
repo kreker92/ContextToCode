@@ -13,7 +13,7 @@ public class Actions {
     private Project project;
 
     public Actions(Project project) {
-        ed = FileEditorManager.getInstance(project).getSelectedTextEditor();
+//        ed = FileEditorManager.getInstance(project).getSelectedTextEditor();
     }
 
     public void insert(String q, int line_num) {
@@ -26,6 +26,7 @@ public class Actions {
     }
 
     public String send(String request) throws Exception {
+//        Generator g = new Generator();
         return Util.sendGet(request);
     }
 }

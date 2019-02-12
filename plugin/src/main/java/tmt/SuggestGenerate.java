@@ -1,39 +1,73 @@
 package tmt;
 
-import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.codeInspection.ProblemHighlightType;
+import com.intellij.codeInspection.*;
 import com.intellij.codeInspection.QuickFix;
+import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.ProblemGroup;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import tmt.attributes.TextAttributes;
+
+import java.lang.reflect.Array;
 
 public class SuggestGenerate implements ProblemDescriptor {
-    private int curr_line;
-    private String annotation;
+    private final int curr_line;
+//    private final TextRange range;
     private String fix;
+    private String annotation;
+    private Project project;
+    private PsiElement element;
 
-    public SuggestGenerate(int selected_line, String documentation, String prediction) {
+//    public SuggestGenerate(@NotNull PsiElement startElement,
+//                                 @NotNull PsiElement endElement,
+//                                 @NotNull String descriptionTemplate,
+//                                 LocalQuickFix[] fixes,
+//                                 @NotNull ProblemHighlightType highlightType,
+//                                 boolean isAfterEndOfLine,
+//                                 @Nullable TextRange rangeInElement,
+//                                 final boolean tooltip,
+//                                 @Nullable HintAction hintAction,
+//                                 boolean onTheFly,
+//                           String prediction) {
+//        super(startElement, endElement, descriptionTemplate, fixes, highlightType, isAfterEndOfLine, rangeInElement, tooltip, onTheFly);
+//       // myHintAction = hintAction;
+//        fix = prediction;
+//    }
+//
+//    public String getFixMessage() {
+//        return fix;
+//    }
+
+    public SuggestGenerate(int selected_line, String documentation, String prediction, Project project_, Document document, PsiElement element_) {
         curr_line = selected_line;
         annotation = documentation;
         fix = prediction;
+        project = project_;
+        element = element_;
+
+//        range = new TextRange(0, document.getLineEndOffset(curr_line)-document.getLineStartOffset(curr_line));
+
+        this.setTextAttributes(TextAttributes.CRITICAL);
     }
 
     @Override
     public PsiElement getPsiElement() {
-        return null;
+        return element;
     }
 
     @Override
     public PsiElement getStartElement() {
-        return null;
+        return element;
     }
 
     @Override
     public PsiElement getEndElement() {
-        return null;
+        return element;
     }
 
     @Override
@@ -49,7 +83,7 @@ public class SuggestGenerate implements ProblemDescriptor {
     @NotNull
     @Override
     public ProblemHighlightType getHighlightType() {
-        return ProblemHighlightType.WARNING;
+        return ProblemHighlightType.INFORMATION;
     }
 
     @Override
@@ -75,7 +109,7 @@ public class SuggestGenerate implements ProblemDescriptor {
 
     @Override
     public boolean showTooltip() {
-        return false;
+        return true;
     }
 
     @NotNull
@@ -86,8 +120,9 @@ public class SuggestGenerate implements ProblemDescriptor {
 
     @Nullable
     @Override
-    public QuickFix[] getFixes() {
-        return new QuickFix[0];
+    public LocalQuickFix[] getFixes() {
+        LocalQuickFix[] qf = {new tmt.QuickFix(fix, project, curr_line, element)};
+        return qf;
     }
 
     public String getAnnotationMessage() {
