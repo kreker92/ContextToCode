@@ -30,6 +30,12 @@ import tmt.dsl.executor.Executor;
 import java.nio.file.Files;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import tmt.dsl.DSL;
 import tmt.dsl.Classifier;
@@ -55,6 +61,7 @@ public class Generator  {
   public final String root = "../data/datasets/";
   private InnerClass[] code;
   private Random rand;
+  private CloseableHttpClient httpclient;
 
   public static ArrayList<String> good_types;
   public static ArrayList<String> bad_types;
@@ -65,8 +72,22 @@ public class Generator  {
   public Generator () throws JsonSyntaxException, JsonIOException, FileNotFoundException {
     good_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("../output/conf/good_types"), String[].class)) );
     bad_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("../output/conf/bad_types"), String[].class)) );
-    
+
     rand = new Random();
+
+    PoolingHttpClientConnectionManager connManager = new
+        PoolingHttpClientConnectionManager();
+    connManager.setMaxTotal(30);
+    connManager.setDefaultMaxPerRoute(30);
+
+    RequestConfig config = RequestConfig.custom()
+        .setConnectionRequestTimeout(45)
+        .setConnectTimeout(45)
+        .setSocketTimeout(45)
+        .setExpectContinueEnabled(true)
+        .setStaleConnectionCheckEnabled(true).build();
+
+    httpclient = HttpClients.createDefault();
   }
 
   public ArrayList<HashMap<Integer, Step>> setTrainAndTest(Classifier t) throws Exception{
@@ -127,7 +148,13 @@ public class Generator  {
       Pumpkin pmp = new Pumpkin(context, t);
       
       if (pmp.is_continue()) {
-        int[] res = new Gson().fromJson(Utils.sendPost(new Gson().toJson(context), "http://78.46.103.68:8081/"), int[].class);
+        long time = System.currentTimeMillis();  
+        HttpPost httppost = new HttpPost("http://localhost:8081/");
+
+        //THREAD SAFE ABORT OPERATION: http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e143
+        int[] res = new Gson().fromJson(Utils.read(httppost, httpclient, pmp.getContext(), "http://localhost:8081/"), int[].class);
+        
+        System.err.println("!"+(System.currentTimeMillis() - time));
         return pmp.snippetize(res, snippets);
       } else {
         return snippets;

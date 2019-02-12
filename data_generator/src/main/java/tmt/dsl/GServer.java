@@ -126,7 +126,7 @@ public class GServer {
         if (!bad_types.contains(type) && !f.exists()) {
           types.add(type);
           /* background class */
-          InnerClass background_class = new InnerClass("falsekey", "1");
+          InnerClass background_class = new InnerClass("falsekey", "1", type);
           background_class.elements.add(new ElementInfo("ast_type", type, null));
           background_class.elements.add(new ElementInfo("class_method", type+"#PsiIdentifier:*", null));
           LinkedHashMap<String, String> temp7_1 = new LinkedHashMap<>();
@@ -149,7 +149,7 @@ public class GServer {
 //            count = Integer.parseInt(StringUtils.substringsBetween(info, "\"prog\": \"", "\"")[0]);
 //          }
 
-          InnerClass ic = new InnerClass("truekey", count+"");
+          InnerClass ic = new InnerClass("truekey", count+"", type);
           ic.elements.add(new ElementInfo("ast_type", type, null));
           ic.elements.add(new ElementInfo("class_method", com.getKey(), null));
           ic.scheme.add(temp6_1);
@@ -177,7 +177,7 @@ public class GServer {
         String class_method = "PsiType:"+classes.getValue().get("dir").replace("_", "#PsiIdentifier:");
         String type = StringUtils.substringsBetween(class_method, "PsiType:", "#")[0];
         
-        InnerClass ic = new InnerClass("truekey", classes.getKey());
+        InnerClass ic = new InnerClass("truekey", classes.getKey(), type);
         ic.elements.add(new ElementInfo("ast_type", "PsiType:"+type, null));
         ic.elements.add(new ElementInfo("class_method", class_method, null));
         
@@ -517,7 +517,7 @@ public class GServer {
     ic8.scheme.add(temp8_1);
     ic8.description = " Returns a Resources instance for the application's package. "; */
 
-    InnerClass ic5 = new InnerClass("truekey", "2");
+    InnerClass ic5 = new InnerClass("truekey", "2", "PsiType:Cursor");
     ic5.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
     ic5.elements.add(new ElementInfo("class_method", "PsiType:Cursor#PsiIdentifier:getString", null));
     LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
@@ -527,31 +527,31 @@ public class GServer {
     ic5.scheme.add(temp6_1);
     ic5.description = " Returns the value of the requested column as a String. ";
     
-    InnerClass ic6 = new InnerClass("truekey", "3");
+    InnerClass ic6 = new InnerClass("truekey", "3", "PsiType:Cursor");
     ic6.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
     ic6.elements.add(new ElementInfo("class_method", "PsiType:Cursor#PsiIdentifier:getColumnIndex", null));
     ic6.scheme.add(temp6_1);
     ic6.description = " Returns the value of the requested column as a String. ";
 
-    InnerClass ic8 = new InnerClass("truekey", "4");
+    InnerClass ic8 = new InnerClass("truekey", "4", "PsiType:Cursor");
     ic8.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
     ic8.elements.add(new ElementInfo("class_method", "PsiType:Cursor#PsiIdentifier:close", null));
     ic8.scheme.add(temp6_1);
     ic8.description = " Returns the value of the requested column as a String. ";
     
-    InnerClass ic9 = new InnerClass("truekey", "5");
+    InnerClass ic9 = new InnerClass("truekey", "5", "PsiType:Cursor");
     ic9.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
     ic9.elements.add(new ElementInfo("class_method", "PsiType:Cursor#PsiIdentifier:getLong", null));
     ic9.scheme.add(temp6_1);
     ic9.description = " Returns the value of the requested column as a String. ";
     
-    InnerClass ic10 = new InnerClass("truekey", "6");
+    InnerClass ic10 = new InnerClass("truekey", "6", "PsiType:Cursor");
     ic10.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
     ic10.elements.add(new ElementInfo("class_method", "PsiType:Cursor#PsiIdentifier:getInt", null));
     ic10.scheme.add(temp6_1);
     ic10.description = " Returns the value of the requested column as a String. ";
     
-    InnerClass ic7 = new InnerClass("falsekey", "1");
+    InnerClass ic7 = new InnerClass("falsekey", "1", "PsiType:Cursor");
     ic7.elements.add(new ElementInfo("ast_type", "PsiType:Cursor", null));
     ic7.elements.add(new ElementInfo("class_method", "PsiType:Cursor#PsiIdentifier:*", null));
     LinkedHashMap<String, String> temp7_1 = new LinkedHashMap<>();

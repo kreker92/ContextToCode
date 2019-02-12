@@ -40,13 +40,20 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
+
+import tmt.dsl.executor.info.Step;
 
 public class Utils {
 
@@ -226,28 +233,50 @@ public class Utils {
     }
   }
 
-  public static String sendPost(String string, String url_) throws IOException {
-    HttpClient httpclient = HttpClients.createDefault();
-    HttpPost httppost = new HttpPost(url_);
+  public static String read (final HttpPost httppost, CloseableHttpClient httpclient, String context, String url_) throws IOException {
+    String res = "";
 
     // Request parameters and other properties.
     List<NameValuePair> params = new ArrayList<NameValuePair>(2);
-    params.add(new BasicNameValuePair("context", string));
-//    params.add(new BasicNameValuePair("param-2", "Hello!"));
+    params.add(new BasicNameValuePair("context", context));
+    //    params.add(new BasicNameValuePair("param-2", "Hello!"));
     httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 
     //Execute and get the response.
-    HttpResponse response = httpclient.execute(httppost);
+    HttpResponse response = httpclient.execute(httppost, new BasicHttpContext());
     HttpEntity entity = response.getEntity();
 
-    String res = "";
     if (entity != null) {
       try (InputStream instream = entity.getContent()) {
         Scanner s = new Scanner(instream).useDelimiter("\\A");
         res += s.hasNext() ? s.next() : "";
       }
     }
-    
     return res;
+  }
+  
+  public static String sendPost__(ArrayList<String> keys, ArrayList<HashMap<Integer, Step>> context, String url_) throws IOException {
+    HttpClient httpclient = HttpClients.createDefault();
+    HttpPost httppost = new HttpPost(url_);
+
+    // Request parameters and other properties.
+    List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+    params.add(new BasicNameValuePair("context", new Gson().toJson(context)));
+    params.add(new BasicNameValuePair("keys", new Gson().toJson(keys)));
+//    params.add(new BasicNameValuePair("param-2", "Hello!"));
+    httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+
+    //Execute and get the response.
+//    HttpResponse response = httpclient.execute(httppost);
+//    HttpEntity entity = response.getEntity();
+//
+//    String res = "";
+//    if (entity != null) {
+//      try (InputStream instream = entity.getContent()) {
+//        Scanner s = new Scanner(instream).useDelimiter("\\A");
+//        res += s.hasNext() ? s.next() : "";
+//      }
+//    }
+    return null;
   }
 }

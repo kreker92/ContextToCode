@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.gson.Gson;
+import com.intellij.util.containers.HashSet;
 
 import tmt.dsl.Classifier;
 import tmt.dsl.executor.info.Step;
@@ -18,7 +19,7 @@ import tmt.dsl.formats.context.in.InnerClass;
 public class Pumpkin {
 //  ArrayList<Integer> candidates = new ArrayList<>();
   ArrayList<Integer> lines;
-  HashMap<Integer, HashMap<String, String>> stabs = new HashMap<>();
+  private HashMap<Integer, HashMap<String, String>> stabs = new HashMap<>();
   private ArrayList<HashMap<Integer, Step>> context;
 
   public Pumpkin(ArrayList<HashMap<Integer, Step>> context_, Classifier ts) {
@@ -74,6 +75,7 @@ public class Pumpkin {
       temp.put("prediction", snippet);
       temp.put("code", innerClass.executor_command);
       temp.put("documentation", innerClass.description);
+      temp.put("ast_type", innerClass.ast_type);
       return temp;
     }
     
@@ -89,5 +91,16 @@ public class Pumpkin {
             return el.text;
     return "";
   }
-
+  
+  public String getContext() {
+    ArrayList out = new ArrayList<>();
+    
+    HashSet<String> keys = new HashSet<>();
+    for (Entry<Integer, HashMap<String, String>> stab : stabs.entrySet()) {
+        keys.add(stab.getValue().get("ast_type"));
+    }
+    out.add(keys);
+    out.add(context);
+    return new Gson().toJson(out);
+  }
 }

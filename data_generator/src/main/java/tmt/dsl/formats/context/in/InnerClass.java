@@ -12,13 +12,15 @@ public class InnerClass {
   public int line_num;
   public String line_text;
   public String type;
+  public String ast_type;
   public String executor_command = "1";
   
   public ArrayList<LinkedHashMap<String, String>> scheme = new ArrayList<LinkedHashMap<String, String>>();
   public String description;
   
-  public InnerClass(String type_, String executor_command_) {
+  public InnerClass(String type_, String executor_command_, String ast_type_) {
     type = type_;
+    ast_type = ast_type_;
     
     if (executor_command_ != null) 
       executor_command = executor_command_;
