@@ -1,7 +1,6 @@
 package tmt;
 
 import com.intellij.codeInspection.*;
-import com.intellij.codeInspection.QuickFix;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.ProblemGroup;
 import com.intellij.openapi.editor.Document;
@@ -121,12 +120,12 @@ public class SuggestGenerate implements ProblemDescriptor {
     @Nullable
     @Override
     public LocalQuickFix[] getFixes() {
-        LocalQuickFix[] qf = {new tmt.QuickFix(fix, project, curr_line, element)};
+        LocalQuickFix[] qf = {new QuickFix(fix, project, curr_line, element)};
         return qf;
     }
 
-    public String getAnnotationMessage() {
-        return annotation;
+    public String toString() {
+        return "annotation: "+annotation+", curr_line: "+curr_line+", fix: "+fix+", element: "+element;
     }
 
     public String getFixMessage() {

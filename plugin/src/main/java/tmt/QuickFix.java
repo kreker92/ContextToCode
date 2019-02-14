@@ -15,15 +15,13 @@ import org.jetbrains.annotations.NotNull;
 import tmt.util.Actions;
 
 public class QuickFix extends LocalQuickFixOnPsiElement {
-    private final Actions act;
+  //  private final Actions act;
     private String code_line;
     private int line_num;
 
     public QuickFix(String code_line_, Project project, int ln, PsiElement el) {
         super(el);
         this.code_line = code_line_;
-        System.err.println(code_line);
-        act = new Actions(project);
         line_num = ln;
     }
 
@@ -51,7 +49,7 @@ public class QuickFix extends LocalQuickFixOnPsiElement {
         int startOffset = textRange.getStartOffset();
         int endOffset = textRange.getEndOffset();
         blockSupport.reparseRange(file, startOffset, endOffset, " ::");*/
-        act.insert(code_line, line_num);
+        Actions.insert(code_line, line_num, project);
     }
 }
 

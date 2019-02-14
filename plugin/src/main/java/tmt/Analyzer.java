@@ -1,56 +1,47 @@
 package tmt;
 
-import com.intellij.codeInspection.HintAction;
-import com.intellij.codeInspection.LocalQuickFix;
-import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.colors.CodeInsightColors;
-import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import tmt.analyze.ContextHelperPanel;
 import tmt.analyze.ElementInfo;
 import tmt.analyze.InnerContext;
 import tmt.analyze.SyntaxUtils;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
-import com.intellij.codeInspection.InspectionManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
+import tmt.conf.Conf;
+import tmt.conf.Utils;
+import tmt.dsl.GServer;
+import tmt.dsl.cache.Cache;
+import tmt.dsl.formats.context.in.InnerClass;
 import tmt.util.Actions;
+import tmt.util.Util;
 
 class Analyzer {
+    private final Cache cache;
     private ArrayList<SuggestGenerate> suggests = new ArrayList<>();
     private Project project;
-    private int end;
     private PsiFile fi;
-    private Actions act;
-    private int scope;
-    private PsiElement element;
     private Document document;
 
-    Analyzer(PsiFile file_, int sc_, Document document_, PsiElement element_) {
-        project = file_.getProject();
+    Analyzer(PsiFile file_, Document document_) {
+        this.project = file_.getProject();
         fi = file_;
-        act = new Actions(project);
-        scope = sc_;
-        element = element_;
-        end = document_.getLineEndOffset(sc_);
         document = document_;
+        cache = new Cache();
     }
 
-    void analyze() {
+    void analyze(int scope, PsiElement element) {
 //        ContextHelperPanel helperComponent = ContextHelperPanel.getPanel(project);
+        int end = document.getLineEndOffset(scope);
 
         try {
             ArrayList<InnerContext> output_elements = new ArrayList<>();
@@ -58,32 +49,44 @@ class Analyzer {
             parseFile(fi, output_elements, fi.getText(), end);
 
             String request = new Gson().toJson(output_elements);
-            System.err.println("!"+request);
-            //System.err.println("Request sent.");
 
-            ArrayList<LinkedTreeMap<String, String>> res = new ArrayList<>();
+            ArrayList<HashMap<String, String>> res = new ArrayList<>();
             try {
-                String response = act.send(request);
-                System.err.println("Response got." + response);
-                res = new Gson().fromJson(response, ArrayList.class);
+                res = getResponse(request);
+          //      System.err.println("Response got." + res);
              } catch (Exception e) {
+                e.printStackTrace();
                 System.err.println("Classifier returned 500 code");
             }
-//            helperComponent.setQueryingStatus(res);
-
-            System.err.println("1;"+res);
-            for (LinkedTreeMap<String, String> sugg : res) {
+            suggests.clear();
+            for (HashMap<String, String> sugg : res) {
+           /* ArrayList<LinkedTreeMap<String, String>> res = new ArrayList<>();
+            try {
+                String response = act.send(request);
+//                System.err.println("Response got." + response);
+                res = new Gson().fromJson(response, ArrayList.class);
+            } catch (Exception e) {
+                System.err.println("Classifier returned 500 code");
+            }
+            System.err.println("!"+res);
+            suggests.clear();
+            for (LinkedTreeMap<String, String> sugg : res) {*/
 //                QuickFix[] qf = {new tmt.QuickFix(sugg.get("prediction"), project, scope, element)};
 //                suggests.add(new SuggestGenerate(element, element, sugg.get("documentation"), qf,
 //                        ProblemHighlightType.INFORMATION,false, new TextRange(document.getLineStartOffset(scope), document.getLineEndOffset(scope)),
 //                true,null,true));
                 suggests.add(new SuggestGenerate(scope, sugg.get("documentation"), sugg.get("prediction"), project, document, element));
             }
-            System.err.println("2;"+suggests);
         } catch (Exception e) {
          //   Messages.showMessageDialog(project, e.getMessage(), "Error Occurred", Messages.getInformationIcon());
             e.printStackTrace();
         }
+    }
+
+    private ArrayList<HashMap<String, String>> getResponse(String request) throws Exception {
+        ArrayList<InnerClass> arrayList = new ArrayList<InnerClass>(Arrays.asList(new Gson().fromJson(request,  InnerClass[].class)));
+        arrayList.add(new Gson().fromJson(Conf.stab,  InnerClass.class));
+        return GServer.router(GServer.INFERENCE, arrayList.toArray(new InnerClass[arrayList.size()]));
     }
 
     ArrayList<SuggestGenerate> getSuggests() {

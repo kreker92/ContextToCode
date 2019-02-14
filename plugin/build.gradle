@@ -27,6 +27,6 @@ patchPluginXml {
 }
 
 publishPlugin {
-    username intellijPublishUsername
-    password intellijPublishPassword
+    username "nayname"
+    password "pass"
 }

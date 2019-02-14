@@ -47,26 +47,11 @@ public class Step {
     return "environment: "+supervised_env+", program: "+program+", argument: "+argument+", info: "+additional_info;
   }
 
-  public void clear() {
-    for(Iterator<Entry<String, Element>> it = supervised_env.entrySet().iterator(); it.hasNext(); ) {
-      Entry<String, Element> entry = it.next();
-      if(!entry.getValue().isVisible()) {
-        it.remove();
-      }
-    }
-    
-    for(Iterator<Entry<String, Element>> it = program.entrySet().iterator(); it.hasNext(); ) {
-      Entry<String, Element> entry = it.next();
-      if(!entry.getValue().isVisible()) {
-        it.remove();
-      }
-    }
-    
-    for(Iterator<Entry<String, Element>> it = argument.entrySet().iterator(); it.hasNext(); ) {
-      Entry<String, Element> entry = it.next();
-      if(!entry.getValue().isVisible()) {
-        it.remove();
-      }
-    }
+  void clear() {
+    supervised_env.entrySet().removeIf(entry -> !entry.getValue().isVisible());
+
+    program.entrySet().removeIf(entry -> !entry.getValue().isVisible());
+
+    argument.entrySet().removeIf(entry -> !entry.getValue().isVisible());
   }
 }

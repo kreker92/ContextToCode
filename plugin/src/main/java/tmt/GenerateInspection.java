@@ -36,6 +36,7 @@ import com.intellij.psi.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import tmt.attributes.TextAttributes;
+import tmt.dsl.data.Generator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,6 +44,10 @@ import java.util.stream.Collectors;
 import static com.intellij.codeInsight.AnnotationUtil.CHECK_HIERARCHY;
 
 public class GenerateInspection extends LocalInspectionTool {
+
+    public GenerateInspection() {
+        System.err.println("*&&*");
+    }
     @Override
     public ProblemDescriptor[] checkFile(@NotNull final PsiFile psiFile,
                                          @NotNull final InspectionManager manager,
@@ -89,11 +94,12 @@ public class GenerateInspection extends LocalInspectionTool {
         PsiDocumentManager documentManager = PsiDocumentManager.getInstance(psiFile.getProject());
         Document document = documentManager.getDocument(psiFile);
 
+        Analyzer an = new Analyzer(psiFile, document);
+
         return new PsiElementVisitor() {
             HashSet<Integer> lines = new HashSet<>();
             @Override
             public void visitElement(PsiElement element) {
-                AnnotationHolderImpl annotationHolder = new AnnotationHolderImpl(new AnnotationSession(psiFile));
                 if (element.isValid() && !element.getText().isEmpty()) {
                     int el_line = document.getLineNumber(element.getTextRange().getStartOffset());
 
@@ -101,13 +107,13 @@ public class GenerateInspection extends LocalInspectionTool {
                     if (document.getLineEndOffset(el_line) != document.getTextLength()) {
                         current_text = psiFile.getText().substring(document.getLineStartOffset(el_line), document.getLineEndOffset(el_line)).trim();
                     }
-
                     if (!lines.contains(el_line)
                             && validBlock(element, current_text)) {
 
+                        System.err.println("^"+el_line);
+
                         if (Filter.pass(psiFile, el_line, document)) {
-                            Analyzer an = new Analyzer(psiFile, el_line, document, element);
-                            an.analyze();
+                            an.analyze(el_line, element);
 
                             ArrayList<SuggestGenerate> problems = Filter.removeDoubles(an.getSuggests(), current_text, holder, psiFile.getProject(), element);
 
@@ -117,7 +123,7 @@ public class GenerateInspection extends LocalInspectionTool {
 //                        LocalQuickFix[] qf = {new tmt.QuickFix(element.getText(), null, 1, element)};
 //                        holder.registerProblem(element, element.toString(), qf);
                         lines.add(el_line);
-//                        System.err.println(holder.hasResults()/*element.getText()*/+"!" + el_line);
+                        System.err.println(holder.getResults()/*element.getText()*/+"!" + el_line);
                     }
                 }
             }
