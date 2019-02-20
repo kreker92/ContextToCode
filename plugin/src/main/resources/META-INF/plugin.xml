@@ -1,38 +1,38 @@
 <idea-plugin>
-  <id>com.ansorgit.intellijSamples.startupActivity</id>
-  <name>[Demo] Plugin startup activites</name>
-  <version>0.1</version>
+    <id>code generator</id>
+    <name>Context based code generator</name>
+    <version>0.1</version>
 
-  <description><![CDATA[
-      This plugin demonstrates how a plugin can run code as soon as it's loaded.
+    <description><![CDATA[
+      This plugin suggests you code snippets based on the context of your program.
     ]]></description>
 
-  <idea-version since-build="145.0"/>
-  <depends>com.intellij.modules.lang</depends>
+    <idea-version since-build="145.0"/>
+    <depends>com.intellij.modules.lang</depends>
 
 
 
-  <!--<application-components>-->
+    <!--<application-components>-->
     <!--<component>-->
-      <!--<implementation-class>MyApplicationComponent</implementation-class>-->
+    <!--<implementation-class>MyApplicationComponent</implementation-class>-->
     <!--</component>-->
-  <!--</application-components>-->
+    <!--</application-components>-->
 
-  <!--  <project-components>-->
-   <!--     <component>-->
+    <!--  <project-components>-->
+    <!--     <component>-->
     <!--        <implementation-class>tmt.PluginMain</implementation-class>-->
-     <!--   </component>-->
-   <!-- </project-components>-->
+    <!--   </component>-->
+    <!-- </project-components>-->
 
-  <extensions defaultExtensionNs="com.intellij">
-      <!--<preloadingActivity implementation="MyPreloadingActivity"/>-->
-      <!--<annotator language="JAVA" implementationClass="SimpleAnnotator"/>-->
-      <!--<postStartupActivity implementation="MyPostStartupActivity"/>-->
-      <localInspection groupPath="Java" language="JAVA" shortName="tmt.GenerateInspection"
-                       displayName="Instance field count" groupName="GenerateInspection"
-                       bundle="com.siyeh.InspectionGadgetsBundle"
-                       groupBundle="messages.InspectionsBundle" groupKey="group.names.imports" enabledByDefault="true" level="WARNING"
-                       implementationClass="tmt.GenerateInspection"/>
+    <extensions defaultExtensionNs="com.intellij">
+        <!--<preloadingActivity implementation="MyPreloadingActivity"/>-->
+        <!--<annotator language="JAVA" implementationClass="SimpleAnnotator"/>-->
+        <!--<postStartupActivity implementation="MyPostStartupActivity"/>-->
+        <localInspection groupPath="Java" language="JAVA" shortName="tmt.GenerateInspection"
+                         displayName="Instance field count" groupName="GenerateInspection"
+                         bundle="com.siyeh.InspectionGadgetsBundle"
+                         groupBundle="messages.InspectionsBundle" groupKey="group.names.imports" enabledByDefault="true" level="WARNING"
+                         implementationClass="tmt.GenerateInspection"/>
 
-  </extensions>
+    </extensions>
 </idea-plugin>

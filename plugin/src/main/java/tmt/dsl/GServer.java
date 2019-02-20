@@ -65,7 +65,7 @@ public class GServer {
       router(USE_CASES, null);
   }
 
-  public static ArrayList<HashMap<String, String>> router(int swtch, InnerClass[] code) throws Exception {
+  public static ArrayList<HashMap<String, String>> router(int swtch, InnerClass[] code) throws IOException {
     ArrayList<HashMap<String, String>> res = null;
 
     Generator g = new Generator();
@@ -189,7 +189,7 @@ public class GServer {
 //    System.exit(1);
   }
 
-  private static ArrayList<HashMap<String, String>> doInference(Generator g, Classifier classifier, InnerClass[] code) throws Exception{
+  private static ArrayList<HashMap<String, String>> doInference(Generator g, Classifier classifier, InnerClass[] code) throws IOException{
     for ( InnerClass c : code )
       c.executor_command = "1";
 
@@ -199,7 +199,7 @@ public class GServer {
     
     g.iterateCode(code, classifier, "inference", res, 5);
 
-    ArrayList<HashMap<String, String>> snippets = null;
+    ArrayList<HashMap<String, String>> snippets = null;//g.fromCache(classifier.vs);
 
     if (snippets != null)
         return snippets;
@@ -210,7 +210,7 @@ public class GServer {
     }
   }
 
-  private static void doEval(Generator g, Classifier t) throws Exception {
+  private static void doEval(Generator g, Classifier t) throws IOException {
 
     evalCounter c;
 
@@ -311,7 +311,7 @@ public class GServer {
     Utils.writeFile1(c.toString(), g.root+"/folder5_validation", true);
   }
   
-  private static void validate_file(Entry<Integer, String> f, Generator g, Classifier t, evalCounter c) throws Exception {
+  private static void validate_file(Entry<Integer, String> f, Generator g, Classifier t, evalCounter c) throws IOException {
     InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getValue()), InnerClass[].class);
     g.loadCode(code, g.ASC, t);
 
@@ -335,7 +335,7 @@ public class GServer {
     }
   }
   
-  private static void validate_line_by_line(Entry<Integer, String> f, Generator g, Classifier t, HashMap<String, Integer> counter, evalCounter c) throws Exception {
+  private static void validate_line_by_line(Entry<Integer, String> f, Generator g, Classifier t, HashMap<String, Integer> counter, evalCounter c) throws IOException {
     InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getValue()), InnerClass[].class);
     g.loadCode(code, g.ASC, t);
 
@@ -380,7 +380,7 @@ public class GServer {
     return res;
   }
 
-  private static void doLearn(Generator g, Classifier t) throws Exception {
+  private static void doLearn(Generator g, Classifier t) throws IOException {
 /*    PopularCounter popular = new PopularCounter(g.bad_types);
 
     File file = new File(g.root+"/context.json"); 

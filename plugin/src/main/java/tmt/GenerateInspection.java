@@ -15,6 +15,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.JavaSdkVersion;
 import com.intellij.openapi.projectRoots.JavaVersionService;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.javadoc.PsiDocToken;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.refactoring.RefactoringManager;
 import com.intellij.refactoring.migration.MigrationManager;
@@ -93,6 +94,7 @@ public class GenerateInspection extends LocalInspectionTool {
         final PsiFile psiFile = session.getFile();
         PsiDocumentManager documentManager = PsiDocumentManager.getInstance(psiFile.getProject());
         Document document = documentManager.getDocument(psiFile);
+//        Generator g = new Generator();
 
         Analyzer an = new Analyzer(psiFile, document);
 
@@ -107,11 +109,10 @@ public class GenerateInspection extends LocalInspectionTool {
                     if (document.getLineEndOffset(el_line) != document.getTextLength()) {
                         current_text = psiFile.getText().substring(document.getLineStartOffset(el_line), document.getLineEndOffset(el_line)).trim();
                     }
+
                     if (!lines.contains(el_line)
                             && validBlock(element, current_text)) {
-
-                        System.err.println("^"+el_line);
-
+                        System.err.println("^"+el_line+" - "+element + "-" + current_text);
                         if (Filter.pass(psiFile, el_line, document)) {
                             an.analyze(el_line, element);
 
@@ -123,7 +124,7 @@ public class GenerateInspection extends LocalInspectionTool {
 //                        LocalQuickFix[] qf = {new tmt.QuickFix(element.getText(), null, 1, element)};
 //                        holder.registerProblem(element, element.toString(), qf);
                         lines.add(el_line);
-                        System.err.println(holder.getResults()/*element.getText()*/+"!" + el_line);
+//                        System.err.println(holder.getResults()/*element.getText()*/+"!" + el_line);
                     }
                 }
             }
@@ -131,8 +132,8 @@ public class GenerateInspection extends LocalInspectionTool {
     }
 
     public boolean validBlock(PsiElement element, String current_text) {
-        return (!(element instanceof PsiComment) && element.getText().contains(current_text) &&
-                (!element.getText().contains("\n")
+        return (!(element instanceof PsiComment) && !(element instanceof PsiDocToken) && !(element instanceof PsiImportStatement) &&
+                element.getText().contains(current_text) && (!element.getText().contains("\n")
                         || (element instanceof PsiStatement && !element.getText().contains(";"))
                         || element instanceof PsiDeclarationStatement
                         || element instanceof PsiExpressionStatement));

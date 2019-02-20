@@ -1,32 +1,29 @@
 package tmt;
 
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import org.jetbrains.annotations.NotNull;
 import tmt.analyze.ElementInfo;
 import tmt.analyze.InnerContext;
 import tmt.analyze.SyntaxUtils;
 import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import tmt.conf.Conf;
-import tmt.conf.Utils;
 import tmt.dsl.GServer;
-import tmt.dsl.cache.Cache;
+import tmt.dsl.data.Generator;
 import tmt.dsl.formats.context.in.InnerClass;
-import tmt.util.Actions;
-import tmt.util.Util;
 
 class Analyzer {
-    private final Cache cache;
     private ArrayList<SuggestGenerate> suggests = new ArrayList<>();
     private Project project;
     private PsiFile fi;
@@ -36,7 +33,6 @@ class Analyzer {
         this.project = file_.getProject();
         fi = file_;
         document = document_;
-        cache = new Cache();
     }
 
     void analyze(int scope, PsiElement element) {
@@ -45,18 +41,20 @@ class Analyzer {
 
         try {
             ArrayList<InnerContext> output_elements = new ArrayList<>();
-
-            parseFile(fi, output_elements, fi.getText(), end);
-
-            String request = new Gson().toJson(output_elements);
-
             ArrayList<HashMap<String, String>> res = new ArrayList<>();
+
             try {
+                parseFile(fi, output_elements, fi.getText(), end);
+
+                String request = new Gson().toJson(output_elements);
+
                 res = getResponse(request);
           //      System.err.println("Response got." + res);
-             } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
-                System.err.println("Classifier returned 500 code");
+                System.err.println("No response returned");
+            } catch (ProcessCanceledException e) {
+                 System.err.println("Background process stopped");
             }
             suggests.clear();
             for (HashMap<String, String> sugg : res) {
@@ -83,7 +81,7 @@ class Analyzer {
         }
     }
 
-    private ArrayList<HashMap<String, String>> getResponse(String request) throws Exception {
+    private ArrayList<HashMap<String, String>> getResponse(String request) throws IOException {
         ArrayList<InnerClass> arrayList = new ArrayList<InnerClass>(Arrays.asList(new Gson().fromJson(request,  InnerClass[].class)));
         arrayList.add(new Gson().fromJson(Conf.stab,  InnerClass.class));
         return GServer.router(GServer.INFERENCE, arrayList.toArray(new InnerClass[arrayList.size()]));

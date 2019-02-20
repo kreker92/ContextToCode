@@ -60,7 +60,7 @@ public class Generator  {
 
   public final String root = "../data/datasets/";
   private CloseableHttpClient httpclient;
-  //private Cache cache;
+ // private Cache cache;
 
   public static final int ASC = 1;
   public static final int DESC = 2;
@@ -79,7 +79,7 @@ public class Generator  {
         .setStaleConnectionCheckEnabled(true).build();*/
 
     httpclient = HttpClients.createDefault();
-  //  cache = new Cache();
+ //   cache = new Cache();
   }
 
   public ArrayList<HashMap<Integer, Step>> setTrainAndTest(Classifier t) {
@@ -109,7 +109,7 @@ public class Generator  {
     return output;
   }
 
-  public ArrayList<HashMap<String, String>> filter_through_npi(ArrayList<HashMap<Integer, Step>> context, Classifier t) throws Exception {
+  public ArrayList<HashMap<String, String>> filter_through_npi(ArrayList<HashMap<Integer, Step>> context, Classifier t) throws IOException {
     ArrayList<HashMap<String, String>> snippets = new ArrayList<>();
 
     if ( context.size() > 0) {
@@ -130,7 +130,7 @@ public class Generator  {
           int[] res = new Gson().fromJson(response, int[].class);
 
           System.err.println("time: " + (System.currentTimeMillis() - time));
-         // cache.add(t.vs, snippets);
+          //cache.add(t.vs, snippets);
           return pmp.snippetize(res, snippets);
         } else {
           return snippets;
@@ -175,7 +175,7 @@ public class Generator  {
     return 0;
   }*/
 
-  public void loadCode(InnerClass[] data, int direction, Classifier t) throws JsonSyntaxException, IOException, InterruptedException {
+  public void loadCode(InnerClass[] data, int direction, Classifier t) {
     if ( direction == DESC )
       ArrayUtils.reverse(data);
     for ( InnerClass c : data ) {
@@ -261,7 +261,7 @@ public class Generator  {
     }
   }
 
- /* public ArrayList<HashMap<String, String>> fromCache(ArrayList<Vector> vs) {
+  /*public ArrayList<HashMap<String, String>> fromCache(ArrayList<Vector> vs) {
     return cache.validate(vs);
   }*/
 }
