@@ -10,7 +10,6 @@ public class Classifier {
 
   public String folder;
   public String vectors;
-  public String model;
 
   public boolean blocking = true;
 
@@ -26,11 +25,20 @@ public class Classifier {
     // TODO Auto-generated constructor stub
   }
 
-  public void clear() { 
+  public Classifier(Classifier t) {
+    this.classes = new ArrayList<>(t.classes);
+    this.folder = t.folder;
+    this.vectors = t.vectors;
+    this.blocking = t.blocking;
+    this.vs = new ArrayList<>(t.vs);
+    this.domain = t.domain;
+  }
+
+  public void clear() {
     vs.clear();
     vectors = "";
   }
-  
+
   public String toString() {
     return "Domain: "+domain+", vs: "+vs+", classes: "+classes;
   }

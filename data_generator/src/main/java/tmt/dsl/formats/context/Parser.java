@@ -3,6 +3,7 @@ package tmt.dsl.formats.context;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import tmt.conf.Conf;
 import tmt.dsl.Classifier;
 import tmt.dsl.formats.context.in.InnerClass;
 
@@ -30,7 +31,7 @@ public class Parser {
     return res.toArray(new Vector[res.size()]);
   } */
   
-  public static Vector[] getSnippet(int line_num, InnerClass[] code, String path, ArrayList<InnerClass> keys, ArrayList<String> goodTypes, ArrayList<String> badTypes, int  limit) {
+  public static Vector[] getSnippet(int line_num, InnerClass[] code, String path, ArrayList<InnerClass> keys, int  limit) {
     ArrayList<Vector> res = new ArrayList<Vector>();
     ArrayList<String> sequence = new ArrayList<>();
 
@@ -43,7 +44,7 @@ public class Parser {
       String line_clean = clean(line);
 //      System.err.println(i+"!"+path);
       if (hasSense(line_clean)) {
-        Vector v = new Vector(code[i], i, line, i == line_num, count, path, line_num, goodTypes, badTypes);
+        Vector v = new Vector(code[i], i, line, i == line_num, count, path, line_num);
         if (!v.isEmpty()) {
           res.add(0, v);
           sequence.add(code[i].executor_command);
@@ -92,9 +93,15 @@ public class Parser {
   }
 
   private static boolean isStart(InnerClass code, ArrayList<InnerClass> keys) {
-    if (code.line_text.contains("public ") || code.line_text.contains("private ") || code.line_text.contains("protected ") ) // || code.matches(keys))
-      return true;
-    else
+    if (Conf.lang.equals("java")) {
+      if (code.line_text.contains("public ") || code.line_text.contains("private ") || code.line_text.contains("protected ") ) // || code.matches(keys))
+        return true;
+      else
+        return false;
+    } else if (Conf.lang.equals("javascript")) {
       return false;
+    } else {
+      return false;
+    }
   }
 }

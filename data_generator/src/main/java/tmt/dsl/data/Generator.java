@@ -24,6 +24,7 @@ import java.util.Random;
 import java.nio.charset.Charset;
 import java.util.Map.Entry;
 
+import tmt.conf.Conf;
 import tmt.conf.Utils;
 import tmt.dsl.executor.Executor;
 
@@ -57,25 +58,14 @@ public class Generator  {
 
 //  public static int limit = 15000;
 
-  private static Gson gson = new Gson();
   public final String root = "../data/datasets/";
-  private InnerClass[] code;
-  private Random rand;
   private CloseableHttpClient httpclient;
 
-  public static ArrayList<String> good_types;
-  public static ArrayList<String> bad_types;
-  
   public static final int ASC = 1;
   public static final int DESC = 2;
   
-  public Generator () throws JsonSyntaxException, JsonIOException, FileNotFoundException {
-    good_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("../output/conf/good_types"), String[].class)) );
-    bad_types = new ArrayList( Arrays.asList( gson.fromJson(new FileReader("../output/conf/bad_types"), String[].class)) );
-
-    rand = new Random();
-
-    PoolingHttpClientConnectionManager connManager = new
+  public Generator () {
+/*    PoolingHttpClientConnectionManager connManager = new
         PoolingHttpClientConnectionManager();
     connManager.setMaxTotal(30);
     connManager.setDefaultMaxPerRoute(30);
@@ -85,22 +75,14 @@ public class Generator  {
         .setConnectTimeout(45)
         .setSocketTimeout(45)
         .setExpectContinueEnabled(true)
-        .setStaleConnectionCheckEnabled(true).build();
+        .setStaleConnectionCheckEnabled(true).build();*/
 
     httpclient = HttpClients.createDefault();
   }
 
-  public ArrayList<HashMap<Integer, Step>> setTrainAndTest(Classifier t) throws Exception{
-    new File(root+"/classifiers/"+t.domain).mkdir();
-    String filename = root+"/classifiers/"+t.domain+"/context.json";
-    String domain_info = root+"/classifiers/"+t.domain+"/domain.json";
-    File f_ = new File(filename);
-    f_.createNewFile();
-    new FileOutputStream(f_, false);
-
+  public ArrayList<HashMap<Integer, Step>> setTrainAndTest(Classifier t) {
     ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
-    HashMap<String, Integer> scores = new HashMap<>();
-
+    
     try {
       HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
 
@@ -117,19 +99,7 @@ public class Generator  {
         cntx_dsl = new ContextDSL(s.getValue(), root);  
         cntx_dsl.execute();
         output.addAll(cntx_dsl.getData());
-
-        String p = s.getValue().get(s.getValue().size() - 1).getProgram();
-
-        if (!scores.containsKey(p))
-          scores.put(p, 0);
-
-        scores.put(p, scores.get(p)+1);
-        
-        System.err.println(scores);
       }
-
-      DSL.send(new Gson().toJson(output), "", filename);
-      Utils.writeFile1(new Gson().toJson(t.domain), domain_info, false);
     } catch (Exception e) {
       e.printStackTrace();
     } 
@@ -137,7 +107,7 @@ public class Generator  {
     return output;
   }
 
-  public ArrayList<HashMap<String, String>> filter_through_npi(ArrayList<HashMap<Integer, Step>> context, Classifier t) throws NumberFormatException, Exception {
+  public ArrayList<HashMap<String, String>> filter_through_npi(ArrayList<HashMap<Integer, Step>> context, Classifier t) throws IOException {
     ArrayList<HashMap<String, String>> snippets = new ArrayList<>();
 
     if ( context.size() > 0) {
@@ -152,10 +122,17 @@ public class Generator  {
         HttpPost httppost = new HttpPost("http://localhost:8081/");
 
         //THREAD SAFE ABORT OPERATION: http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e143
-        int[] res = new Gson().fromJson(Utils.read(httppost, httpclient, pmp.getContext(), "http://localhost:8081/"), int[].class);
-        
-        System.err.println("!"+(System.currentTimeMillis() - time));
-        return pmp.snippetize(res, snippets);
+        String response = Utils.read(httppost, httpclient, pmp.getContext(), "http://78.46.103.68:8081/");
+
+        if (response != null) {
+          int[] res = new Gson().fromJson(response, int[].class);
+
+          System.err.println("time: " + (System.currentTimeMillis() - time));
+          //cache.add(t.vs, snippets);
+          return pmp.snippetize(res, snippets);
+        } else {
+          return snippets;
+        }
       } else {
         return snippets;
       }
@@ -196,53 +173,90 @@ public class Generator  {
     return 0;
   }*/
 
-  public void loadCode(InnerClass[] data, int direction, Classifier t) throws JsonSyntaxException, IOException, InterruptedException {
-    HashMap<String, String> progs = new Gson().fromJson(Utils.readFile("/root/ContextToCode/data/datasets/hots"), HashMap.class);
-
+  public void loadCode(InnerClass[] data, int direction, Classifier t) {
     if ( direction == DESC )
       ArrayUtils.reverse(data);
     for ( InnerClass c : data ) {
-      String prev_type = "";
-//      String executor_command = "1";
+      switch (Conf.lang) {
+      case "java":
+        loadJava(t, c);
+        break;
 
-      for (ElementInfo e : c.elements ) 
-        if (e.ast_type != null && !e.ast_type.isEmpty()) {
-          //        PopularType t1 = new PopularType(c, bad_types);
-          if (e.ast_type.contains("PsiType:")) 
-            prev_type = e.ast_type;
-          else if (e.ast_type.contains("PsiIdentifier:") && !prev_type.isEmpty()) { 
-            e.class_method = prev_type+"#"+e.ast_type;
-//            if (progs.containsKey(e.class_method)) 
-//              executor_command = progs.get(e.class_method);
-          }
-        }
-
-      if (c.matches(t.classes)) {
-        for (InnerClass key : t.classes)
-          if (c.hasElements(key)) {
-            if (key.type.equals("truekey")) 
-              c.executor_command = key.executor_command;
-            else if (c.executor_command == null || c.executor_command.equals("1"))
-              c.executor_command = "1";
-          }
-      } else {
-        c.executor_command = Executor.NOT_CONNECT;
+      case "javascript":
+        loadJavaScript(t, c);
+        break;
       }
     }
-    code = data;
+  }
+
+  private void loadJava(Classifier t, InnerClass c) {
+    String prev_type = "";
+    //  String executor_command = "1";
+
+    for (ElementInfo e : c.elements ) 
+      if (e.ast_type != null && !e.ast_type.isEmpty()) {
+        //        PopularType t1 = new PopularType(c, bad_types);
+        if (e.ast_type.contains("PsiType:")) 
+          prev_type = e.ast_type;
+        else if (e.ast_type.contains("PsiIdentifier:") && !prev_type.isEmpty()) { 
+          e.class_method = prev_type+"#"+e.ast_type;
+          //        if (progs.containsKey(e.class_method)) 
+          //          executor_command = progs.get(e.class_method);
+        }
+      }
+
+    if (c.matches(t.classes)) {
+      for (InnerClass key : t.classes)
+        if (c.hasElements(key)) {
+          if (key.type.equals("truekey")) 
+            c.executor_command = key.executor_command;
+          else if (c.executor_command == null || c.executor_command.equals("1"))
+            c.executor_command = "1";
+        }
+    } else {
+      c.executor_command = Executor.NOT_CONNECT;
+    }
+  }
+  
+  private void loadJavaScript(Classifier t, InnerClass c) {
+    String prev_type = "";
+    //  String executor_command = "1";
+
+    for (ElementInfo e : c.elements ) 
+      if (e.ast_type != null && !e.ast_type.isEmpty()) {
+        //        PopularType t1 = new PopularType(c, bad_types);
+        if (e.ast_type.contains("PsiType:")) 
+          prev_type = e.ast_type;
+        else if (e.ast_type.contains("PsiIdentifier:") && !prev_type.isEmpty()) { 
+          e.class_method = prev_type+"#"+e.ast_type;
+          //        if (progs.containsKey(e.class_method)) 
+          //          executor_command = progs.get(e.class_method);
+        }
+      }
+
+    if (c.matches(t.classes)) {
+      for (InnerClass key : t.classes)
+        if (c.hasElements(key)) {
+          if (key.type.equals("truekey")) 
+            c.executor_command = key.executor_command;
+          else if (c.executor_command == null || c.executor_command.equals("1"))
+            c.executor_command = "1";
+        }
+    } else {
+      c.executor_command = Executor.NOT_CONNECT;
+    }
   }
 
   public void iterateCode(InnerClass[] code, Classifier t, String path, ArrayList<Vector[]> res, int limit) {
     for (int line = code.length-1; line >= 0; line --) {
       if ( (!t.blocking && line == code.length-1) || (/*TRIN*/t.blocking  && code[line].matches(t.classes))) {
-        Vector[] snip = Parser.getSnippet(line, code, path, t.classes, good_types, bad_types, limit);
+        Vector[] snip = Parser.getSnippet(line, code, path, t.classes, limit);
         if (snip.length > 0) 
           res.add(snip);
       }
     }
-    for (Vector[] c : res) 
-      for (Vector v : c) 
-        t.vs.add(v);
+    for (Vector[] c : res)
+      t.vs.addAll(Arrays.asList(c));
   }
 
   public void snippetize() throws JsonSyntaxException, IOException {

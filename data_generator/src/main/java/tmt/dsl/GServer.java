@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.internal.LinkedTreeMap;
 
+import tmt.conf.Conf;
 import tmt.conf.Utils;
 import tmt.dsl.data.Generator;
 import tmt.dsl.executor.info.Element;
@@ -64,14 +65,10 @@ public class GServer {
       router(USE_CASES, null);
   }
 
-  public static ArrayList<HashMap<String, String>> router(int swtch, InnerClass[] code) throws Exception {
+  public static ArrayList<HashMap<String, String>> router(int swtch, InnerClass[] code) throws IOException {
     ArrayList<HashMap<String, String>> res = null;
 
-    Generator g = new Generator(); 
-
-    PrintStream fileStream = new PrintStream(
-        new FileOutputStream("../log/log.txt", true)); 
-    System.setOut(fileStream);
+    Generator g = new Generator();
 
     Classifier t1 = new Classifier("android/ast");
     //getTemplates();
@@ -100,10 +97,8 @@ public class GServer {
       //      doPattern(g, templates.get(0));
     }
     else if (swtch == INFERENCE) {
-      createEvalCases(g, templates);
-      templates.get(0).blocking = false;
-      res = doInference(g, templates.get(0), code);
-      System.err.println(res);
+      Classifier c = new Classifier(Conf.templates);
+      res = doInference(g, c, code);
     }
     return res;
   }
@@ -194,7 +189,7 @@ public class GServer {
 //    System.exit(1);
   }
 
-  private static ArrayList<HashMap<String, String>> doInference(Generator g, Classifier classifier, InnerClass[] code) throws Exception{
+  private static ArrayList<HashMap<String, String>> doInference(Generator g, Classifier classifier, InnerClass[] code) throws IOException{
     for ( InnerClass c : code )
       c.executor_command = "1";
 
@@ -203,13 +198,19 @@ public class GServer {
     g.loadCode(code, g.ASC, classifier);
     
     g.iterateCode(code, classifier, "inference", res, 5);
-    
-    ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(classifier);
 
-    return g.filter_through_npi(out, classifier);
+    ArrayList<HashMap<String, String>> snippets = null;//g.fromCache(classifier.vs);
+
+    if (snippets != null)
+        return snippets;
+    else {
+        ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(classifier);
+
+        return g.filter_through_npi(out, classifier);
+    }
   }
 
-  private static void doEval(Generator g, Classifier t) throws Exception {
+  private static void doEval(Generator g, Classifier t) throws IOException {
 
     evalCounter c;
 
@@ -310,7 +311,7 @@ public class GServer {
     Utils.writeFile1(c.toString(), g.root+"/folder5_validation", true);
   }
   
-  private static void validate_file(Entry<Integer, String> f, Generator g, Classifier t, evalCounter c) throws Exception {
+  private static void validate_file(Entry<Integer, String> f, Generator g, Classifier t, evalCounter c) throws IOException {
     InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getValue()), InnerClass[].class);
     g.loadCode(code, g.ASC, t);
 
@@ -334,7 +335,7 @@ public class GServer {
     }
   }
   
-  private static void validate_line_by_line(Entry<Integer, String> f, Generator g, Classifier t, HashMap<String, Integer> counter, evalCounter c) throws Exception {
+  private static void validate_line_by_line(Entry<Integer, String> f, Generator g, Classifier t, HashMap<String, Integer> counter, evalCounter c) throws IOException {
     InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getValue()), InnerClass[].class);
     g.loadCode(code, g.ASC, t);
 
@@ -379,7 +380,7 @@ public class GServer {
     return res;
   }
 
-  private static void doLearn(Generator g, Classifier t) throws Exception {
+  private static void doLearn(Generator g, Classifier t) throws IOException {
 /*    PopularCounter popular = new PopularCounter(g.bad_types);
 
     File file = new File(g.root+"/context.json"); 

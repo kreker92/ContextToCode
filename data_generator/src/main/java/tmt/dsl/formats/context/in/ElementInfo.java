@@ -6,9 +6,11 @@ import com.intellij.psi.PsiElement;
 
 public class ElementInfo {
   public String node = "";
+  //ACTUAL "VALUE" in traces
   public String text = "";
   public int line;
   public String type = "";
+  //ACTUAL "VALUE" in traces
   public String ast_type = "";
   public String parent;
   public String child;

@@ -17,16 +17,6 @@ package tmt.dsl.executor;
 
 import com.google.gson.Gson;
 
-import java.net.InetAddress;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-
-import tmt.dsl.data.Utils;
-import tmt.dsl.executor.info.ExecData;
-import tmt.dsl.executor.subprocess.SubProcess;
-import tmt.dsl.formats.detection_log.Event;
-import tmt.dsl.formats.detection_log.LogUtils;
-
 public class Executor {
 
   //programs

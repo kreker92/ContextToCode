@@ -4,16 +4,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import tmt.conf.Conf;
 import tmt.dsl.formats.context.in.ElementInfo;
 import tmt.dsl.formats.context.in.InnerClass;
 
 public class Vector {
   public ArrayList<Integer> vector = new ArrayList<>();
+  //ACTUAL "VALUE" in traces
   public ArrayList<String> strings = new ArrayList<>();
   public Integer row = null;
   private Integer level = null;
   private String origin;
+  //not used in traces
   private String node;
+  //not used in traces
   private String parent;
   private int label = 0;
   public int parent_id;
@@ -21,6 +25,7 @@ public class Vector {
   public int line_num;
   public ArrayList<ElementInfo> el = new ArrayList<>();
   
+  //ACTUAL "PROGRAM" in traces
   private String program;
 
   /*public Vector(String o, HashSet<String> commands, int i, String line, boolean b, int level_, int parent_id_) {
@@ -39,7 +44,7 @@ public class Vector {
     parent_id = parent_id_;
   }*/
   
-  public Vector(InnerClass c, int i, String line, boolean b, int level_, String path_, int line_num_, ArrayList<String> goodTypes, ArrayList<String> badTypes) {
+  public Vector(InnerClass c, int i, String line, boolean b, int level_, String path_, int line_num_) {
     origin = line;//.toLowerCase().replaceAll("[^a-z]", " ").replaceAll(" +", " ").trim();;
     line_num = c.line_num;
     path = path_;
@@ -53,14 +58,29 @@ public class Vector {
 //        System.exit(1);
 //      }
       el.add(new ElementInfo("ast_type", s.ast_type, s.text));
-      if (s.ast_type != null && !s.ast_type.equals("null")) {
-        strings.add(s.ast_type.trim());
-        parent = s.parent;
-        node = s.node;
-      } else if (goodTypes.contains(s.node) && !badTypes.contains(s.parent)) {
-        strings.add(s.text.trim());
-        parent = s.parent;
-        node = s.node;
+      switch (Conf.lang) {
+        case "java":
+          if (s.ast_type != null && !s.ast_type.equals("null")) {
+            strings.add(s.ast_type.trim());
+            parent = s.parent;
+            node = s.node;
+          } else if (Conf.good_types.contains(s.node) && !Conf.bad_types.contains(s.parent)) {
+            strings.add(s.text.trim());
+            parent = s.parent;
+            node = s.node;
+          }
+          break;
+        case "javascript":
+          if (s.ast_type != null && !s.ast_type.equals("null")) {
+            strings.add(s.ast_type.trim());
+            parent = s.parent;
+            node = s.node;
+          } else if (Conf.good_types.contains(s.node) && !Conf.bad_types.contains(s.parent)) {
+            strings.add(s.text.trim());
+            parent = s.parent;
+            node = s.node;
+          }
+          break;
       }
     }
     row = i;

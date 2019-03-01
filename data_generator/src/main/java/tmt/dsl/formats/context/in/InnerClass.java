@@ -13,6 +13,7 @@ public class InnerClass {
   public String line_text;
   public String type;
   public String ast_type;
+  //ACTUAL "PROGRAM" in traces
   public String executor_command = "1";
   
   public ArrayList<LinkedHashMap<String, String>> scheme = new ArrayList<LinkedHashMap<String, String>>();
