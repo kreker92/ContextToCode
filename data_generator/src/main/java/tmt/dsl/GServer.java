@@ -30,6 +30,7 @@ import tmt.dsl.executor.info.Step;
 import tmt.dsl.formats.context.Vector;
 import tmt.dsl.formats.context.in.ElementInfo;
 import tmt.dsl.formats.context.in.InnerClass;
+import tmt.dsl.formats.langs.JavaScriptAST;
 
 public class GServer {
 
@@ -38,20 +39,7 @@ public class GServer {
   public static final int INFERENCE  = 3;
   public static final int USE_CASES  = 4;
   
-  private static ArrayList<String> bad_types = new ArrayList<>();
-
   public static void main(String[] args) throws Exception{
-    
-    bad_types.add("PsiType:String");
-    bad_types.add("PsiType:StringBuilder");
-    bad_types.add("PsiType:long");
-    bad_types.add("PsiType:View");
-    bad_types.add("PsiType:int");
-    bad_types.add("PsiType:void");
-    bad_types.add("PsiType:boolean"); 
-    bad_types.add("PsiType:HashMap<String, String>");
-    bad_types.add("PsiType:Exception"); 
-    bad_types.add("PsiType:ArrayList<String>"); 
     
     if (args[0].equals("learn")) 
       router(LEARN, null);
@@ -75,8 +63,12 @@ public class GServer {
     ArrayList<Classifier> templates = new ArrayList<>();
 
     if (swtch == LEARN) {
+
+      if (Conf.lang.equals("java"))
+        createUseCasesJava(g, templates);
+      else if (Conf.lang.equals("javascript"))
+        createUseCasesJavaScript(g, templates);
       
-      createUseCases(g, templates);
       for ( Classifier t : templates )
         doLearn(g, t);
     }
@@ -103,20 +95,33 @@ public class GServer {
     return res;
   }
 
-  private static void createUseCases(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
-    HashMap<String, Double> ast_types = new Gson().fromJson(Utils.readFile(g.root+"/pop_lines"), HashMap.class);
-    HashMap<String, Double> commands = new Gson().fromJson(Utils.readFile(g.root+"/pop_comm"), HashMap.class);
+  private static void createUseCasesJava(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
+    ArrayList<String> bad_types = new ArrayList<>();
+    bad_types.add("PsiType:String");
+    bad_types.add("PsiType:StringBuilder");
+    bad_types.add("PsiType:long");
+    bad_types.add("PsiType:View");
+    bad_types.add("PsiType:int");
+    bad_types.add("PsiType:void");
+    bad_types.add("PsiType:boolean"); 
+    bad_types.add("PsiType:HashMap<String, String>");
+    bad_types.add("PsiType:Exception"); 
+    bad_types.add("PsiType:ArrayList<String>"); 
+    
+    HashMap<String, Double> ast_types = new Gson().fromJson(Utils.readFile(Conf.root+"/pop_lines"), HashMap.class);
+    HashMap<String, Double> commands = new Gson().fromJson(Utils.readFile(Conf.root+"/pop_comm"), HashMap.class);
     HashSet<String> types = new HashSet<>();
 
     int count = 3;
+
     for (Entry<String, Double> com : commands.entrySet()) 
       if (/*ast_types.com.getKey().contains("PsiType:Cursor") &&*/ com.getValue() > 8000) {
 
         Classifier t1 = new Classifier("android-copy/ast");
         String type = com.getKey().split("#")[0];
         
-        String folder = com.getKey().replace("#PsiIdentifier:", "_").replace("PsiType:", "");
-        File f = new File(g.root+"/classifiers/"+folder);
+        String folder = com.getKey().replace("#PsiIdentifier:", "_").replace("PsiType:", "")+"_";
+        File f = new File(Conf.root+"/classifiers/"+folder);
 
         if (!bad_types.contains(type) && !f.exists()) {
           types.add(type);
@@ -161,7 +166,15 @@ public class GServer {
 //    System.err.println(count);
 //    System.exit(1);
   }
+
+  private static void createUseCasesJavaScript(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
+    Classifier t1 = new Classifier("sandbox/");
+    t1.domain = "/root/js/data_picks/";
+    t1.blocking = false;
+    templates.add(t1);
+  }
   
+
   private static void createEvalCases(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
 
     HashMap<String, LinkedTreeMap<String, String>> outputs = new Gson().fromJson(Utils.readFile("/root/ContextToCode/predictor/log/1class/expect_to_prog"), HashMap.class);
@@ -229,7 +242,7 @@ public class GServer {
     counter.put("no", 0);
     counter.put("yes", 0);
     
-    for (File f : new File(g.root+t.folder+"folder1").listFiles()) {
+    for (File f : new File(Conf.root+t.folder+"folder1").listFiles()) {
       folder1.put(count, f.getPath());
       count ++;
     }
@@ -250,9 +263,9 @@ public class GServer {
       System.err.println("count: "+f.getKey());
     }
     
-    Utils.writeFile1(c.toString(), g.root+"/folder1_validation", true);
+    Utils.writeFile1(c.toString(), Conf.root+"/folder1_validation", true);
     
-    for (File f : new File(g.root+t.folder+"folder2").listFiles()) {
+    for (File f : new File(Conf.root+t.folder+"folder2").listFiles()) {
       folder2.put(count, f.getPath());
       count ++;
     }
@@ -263,9 +276,9 @@ public class GServer {
       System.err.println("count: "+f.getKey());
     }
     
-    Utils.writeFile1(c.toString(), g.root+"/folder2_validation", true);
+    Utils.writeFile1(c.toString(), Conf.root+"/folder2_validation", true);
     
-    for (File f : new File(g.root+t.folder+"folder3").listFiles()) {
+    for (File f : new File(Conf.root+t.folder+"folder3").listFiles()) {
       folder3.put(count, f.getPath());
       count ++;
     }
@@ -276,9 +289,9 @@ public class GServer {
       System.err.println("count: "+f.getKey());
     }
     
-    Utils.writeFile1(c.toString(), g.root+"/folder3_validation", true);
+    Utils.writeFile1(c.toString(), Conf.root+"/folder3_validation", true);
     
-    for (File f : new File(g.root+t.folder+"folder4").listFiles()) {
+    for (File f : new File(Conf.root+t.folder+"folder4").listFiles()) {
       folder4.put(count, f.getPath());
       count ++;
     }
@@ -295,9 +308,9 @@ public class GServer {
       System.err.println("count: "+f.getKey());
     }
     
-    Utils.writeFile1(c.toString(), g.root+"/folder4_validation", true);
+    Utils.writeFile1(c.toString(), Conf.root+"/folder4_validation", true);
     
-    for (File f : new File(g.root+t.folder+"folder5").listFiles()) {
+    for (File f : new File(Conf.root+t.folder+"folder5").listFiles()) {
       folder5.put(count, f.getPath());
       count ++;
     }
@@ -308,7 +321,7 @@ public class GServer {
       System.err.println("count: "+f.getKey());
     }
     
-    Utils.writeFile1(c.toString(), g.root+"/folder5_validation", true);
+    Utils.writeFile1(c.toString(), Conf.root+"/folder5_validation", true);
   }
   
   private static void validate_file(Entry<Integer, String> f, Generator g, Classifier t, evalCounter c) throws IOException {
@@ -381,34 +394,35 @@ public class GServer {
   }
 
   private static void doLearn(Generator g, Classifier t) throws IOException {
-/*    PopularCounter popular = new PopularCounter(g.bad_types);
+    PopularCounter popular = new PopularCounter();
 
-    File file = new File(g.root+"/context.json"); 
+/*    File file = new File(Conf.root+"/context.json"); 
     file.delete();
-    file = new File(g.root+"/log.json"); 
+    file = new File(Conf.root+"/log.json"); 
     file.delete();
-    file = new File(g.root+"/pop_comm"); 
+    File file = new File(Conf.root+"/pop_comm"); 
     file.delete();
-    file = new File(g.root+"/pop_lines"); 
-    file.delete();*/ 
+    file = new File(Conf.root+"/pop_lines"); 
+    file.delete();*/
     
     ArrayList<Vector[]> res = new ArrayList<>();
     
     int count = 0;
 
-    File[] files = new File(g.root+t.folder).listFiles();
+    File[] files = new File(Conf.root+t.folder).listFiles();
+
     for (File f : files) {
 //        if (f.getPath().contains("97827446")) {
 
-      System.err.println(f.getPath());
       t.clear();
 
-      InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getPath()), InnerClass[].class);
+      InnerClass[] code = getRaw(f);
+      System.exit(1);
       g.loadCode(code, g.ASC, t);
 
       g.iterateCode(code, t, f.getPath(), res, 3);
 
-/*      for ( InnerClass c : code )
+     /* for ( InnerClass c : code )
       //  if(c.matches(t.classes))
     	    popular.add(c);*/
       
@@ -420,13 +434,22 @@ public class GServer {
 ////        }
     }
 
-/*    Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), g.root+"/pop_lines", false);
-    Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.commands)), g.root+"/pop_comm", false);*/ 
+  /*  Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), Conf.root+"/pop_lines", false);
+    Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.commands)), Conf.root+"/pop_comm", false); */ 
     
     g.setTrainAndTest(t);
     t.clear();
   }
   
+  private static InnerClass[] getRaw(File f) throws JsonSyntaxException, IOException {
+    if (Conf.lang.equals("java"))
+      return new Gson().fromJson(Utils.readFile(f.getPath()), InnerClass[].class);
+    else if (Conf.lang.equals("javascript")) {
+      return new JavaScriptAST(f).getClasses();
+    }
+    return null;
+  }
+
   /**
 
   InnerContext ic = new InnerContext("truekey", "2");
@@ -446,8 +469,8 @@ public class GServer {
     //      g.key = "intent.getAction()";
     //      g.description = "Retrieve the general action to be performed, such as ACTION_VIEW.";
     //
-    //      g.root = "/root/ContextToCode/data/datasets/android/";
-    //      g.root_key = "ast/";
+    //      Conf.root = "/root/ContextToCode/data/datasets/android/";
+    //      Conf.root_key = "ast/";
     //	   res.add(new Template("DriverManager.getConnection", "Open DB connection", "database/ast/parsed/", "8"));
 
     Classifier t1 = new Classifier("android/ast");
@@ -595,10 +618,10 @@ public class GServer {
 class PopularCounter {
   public HashMap<String, Integer> ast_types = new HashMap<>();
   public HashMap<String, Integer> commands = new HashMap<>();
-  public ArrayList<String> bad_types;
+//  public ArrayList<String> bad_types;
 
-  public PopularCounter(ArrayList<String> bad_types_) {
-    bad_types = bad_types_;
+  public PopularCounter () {
+//    bad_types = bad_types_;
   }
 
   public void add(InnerClass c) {

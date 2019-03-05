@@ -2,7 +2,17 @@ import json
 import os.path
 from shutil import copyfile
 
-#def carret_return ():
+def is_valid (value):
+    if value["type"] == "BlockStatement":
+        return False
+    else:
+        return True
+
+def is_end_node (value, ids):
+    if value["type"] != "FunctionExpression" and (value["type"] == "Program" or value["type"] == "VariableDeclarator" or value["type"] == "BlockStatement" or value["type"] == "CallExpression" or value["id"] in ids):
+        return False
+    else:
+        return True
 
 def get_text(node):
     if not "value" in node:
@@ -15,43 +25,63 @@ def get_text(node):
                 node["value"] += " "+get_text(child) 
         return node["value"]
 
+def get_ids(ids, value):
+    ids.append(value["id"])
+    for child in value["links"]:
+       if "links" in child:
+           get_ids(ids, child)
+       else:
+           ids.append(child["id"])
 
 def parse_file (src, dst, data):
-    ast = {}
-    with open(data, 'r') as handle:
-        parsed = json.load(handle)
+#and value["type"] == "VariableDeclaration"
+    print(src)
+    ast_raw = {}
+    ast_out = []
+    ids = []
+    #with open(data, 'r') as handle:
+    parsed = json.loads(data)
     for node in parsed:
         if node != 0:
-            ast[node['id']] = node
-    for key, value in ast.items():
+            ast_raw[node['id']] = node
+    for key, value in ast_raw.items():
         if "children" in value:
             value["links"] = []
             for child in value["children"]:
-                if "BlockStatement" != ast[child]["type"]:
-                    value["links"].append(ast[child])
-    for key, value in ast.items():
-        if not "value" in value and value["type"] == "VariableDeclaration":
-            ast["value"] = get_text(value)
-            print(ast["value"])
-    with open('/root/ContextToCode/data_generator/lang_scripts/data.json', 'w') as outfile:
-        json.dump(ast, outfile)
-    sss()
+                 if is_valid(ast_raw[child]):				 
+                     value["links"].append(ast_raw[child])
+    for key, value in ast_raw.items():
+        if is_end_node(value, ids):
+           # get_text(value)
+            if "links" in value:
+       	        get_ids(ids, value)	
+            ast_out.append(value)
+
+   # with open('/root/ContextToCode/data_generator/lang_scripts/data_raw.json', 'w') as outfile:
+   #     json.dump(ast_raw, outfile)
+    with open(dst.strip(), 'w') as outfile:
+        json.dump(ast_out, outfile)
             
-
+f = open("/root/js/data_picks/picked", "r")
+check = f.read()
 			
-#with open("/root/js/programs_eval.json", 'r') as f: 
-#    jsons = f.readlines()
+with open("/root/js/programs_eval.json", 'r') as f: 
+    jsons = f.readlines()
 
-with open("/root/js/programs_training.txt", 'r') as f: 
+with open("/root/js/programs_eval.txt", 'r') as f: 
     files = f.readlines()
 
-#print(len(jsons))
+count = 0
+print(len(jsons))
 print(len(files))
 for i in range(len(files)):
     name = files[i].split('/')[-1]
-    if os.path.isfile("/root/js/data_picks/1/"+name.strip()) and "semantic-layout" in name:
-        #f = open("/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-json.js"), "w")
+    k = files[i].rfind("data/")
+    file = files[i][:k] + "/root/js/data/" + files[i][k+5:]
+    if files[i] in check:#os.path.isfile("/root/js/data_picks/1/"+name.strip()):
         #data = json.loads(jsons[i])
-        #f.write(jsons[i])
-        parse_file("/root/js/data_picks/1/"+name.strip(), "/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-json.js"), "/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
+        f = open("/root/js/data_picks/mask", "a")
+        f.write(str(count)+", "+file)
+        parse_file(file, "/root/js/data_picks/sandbox/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
+        count += 1
 					

@@ -16,19 +16,15 @@ package tmt.dsl;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.ArrayList;
 
-import tmt.dsl.data.Utils;
+import com.google.gson.Gson;
+
+import tmt.conf.Utils;
 import tmt.dsl.executor.Executor;
 import tmt.dsl.executor.info.ExecData;
 import tmt.dsl.executor.info.Step;
-
-import com.google.gson.Gson;
 
 public class DSL {
 
@@ -62,7 +58,7 @@ public class DSL {
     try {
       ArrayList<String> tmp = new ArrayList<String>();
       tmp.add(mess);
-      Utils.writeFile(tmp, log, true);
+      Utils.writeFile1(new Gson().toJson(tmp), log, true);
     }
     catch (Exception e) {
       throw new IllegalArgumentException(e.getMessage(), e);
@@ -73,7 +69,7 @@ public class DSL {
     try {
       ArrayList<String> tmp = new ArrayList<String>();
       tmp.add(mess);
-      Utils.writeFile(tmp, filename_, true);
+      Utils.writeFile1(new Gson().toJson(tmp), filename_, true);
     }
     catch (Exception e) {
       e.printStackTrace();

@@ -48,25 +48,26 @@ public class Step {
   }
 
   public void clear() {
-    for(Iterator<Entry<String, Element>> it = supervised_env.entrySet().iterator(); it.hasNext(); ) {
-      Entry<String, Element> entry = it.next();
-      if(!entry.getValue().isVisible()) {
-        it.remove();
-      }
-    }
-    
-    for(Iterator<Entry<String, Element>> it = program.entrySet().iterator(); it.hasNext(); ) {
-      Entry<String, Element> entry = it.next();
-      if(!entry.getValue().isVisible()) {
-        it.remove();
-      }
-    }
-    
-    for(Iterator<Entry<String, Element>> it = argument.entrySet().iterator(); it.hasNext(); ) {
-      Entry<String, Element> entry = it.next();
-      if(!entry.getValue().isVisible()) {
-        it.remove();
-      }
-    }
+	  for(Iterator<Entry<String, Element>> it = supervised_env.entrySet().iterator(); it.hasNext(); ) {
+		  Entry<String, Element> entry = it.next();
+		  if(!entry.getValue().isVisible()) {
+			  it.remove();
+		  }
+	  }
+
+	  for(Iterator<Entry<String, Element>> it = program.entrySet().iterator(); it.hasNext(); ) {
+		  Entry<String, Element> entry = it.next();
+		  if(!entry.getValue().isVisible()) {
+			  it.remove();
+		  }
+	  }
+
+	  for(Iterator<Entry<String, Element>> it = argument.entrySet().iterator(); it.hasNext(); ) {
+		  Entry<String, Element> entry = it.next();
+		  if(!entry.getValue().isVisible()) {
+			  it.remove();
+		  }
+	  }
   }
+
 }

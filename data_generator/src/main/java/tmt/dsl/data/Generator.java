@@ -58,7 +58,6 @@ public class Generator  {
 
 //  public static int limit = 15000;
 
-  public final String root = "../data/datasets/";
   private CloseableHttpClient httpclient;
 
   public static final int ASC = 1;
@@ -83,6 +82,10 @@ public class Generator  {
   public ArrayList<HashMap<Integer, Step>> setTrainAndTest(Classifier t) {
     ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
     
+    String filename = Conf.root+"/classifiers/"+t.domain+"/context1.json";
+    String domain_info = Conf.root+"/classifiers/"+t.domain+"/domain1.json";
+    
+    new File(Conf.root+"/classifiers/"+t.domain).mkdir();
     try {
       HashMap<Integer, ArrayList<Vector>> sequences = new HashMap<>();
 
@@ -96,10 +99,16 @@ public class Generator  {
       ContextDSL cntx_dsl = null;
 
       for (Entry<Integer, ArrayList<Vector>> s : sequences.entrySet()) {
-        cntx_dsl = new ContextDSL(s.getValue(), root);  
+        cntx_dsl = new ContextDSL(s.getValue(), Conf.root);  
         cntx_dsl.execute();
         output.addAll(cntx_dsl.getData());
       }
+      
+      DSL.send(new Gson().toJson(output), "", filename);
+      Utils.writeFile1(new Gson().toJson(t.domain), domain_info, false);
+      
+      System.err.println(filename);
+      System.exit(1);
     } catch (Exception e) {
       e.printStackTrace();
     } 
@@ -294,7 +303,7 @@ public class Generator  {
         snippet.put(ps.getKey(), Utils.sortByValue(s));
       }
 
-      Utils.writeFile1(new Gson().toJson(snippet), root+"/pre_snippet", false);
+      Utils.writeFile1(new Gson().toJson(snippet), Conf.root+"/pre_snippet", false);
     } catch (Exception e) {
       e.printStackTrace();
     }
