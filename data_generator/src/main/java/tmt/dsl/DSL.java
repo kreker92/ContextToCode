@@ -66,14 +66,14 @@ public class DSL {
   }
 
   public static void send(String mess, String label, String filename_) {
-    try {
-      ArrayList<String> tmp = new ArrayList<String>();
-      tmp.add(mess);
-      Utils.writeFile1(new Gson().toJson(tmp), filename_, true);
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      System.exit(1);
-    }
-  }
+	    try {
+	      ArrayList<String> tmp = new ArrayList<String>();
+	      tmp.add(mess);
+	      Utils.writeFile(tmp, filename_, false);
+	    }
+	    catch (Exception e) {
+	      e.printStackTrace();
+	      System.exit(1);
+	    }
+	  }
 }

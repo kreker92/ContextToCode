@@ -104,11 +104,9 @@ public class Generator  {
         output.addAll(cntx_dsl.getData());
       }
       
+
       DSL.send(new Gson().toJson(output), "", filename);
       Utils.writeFile1(new Gson().toJson(t.domain), domain_info, false);
-      
-      System.err.println(filename);
-      System.exit(1);
     } catch (Exception e) {
       e.printStackTrace();
     } 
@@ -228,21 +226,6 @@ public class Generator  {
   }
   
   private void loadJavaScript(Classifier t, InnerClass c) {
-    String prev_type = "";
-    //  String executor_command = "1";
-
-    for (ElementInfo e : c.elements ) 
-      if (e.ast_type != null && !e.ast_type.isEmpty()) {
-        //        PopularType t1 = new PopularType(c, bad_types);
-        if (e.ast_type.contains("PsiType:")) 
-          prev_type = e.ast_type;
-        else if (e.ast_type.contains("PsiIdentifier:") && !prev_type.isEmpty()) { 
-          e.class_method = prev_type+"#"+e.ast_type;
-          //        if (progs.containsKey(e.class_method)) 
-          //          executor_command = progs.get(e.class_method);
-        }
-      }
-
     if (c.matches(t.classes)) {
       for (InnerClass key : t.classes)
         if (c.hasElements(key)) {

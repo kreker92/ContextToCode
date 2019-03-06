@@ -19,6 +19,10 @@ public class InnerClass {
   public ArrayList<LinkedHashMap<String, String>> scheme = new ArrayList<LinkedHashMap<String, String>>();
   public String description;
   
+  public InnerClass() {
+    
+  }
+  
   public InnerClass(String type_, String executor_command_, String ast_type_) {
     type = type_;
     ast_type = ast_type_;

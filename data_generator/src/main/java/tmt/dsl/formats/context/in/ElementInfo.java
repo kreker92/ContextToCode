@@ -31,7 +31,7 @@ public class ElementInfo {
         this.comparing_method = "class_method";
     }
     	
-    if (text_key != null)
+    if (text_key != null && !text_key.isEmpty())
       text = text_key;
   }
   
@@ -62,7 +62,7 @@ public class ElementInfo {
   }
   
   public String toString() {
-    return type+" "+ast_type+" "+parent+" "+node+" "+text +" "+class_method;
+    return "type "+type+" text "+text+" comparing_method "+comparing_method;
   }
 //
 //
