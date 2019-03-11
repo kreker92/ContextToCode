@@ -68,7 +68,7 @@ public class GServer {
         createUseCasesJava(g, templates);
       else if (Conf.lang.equals("javascript"))
         createUseCasesJavaScript(g, templates);
-      
+
       for ( Classifier t : templates )
         doLearn(g, t);
     }
@@ -169,9 +169,34 @@ public class GServer {
 
   private static void createUseCasesJavaScript(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
     Classifier t1 = new Classifier("sandbox/");
-    t1.domain = "/root/js/data_picks/";
-    t1.blocking = false;
+    t1.domain = "/data_picks/";
     templates.add(t1);
+    
+   /* InnerClass background_class = new InnerClass("falsekey", "1", type);
+    background_class.elements.add(new ElementInfo("ast_type", type, null));
+    background_class.elements.add(new ElementInfo("class_method", type+"#PsiIdentifier:*", null));
+    LinkedHashMap<String, String> temp7_1 = new LinkedHashMap<>();
+    temp7_1.put("literal1","String mCursorString = ");
+    temp7_1.put("stab_req",type);
+    temp7_1.put("literal2",".getString(int id))");
+    background_class.scheme.add(temp7_1);
+    background_class.description = " Returns the value of the requested column as a String. ";*/
+
+    LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
+    temp6_1.put("literal1","String mCursorString = ");
+//    temp6_1.put("stab_req",type);
+    temp6_1.put("literal2",".getString(int id))");
+
+
+    InnerClass ic = new InnerClass("truekey", "4", "Property:css");
+    ic.elements.add(new ElementInfo("type", "CallExpression", "Property:css"));
+//    ic.elements.add(new ElementInfo("class_method", com.getKey(), null));
+    ic.scheme.add(temp6_1);
+    ic.description = " Returns the value of the requested column as a String. ";
+
+    t1.classes.add(ic);
+//    t1.classes.add(background_class);
+//    t1.domain = folder;
   }
   
 
@@ -394,9 +419,9 @@ public class GServer {
   }
 
   private static void doLearn(Generator g, Classifier t) throws IOException {
-    PopularCounter popular = new PopularCounter();
+/*    PopularCounter popular = new PopularCounter();
 
-/*    File file = new File(Conf.root+"/context.json"); 
+    File file = new File(Conf.root+"/context.json"); 
     file.delete();
     file = new File(Conf.root+"/log.json"); 
     file.delete();
@@ -417,12 +442,12 @@ public class GServer {
       t.clear();
 
       InnerClass[] code = getRaw(f);
-      System.exit(1);
+//      System.exit(1);
       g.loadCode(code, g.ASC, t);
 
       g.iterateCode(code, t, f.getPath(), res, 3);
 
-     /* for ( InnerClass c : code )
+    /*  for ( InnerClass c : code )
       //  if(c.matches(t.classes))
     	    popular.add(c);*/
       
@@ -434,9 +459,9 @@ public class GServer {
 ////        }
     }
 
-  /*  Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), Conf.root+"/pop_lines", false);
-    Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.commands)), Conf.root+"/pop_comm", false); */ 
-    
+   /* Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), Conf.root+"/pop_lines", false);
+    Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.commands)), Conf.root+"/pop_comm", false); 
+    System.exit(1);*/
     g.setTrainAndTest(t);
     t.clear();
   }
@@ -626,22 +651,42 @@ class PopularCounter {
 
   public void add(InnerClass c) {
     String prev_type = "";
-    for (ElementInfo e : c.elements ) {
-      if (e.ast_type != null && !e.ast_type.isEmpty()) {
-        //        PopularType t1 = new PopularType(c, bad_types);
-        if (e.ast_type.contains("PsiType:")) {
-          prev_type = e.ast_type;
-          if (ast_types.containsKey(e.ast_type)) 
-            ast_types.put(e.ast_type, ast_types.get(e.ast_type)+1);
-          else 
-            ast_types.put(e.ast_type, 1);
-        } else if (e.ast_type.contains("PsiIdentifier:") && !prev_type.isEmpty()) {
-          if (commands.containsKey(prev_type+"#"+e.ast_type))
-            commands.put(prev_type+"#"+e.ast_type, commands.get(prev_type+"#"+e.ast_type)+1);
-          else
-            commands.put(prev_type+"#"+e.ast_type, 1);
+    if (Conf.lang.equals("java")) {
+      for (ElementInfo e : c.elements ) {
+        if (e.ast_type != null && !e.ast_type.isEmpty()) {
+          //        PopularType t1 = new PopularType(c, bad_types);
+          if (e.ast_type.contains("PsiType:")) {
+            prev_type = e.ast_type;
+            if (ast_types.containsKey(e.ast_type)) 
+              ast_types.put(e.ast_type, ast_types.get(e.ast_type)+1);
+            else 
+              ast_types.put(e.ast_type, 1);
+          } else if (e.ast_type.contains("PsiIdentifier:") && !prev_type.isEmpty()) {
+            if (commands.containsKey(prev_type+"#"+e.ast_type))
+              commands.put(prev_type+"#"+e.ast_type, commands.get(prev_type+"#"+e.ast_type)+1);
+            else
+              commands.put(prev_type+"#"+e.ast_type, 1);
+          }
         }
       }
+    }
+    else if (Conf.lang.equals("javascript")) {
+      //if (c.line_text.contains("$")) {
+        for (ElementInfo e : c.elements ) {
+          if (e.type != null && !e.type.isEmpty()) {
+            if (ast_types.containsKey(e.type)) 
+              ast_types.put(e.type, ast_types.get(e.type)+1);
+            else 
+              ast_types.put(e.type, 1);
+          } 
+          if (e.type.contains("CallExpression")) {
+            if (commands.containsKey(e.text))
+              commands.put(e.text, commands.get(e.text)+1);
+            else
+              commands.put(e.text, 1);
+          }
+        }
+      //}
     }
   }
 }

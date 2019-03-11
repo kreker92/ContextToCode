@@ -36,8 +36,7 @@ public class JavaScriptAST {
       cs.add(n.toClass(count));
       count ++;
     }
-    System.err.println(cs);
-    System.exit(1);
+
     out = cs.toArray(new InnerClass[cs.size()]);
   }
 
@@ -93,20 +92,24 @@ class Node {
 
   InnerClass toClass(int count) {
     InnerClass c = new InnerClass();
+    c.line_text = get_text (this);
     if (links != null) {
       Collections.sort(links, comparator_id_desc);
       get_links(this, c.elements);
-      c.line_text = get_text (this);
     }
-    c.line_text = value;
     c.line_num = count;
     return c;
   }
   
   private String get_text(Node node) {
+    if (node.type.equals("Identifier"))
+      node.value = "";
+    else if (!node.value.isEmpty())
+      node.value = node.type+":"+node.value;
+    
     if (node.links != null) {
       for (Node child : node.links)
-        node.value += " "+get_text(child); 
+        node.value += get_text(child); 
       return node.value;
     }
 
@@ -115,6 +118,7 @@ class Node {
   
   private void get_links(Node node, ArrayList<ElementInfo> elements) {
     ElementInfo el = new ElementInfo("type", node.type, node.value);
+    el.ast_type = node.value;
     elements.add(el);
     
     if (node.links != null) {
