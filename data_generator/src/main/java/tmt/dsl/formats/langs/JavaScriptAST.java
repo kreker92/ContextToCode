@@ -17,10 +17,10 @@ import com.google.gson.JsonSyntaxException;
 public class JavaScriptAST {
   private InnerClass[] out;
   
-  public JavaScriptAST (File f) {
+  public JavaScriptAST (String f) {
     Node[] nodes = null;
     try {
-      nodes = new Gson().fromJson(Utils.readFile(f.getPath()), Node[].class);
+      nodes = new Gson().fromJson(Utils.readFile(f), Node[].class);
     } catch (JsonSyntaxException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

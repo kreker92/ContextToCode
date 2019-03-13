@@ -73,7 +73,11 @@ public class GServer {
         doLearn(g, t);
     }
     else if (swtch == EVAL) {
-      createEvalCases(g, templates);
+      if (Conf.lang.equals("java"))
+        createEvalCasesJava(g, templates);
+      else if (Conf.lang.equals("javascript"))
+        createUseCasesJavaScript(g, templates);
+      
       doEval(g, templates.get(0));
 
 
@@ -170,7 +174,6 @@ public class GServer {
   private static void createUseCasesJavaScript(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
     Classifier t1 = new Classifier("sandbox/");
     t1.domain = "/data_picks/";
-    templates.add(t1);
     
    /* InnerClass background_class = new InnerClass("falsekey", "1", type);
     background_class.elements.add(new ElementInfo("ast_type", type, null));
@@ -197,10 +200,11 @@ public class GServer {
     t1.classes.add(ic);
 //    t1.classes.add(background_class);
 //    t1.domain = folder;
+    templates.add(t1);
   }
   
 
-  private static void createEvalCases(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
+  private static void createEvalCasesJava(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
 
     HashMap<String, LinkedTreeMap<String, String>> outputs = new Gson().fromJson(Utils.readFile("/root/ContextToCode/predictor/log/1class/expect_to_prog"), HashMap.class);
     
@@ -261,12 +265,12 @@ public class GServer {
 //    HashMap<Integer, ArrayList<ArrayList<Integer>>> results1 = new HashMap<>();
 
     int count = 0;
-    c = new evalCounter(t.classes.size()+1);
+    c = new evalCounter(t.classes.size()+4);
     
     HashMap<String, Integer> counter = new HashMap<>();
     counter.put("no", 0);
     counter.put("yes", 0);
-    
+    System.err.println(Conf.root+t.folder+"folder1");
     for (File f : new File(Conf.root+t.folder+"folder1").listFiles()) {
       folder1.put(count, f.getPath());
       count ++;
@@ -274,11 +278,11 @@ public class GServer {
     
     for ( Entry<Integer, String> f : folder1.entrySet() ) {
       t.blocking = false;
-      if (f.getValue().contains("99726047")) {
+//      if (f.getValue().contains("99726047")) {
         System.err.println("count: "+f.getValue());
         validate_line_by_line(f, g, t, counter, c);
         System.err.println(counter);
-      }
+//      }
     }
     
     System.exit(1);
@@ -374,7 +378,8 @@ public class GServer {
   }
   
   private static void validate_line_by_line(Entry<Integer, String> f, Generator g, Classifier t, HashMap<String, Integer> counter, evalCounter c) throws IOException {
-    InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getValue()), InnerClass[].class);
+//    InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getValue()), InnerClass[].class);
+    InnerClass[] code = getRaw(f.getValue());
     g.loadCode(code, g.ASC, t);
 
     for (int carret = code.length; carret > 2; carret --) {
@@ -386,13 +391,14 @@ public class GServer {
       ArrayList<HashMap<Integer, Step>> info = g.setTrainAndTest(t);
 
       //    results.put(f.getKey(), new ArrayList<ArrayList<Integer>>());
-
       for (HashMap<Integer, Step> i : info) {
+        if (Integer.parseInt(i.get(Collections.max(i.keySet())).program.get("id").getValue().toString()) > 1) {
         ArrayList<HashMap<Integer, Step>> send = new ArrayList<>();
         send.add(i);
 
         ArrayList<HashMap<String, String>> response = g.filter_through_npi(send, t);
 
+        System.err.println(response);
         c.add(response, Integer.parseInt(i.get(Collections.max(i.keySet())).program.get("id").getValue().toString()), info);
         if (!response.isEmpty())
           counter.put("yes", counter.get("yes")+1);
@@ -403,6 +409,7 @@ public class GServer {
         
         if (counter.get("no") > 2820)
           System.exit(1);
+        }
       }
     }
     
@@ -441,7 +448,7 @@ public class GServer {
 
       t.clear();
 
-      InnerClass[] code = getRaw(f);
+      InnerClass[] code = getRaw(f.getPath());
 //      System.exit(1);
       g.loadCode(code, g.ASC, t);
 
@@ -466,9 +473,9 @@ public class GServer {
     t.clear();
   }
   
-  private static InnerClass[] getRaw(File f) throws JsonSyntaxException, IOException {
+  private static InnerClass[] getRaw(String f) throws JsonSyntaxException, IOException {
     if (Conf.lang.equals("java"))
-      return new Gson().fromJson(Utils.readFile(f.getPath()), InnerClass[].class);
+      return new Gson().fromJson(Utils.readFile(f), InnerClass[].class);
     else if (Conf.lang.equals("javascript")) {
       return new JavaScriptAST(f).getClasses();
     }
@@ -741,7 +748,7 @@ class evalCounter {
         else
           incorrect_prediction += 1;
     
-//        System.err.println(res+" * "+executor_command+" * "+correctness);
+//        System.err.println(res+" * "+executor_command+" * "+correctness+" * "+classes_counter);
         
         classes_counter.get(executor_command).put(correctness, classes_counter.get(executor_command).get(correctness)+1);
       } 
