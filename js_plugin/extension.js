@@ -22,9 +22,17 @@ function activate(context) {
 	// The commandId parameter must match the command field in package.json
 	const commandId = 'extension.showText'
 	let disposable = vscode.commands.registerCommand(commandId, function () {
-		vscode.window.showInformationMessage('Ждём ответ от сервера');
 		const text = editor.document.getText()
-		rp('http://78.46.103.68:8081/')
+
+		let options = {
+			method: 'GET',
+			uri: 'http://78.46.103.68:8081/',
+			body: {
+				text: text
+			},
+			json: true
+		}
+		rp(options)
 			.then(function (htmlString) {
 				vscode.window.showInformationMessage(htmlString);
 			})
