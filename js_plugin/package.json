@@ -10,16 +10,22 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:extension.showText"
 	],
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
+				"command": "extension.showText",
+				"title": "show Text"
 			}
-		]
+		],
+		"keybindings": [{
+        "command": "extension.showText",
+        "key": "ctrl+enter",
+        "mac": "cmd+enter",
+        "when": "editorTextFocus"
+    }]
 	},
 	"scripts": {
 		"postinstall": "node ./node_modules/vscode/bin/install",
@@ -31,5 +37,10 @@
 		"eslint": "^5.13.0",
 		"@types/node": "^10.12.21",
 		"@types/mocha": "^2.2.42"
+	},
+	"dependencies": {
+		"cheerio": "^1.0.0-rc.2",
+		"express": "^4.16.4",
+		"request-promise": "^4.2.4"
 	}
 }
