@@ -57,7 +57,7 @@ public class Vector {
 //        System.err.println(s.node);
 //        System.exit(1);
 //      }
-      el.add(new ElementInfo("ast_type", s.ast_type, s.text));
+      el.add(s);
       switch (Conf.lang) {
         case "java":
           if (s.ast_type != null && !s.ast_type.equals("null")) {

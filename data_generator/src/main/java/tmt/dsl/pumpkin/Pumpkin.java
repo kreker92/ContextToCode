@@ -11,6 +11,7 @@ import java.util.Set;
 import com.google.gson.Gson;
 import com.intellij.util.containers.HashSet;
 
+import tmt.conf.Conf;
 import tmt.dsl.Classifier;
 import tmt.dsl.executor.info.Step;
 import tmt.dsl.formats.context.in.ElementInfo;
@@ -27,7 +28,7 @@ public class Pumpkin {
     
     lines = new ArrayList(context_.get(0).keySet());
     Collections.sort(lines, Collections.reverseOrder());
-    
+
     for (InnerClass c : ts.classes) {
       HashMap<String, String> snpt = fill(c); 
 
@@ -37,16 +38,15 @@ public class Pumpkin {
   }
   
   public boolean is_continue() {
-    System.err.println(!stabs.isEmpty());
+//    System.err.println(!stabs.isEmpty());
     return !stabs.isEmpty();
   }
 
   public ArrayList<HashMap<String, String>> snippetize(int[] res, ArrayList<HashMap<String, String>> snippets) {
-    for (Integer c : res)
+    for (Integer c : res) {
       if (c!= 1 && stabs.containsKey(c))
         snippets.add(stabs.get(c));
-    
-//    System.err.println(command+" - "+new Gson().toJson(snippets)+" - "+candidates);
+    }
     return snippets;
   }
   
@@ -84,11 +84,20 @@ public class Pumpkin {
 
   private String getFirstVar(String type) {
     for (HashMap<Integer, Step> cs : context)
-      for (Integer l : lines)
-        for (ElementInfo el : (ArrayList<ElementInfo>)cs.get(l).additional_info.get("el")) 
-          if (el.ast_type != null && !el.ast_type.isEmpty() && type.equals(el.ast_type)) 
-          //&& (!el.text.equals("TextView") && !el.text.equals("View") && !el.text.equals("Cursor") && !el.text.equals("TextView"))) 
-            return el.text;
+      for (Integer line : lines) {
+    	if  (Conf.lang.equals("java")) {
+	        for (ElementInfo el : (ArrayList<ElementInfo>)cs.get(line).additional_info.get("el")) 
+	          if (el.ast_type != null && !el.ast_type.isEmpty() && type.equals(el.ast_type)) 
+	          //&& (!el.text.equals("TextView") && !el.text.equals("View") && !el.text.equals("Cursor") && !el.text.equals("TextView"))) 
+	            return el.text;
+    	} else if (Conf.lang.equals("javascript")) {
+    	  for (ElementInfo el : (ArrayList<ElementInfo>)cs.get(line).additional_info.get("el")) 
+            if (el.text != null && !el.text.isEmpty() && el.text.contains(type) && el.type.equals("Identifier")) {
+            //&& (!el.text.equals("TextView") && !el.text.equals("View") && !el.text.equals("Cursor") && !el.text.equals("TextView"))) 
+              return el.text;
+            }
+    	}
+      }
     return "";
   }
   
@@ -99,6 +108,8 @@ public class Pumpkin {
     for (Entry<Integer, HashMap<String, String>> stab : stabs.entrySet()) {
         keys.add(stab.getValue().get("ast_type"));
     }
+    /*TODO:
+     * */
     out.add(keys);
     out.add(context);
     return new Gson().toJson(out);

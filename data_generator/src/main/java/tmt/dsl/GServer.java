@@ -186,16 +186,15 @@ public class GServer {
     background_class.description = " Returns the value of the requested column as a String. ";*/
 
     LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
-    temp6_1.put("literal1","String mCursorString = ");
-//    temp6_1.put("stab_req",type);
-    temp6_1.put("literal2",".getString(int id))");
+    temp6_1.put("stab_req","$");
+    temp6_1.put("literal1",".css()");
 
 
     InnerClass ic = new InnerClass("truekey", "4", "Property:css");
     ic.elements.add(new ElementInfo("type", "CallExpression", "Property:css"));
 //    ic.elements.add(new ElementInfo("class_method", com.getKey(), null));
     ic.scheme.add(temp6_1);
-    ic.description = " Returns the value of the requested column as a String. ";
+    ic.description = " Edit CSS. ";
 
     t1.classes.add(ic);
 //    t1.classes.add(background_class);
@@ -392,13 +391,12 @@ public class GServer {
 
       //    results.put(f.getKey(), new ArrayList<ArrayList<Integer>>());
       for (HashMap<Integer, Step> i : info) {
-        if (Integer.parseInt(i.get(Collections.max(i.keySet())).program.get("id").getValue().toString()) > 1) {
         ArrayList<HashMap<Integer, Step>> send = new ArrayList<>();
         send.add(i);
 
         ArrayList<HashMap<String, String>> response = g.filter_through_npi(send, t);
 
-        System.err.println(response);
+        System.err.println("^"+response);
         c.add(response, Integer.parseInt(i.get(Collections.max(i.keySet())).program.get("id").getValue().toString()), info);
         if (!response.isEmpty())
           counter.put("yes", counter.get("yes")+1);
@@ -407,9 +405,8 @@ public class GServer {
         
         System.err.println(counter+" * "+c);
         
-        if (counter.get("no") > 2820)
-          System.exit(1);
-        }
+//        if (counter.get("no") > 2820)
+//          System.exit(1);
       }
     }
     

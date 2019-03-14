@@ -106,6 +106,7 @@ public class Generator  {
       
 
       DSL.send(new Gson().toJson(output), "", filename);
+      System.err.println(output.size());
       Utils.writeFile1(new Gson().toJson(t.domain), domain_info, false);
     } catch (Exception e) {
       e.printStackTrace();
@@ -118,7 +119,6 @@ public class Generator  {
     ArrayList<HashMap<String, String>> snippets = new ArrayList<>();
 
     if ( context.size() > 0) {
-      //      System.err.println("In"+context.size());
       //    HashMap<Integer, Step> st = context.get(context.size()-1);
       //    System.err.println(st.get(st.keySet().size()-1).program.get("id").getValue()+" ^ "+st.get(st.keySet().size()-1).additional_info.get("path")
       //        +" ^ "+st.get(st.keySet().size()-1).additional_info.get("line")+" ^ "+st.get(st.keySet().size()-1).additional_info.get("text"));
@@ -200,7 +200,7 @@ public class Generator  {
     String prev_type = "";
     //  String executor_command = "1";
 
-    for (ElementInfo e : c.elements ) 
+    for (ElementInfo e : c.elements ) { 
       if (e.ast_type != null && !e.ast_type.isEmpty()) {
         //        PopularType t1 = new PopularType(c, bad_types);
         if (e.ast_type.contains("PsiType:")) 
@@ -211,6 +211,8 @@ public class Generator  {
           //          executor_command = progs.get(e.class_method);
         }
       }
+      e.comparing_method = "ast_type";
+    }
 
     if (c.matches(t.classes)) {
       for (InnerClass key : t.classes)
@@ -242,6 +244,7 @@ public class Generator  {
   public void iterateCode(InnerClass[] code, Classifier t, String path, ArrayList<Vector[]> res, int limit) {
     for (int line = code.length-1; line >= 0; line --) {
       if ( (!t.blocking && line == code.length-1) || (/*TRIN*/t.blocking  && code[line].matches(t.classes))) {
+        System.err.println(t.blocking+" && "+code[line].matches(t.classes));
         Vector[] snip = Parser.getSnippet(line, code, path, t.classes, limit);
         if (snip.length > 0) 
           res.add(snip);

@@ -52,6 +52,7 @@ class Node {
   public ArrayList<Node> links = null;
   String value = "";
   int line_num;
+  String var_name;
   
   private static Comparator<Node> comparator_id_desc = new Comparator<Node>() {
     public int compare(Node o1, Node o2) {
@@ -102,8 +103,10 @@ class Node {
   }
   
   private String get_text(Node node) {
-    if (node.type.equals("Identifier"))
+    if (node.type.equals("Identifier")) {
+      node.var_name = node.value; 
       node.value = "";
+    }
     else if (!node.value.isEmpty())
       node.value = node.type+":"+node.value;
     
@@ -117,7 +120,7 @@ class Node {
   }
   
   private void get_links(Node node, ArrayList<ElementInfo> elements) {
-    ElementInfo el = new ElementInfo("type", node.type, node.value);
+    ElementInfo el = new ElementInfo("type", node.type, node.type.equals("Identifier") ? node.var_name : node.value);
     el.ast_type = node.value;
     elements.add(el);
     
