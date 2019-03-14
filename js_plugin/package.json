@@ -19,7 +19,13 @@
 				"command": "extension.showText",
 				"title": "show Text"
 			}
-		]
+		],
+		"keybindings": [{
+        "command": "extension.showText",
+        "key": "ctrl+enter",
+        "mac": "cmd+enter",
+        "when": "editorTextFocus"
+    }]
 	},
 	"scripts": {
 		"postinstall": "node ./node_modules/vscode/bin/install",
