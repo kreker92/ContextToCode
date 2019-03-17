@@ -82,8 +82,8 @@ public class Generator  {
   public ArrayList<HashMap<Integer, Step>> setTrainAndTest(Classifier t) {
     ArrayList<HashMap<Integer, Step>> output = new ArrayList<>();
     
-    String filename = Conf.root+"/classifiers/"+t.domain+"/context1.json";
-    String domain_info = Conf.root+"/classifiers/"+t.domain+"/domain1.json";
+    String filename = Conf.root+"/classifiers/"+t.domain+"/context.json";
+    String domain_info = Conf.root+"/classifiers/"+t.domain+"/domain.json";
     
     new File(Conf.root+"/classifiers/"+t.domain).mkdir();
     try {
@@ -228,23 +228,28 @@ public class Generator  {
   }
   
   private void loadJavaScript(Classifier t, InnerClass c) {
-    if (c.matches(t.classes)) {
-      for (InnerClass key : t.classes)
+    boolean found = false;
+    for (InnerClass key : t.classes) {
+      if (key.type.equals("truekey")) {
         if (c.hasElements(key)) {
-          if (key.type.equals("truekey")) 
-            c.executor_command = key.executor_command;
-          else if (c.executor_command == null || c.executor_command.equals("1"))
-            c.executor_command = "1";
+          c.executor_command = key.executor_command;
+          found = true;
         }
-    } else {
+      }
+    }
+    if (!found) {
       c.executor_command = Executor.NOT_CONNECT;
     }
   }
 
-  public void iterateCode(InnerClass[] code, Classifier t, String path, ArrayList<Vector[]> res, int limit) {
+  public void iterateCode(InnerClass[] code, Classifier t, String path, ArrayList<Vector[]> res, int limit, HashMap<Integer, Integer> map) {
     for (int line = code.length-1; line >= 0; line --) {
       if ( (!t.blocking && line == code.length-1) || (/*TRIN*/t.blocking  && code[line].matches(t.classes))) {
-        System.err.println(t.blocking+" && "+code[line].matches(t.classes));
+//        System.err.println(t.blocking+" && "+code[line].matches(t.classes));
+        if (code[line].executor_command.equals("1"))
+          map.put(0, map.get(0)+1);
+        else 
+          map.put(1, map.get(1)+1);
         Vector[] snip = Parser.getSnippet(line, code, path, t.classes, limit);
         if (snip.length > 0) 
           res.add(snip);
@@ -252,6 +257,8 @@ public class Generator  {
     }
     for (Vector[] c : res)
       t.vs.addAll(Arrays.asList(c));
+    
+    System.err.println(map);
   }
 
   public void snippetize() throws JsonSyntaxException, IOException {

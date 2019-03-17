@@ -184,19 +184,30 @@ public class GServer {
     temp7_1.put("literal2",".getString(int id))");
     background_class.scheme.add(temp7_1);
     background_class.description = " Returns the value of the requested column as a String. ";*/
-
-    LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
-    temp6_1.put("stab_req","$");
-    temp6_1.put("literal1",".css()");
+    
+    /* background class */
+    InnerClass background_class = new InnerClass("falsekey", "1", "Property:AnyTime");
+    background_class.elements.add(new ElementInfo("type", "CallExpression", "Property:"));
+    background_class.elements.add(new ElementInfo("type", "Identifier", "$"));
+    LinkedHashMap<String, String> temp7_1 = new LinkedHashMap<>();
+    temp7_1.put("literal1","String mCursorString = ");
+    temp7_1.put("literal2",".getString(int id))");
+    background_class.scheme.add(temp7_1);
+    background_class.description = " Returns the value of the requested column as a String. ";
+    /* background class */
 
 
     InnerClass ic = new InnerClass("truekey", "4", "Property:css");
+    LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
+    temp6_1.put("stab_req","");
+    temp6_1.put("literal1",".css()");
     ic.elements.add(new ElementInfo("type", "CallExpression", "Property:css"));
-//    ic.elements.add(new ElementInfo("class_method", com.getKey(), null));
+    ic.elements.add(new ElementInfo("type", "Identifier", "$"));
     ic.scheme.add(temp6_1);
     ic.description = " Edit CSS. ";
 
     t1.classes.add(ic);
+    t1.classes.add(background_class);
 //    t1.classes.add(background_class);
 //    t1.domain = folder;
     templates.add(t1);
@@ -238,7 +249,7 @@ public class GServer {
 
     g.loadCode(code, g.ASC, classifier);
     
-    g.iterateCode(code, classifier, "inference", res, 5);
+    g.iterateCode(code, classifier, "inference", res, 5, null);
 
     ArrayList<HashMap<String, String>> snippets = null;//g.fromCache(classifier.vs);
 
@@ -359,7 +370,7 @@ public class GServer {
     ArrayList<Vector[]> res = new ArrayList<>();
     t.clear();
 
-    g.iterateCode(code, t, f.getValue(), res, 5);
+    g.iterateCode(code, t, f.getValue(), res, 5, null);
 
     ArrayList<HashMap<Integer, Step>> info = g.setTrainAndTest(t);
 
@@ -385,12 +396,13 @@ public class GServer {
       ArrayList<Vector[]> res = new ArrayList<>();
       t.clear();
 
-      g.iterateCode(Arrays.copyOfRange(code, 0, carret), t, f.getValue(), res, 5);
+      g.iterateCode(Arrays.copyOfRange(code, 0, carret), t, f.getValue(), res, 5, null);
        
       ArrayList<HashMap<Integer, Step>> info = g.setTrainAndTest(t);
 
       //    results.put(f.getKey(), new ArrayList<ArrayList<Integer>>());
       for (HashMap<Integer, Step> i : info) {
+    	  if (Integer.parseInt(i.get(Collections.max(i.keySet())).program.get("id").getValue().toString()) > 1 ) {
         ArrayList<HashMap<Integer, Step>> send = new ArrayList<>();
         send.add(i);
 
@@ -408,6 +420,7 @@ public class GServer {
 //        if (counter.get("no") > 2820)
 //          System.exit(1);
       }
+      }
     }
     
     
@@ -423,9 +436,9 @@ public class GServer {
   }
 
   private static void doLearn(Generator g, Classifier t) throws IOException {
-/*    PopularCounter popular = new PopularCounter();
+    PopularCounter popular = new PopularCounter();
 
-    File file = new File(Conf.root+"/context.json"); 
+    /*File file = new File(Conf.root+"/context.json"); 
     file.delete();
     file = new File(Conf.root+"/log.json"); 
     file.delete();
@@ -439,6 +452,10 @@ public class GServer {
     int count = 0;
 
     File[] files = new File(Conf.root+t.folder).listFiles();
+    
+    HashMap<Integer, Integer> map = new HashMap<>();
+    map.put(0, 0);
+    map.put(1, 0);
 
     for (File f : files) {
 //        if (f.getPath().contains("97827446")) {
@@ -449,10 +466,10 @@ public class GServer {
 //      System.exit(1);
       g.loadCode(code, g.ASC, t);
 
-      g.iterateCode(code, t, f.getPath(), res, 3);
+      g.iterateCode(code, t, f.getPath(), res, 3, map);
 
-    /*  for ( InnerClass c : code )
-      //  if(c.matches(t.classes))
+   /*   for ( InnerClass c : code )
+        if(c.matches(t.classes))
     	    popular.add(c);*/
       
       count ++;
@@ -463,7 +480,7 @@ public class GServer {
 ////        }
     }
 
-   /* Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), Conf.root+"/pop_lines", false);
+    /*Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), Conf.root+"/pop_lines", false);
     Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.commands)), Conf.root+"/pop_comm", false); 
     System.exit(1);*/
     g.setTrainAndTest(t);
