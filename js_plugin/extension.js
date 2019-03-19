@@ -34,7 +34,30 @@ function activate(context) {
 		}
 		rp(options)
 			.then(function (htmlString) {
-				vscode.window.showInformationMessage(htmlString);
+				var panel = vscode.window.createWebviewPanel(
+					'tips', // Identifies the type of the webview. Used internally
+					'Предлагаемые варианты', // Title of the panel displayed to the user
+					vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
+					{
+						// Enable scripts in the webview
+						enableScripts: true
+					  } // Webview options. More on these later.
+				  );
+				  panel.webview.html = htmlString;
+				  // Handle messages from the webview
+				  panel.webview.onDidReceiveMessage(
+					message => {
+					  switch (message.command) {
+						case 'info':
+							editor.edit(edit => {
+								edit.insert(new vscode.Position(0, 0), message.text);
+							});
+						  return;
+					  }
+					},
+					undefined,
+					context.subscriptions
+				  );
 			})
 			.catch(function(err) {
 				console.log(err);
@@ -43,7 +66,6 @@ function activate(context) {
 	context.subscriptions.push(disposable);
 }
 exports.activate = activate;
-
 
 // this method is called when your extension is deactivated
 function deactivate() {
