@@ -61,6 +61,12 @@ function activate(context) {
 			hr {
 				border-top: 1px solid rgba(255,255,255,.1);
 			}
+			input[type="radio"] {
+				display:none;
+			}
+			.btn-toolbar label {
+				cursor: pointer;
+			}
 		</style>
 		<script>
 			const text_ = 'SOME CODE';
@@ -85,7 +91,38 @@ function activate(context) {
 			<p>This is a new paragraph!</p> <b>This is a new paragraph!</b><br /> <b><i>This is a new sentence without a paragraph break, in bold italics.</i></b>
 			</div>
 			<hr />
-			<button class="btn btn-outline-light btn-block" onclick="useAdvise()">Ok</button>
+			<div class="mark bg-dark">
+				<div class="btn-toolbar">
+					<div class="btn-group btn-group-sm btn-block form-group" data-toggle="buttons">
+						<label class="btn btn-outline-light">
+							<input type="radio" name="options" value="useful"> Useful
+						</label>
+						<label class="btn btn-outline-light">
+							<input type="radio" name="options" value="useful"> Rel+
+						</label>
+						<label class="btn btn-outline-light">
+							<input type="radio" name="options" value="useful"> Rel-
+						</label>
+						<label class="btn btn-outline-light">
+							<input type="radio" name="options" value="useful"> Not rel
+						</label>
+						<label class="btn btn-outline-light">
+							<input type="radio" name="options" value="useful"> Stupid
+						</label>
+						<label class="btn btn-outline-light">
+							<input type="radio" name="options" value="useful"> No mark
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<textarea class="form-control" rows="3" placeholder="Комментарий"></textarea>
+				</div>
+				<div class="form-group">
+					<button type="button" class="btn btn-outline-info btn-block">Отправить</button>
+				</div>
+			</div>
+			<hr />
+			<button class="btn btn-outline-light btn-block" onclick="useAdvise()">Вставить код</button>
 			<button class="btn btn-dark btn-block" onclick="hideAdvise()">Скрыть</button>
 		</div>
 	</body>
