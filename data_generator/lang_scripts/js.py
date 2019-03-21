@@ -2,6 +2,9 @@ import json
 import os.path
 from shutil import copyfile
 
+#import subprocess
+#subprocess.run(["ls", "-l"])
+
 def is_valid (value):
     if value["type"] == "BlockStatement":
         return False

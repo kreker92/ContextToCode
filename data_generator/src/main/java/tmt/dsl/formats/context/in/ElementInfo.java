@@ -42,11 +42,11 @@ public class ElementInfo {
       return true;
     if (!(o2 instanceof ElementInfo)) 
       return false;
-    if ( comparing_method.equals("class_method") || ((ElementInfo)o2).equals("class_method") )
+    if ( comparing_method.equals("class_method") )
     	return Utils.compare(class_method, ((ElementInfo)o2).class_method);
-    else if ( comparing_method.equals("ast_type") || ((ElementInfo)o2).equals("ast_type") )
+    else if ( comparing_method.equals("ast_type") )
     	return Utils.compare(ast_type, ((ElementInfo)o2).ast_type);
-    else if ( comparing_method.equals("type") || ((ElementInfo)o2).equals("type") )
+    else if ( comparing_method.equals("type") )
       if (Utils.compare(type, ((ElementInfo)o2).type)) 
         if ( !text.isEmpty() ) 
           return ((ElementInfo)o2).text.contains(text);
@@ -62,7 +62,7 @@ public class ElementInfo {
   }
   
   public String toString() {
-    return "type "+type+" text "+text+" comparing_method "+comparing_method;
+    return "type: "+type+", text: "+text+" comparing_method: "+comparing_method;
   }
 //
 //
