@@ -32,7 +32,8 @@ function activate(context) {
 				text: text
 			},
 			json: true
-		}
+		};
+
 		rp(options)
 			.then(function (htmlString) {
 				const panel = vscode.window.createWebviewPanel(
