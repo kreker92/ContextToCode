@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Подсказка jQuery</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+		<style>
+			p, button, div {
+				color: #DDD;
+			}
+			hr {
+				border-top: 1px solid rgba(255,255,255,.1);
+			}
+			input[type="radio"] {
+				display:none;
+			}
+			.btn-toolbar label {
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body class="bg-dark">
+		<div class="container-fluid">
+			<hr />
+			<div class="code-wrapper">
+			<h2>Функция отправки AJAX запроса библиотеки jQuery .ajax()</h2>
+			<p>С помощи этой функции вы можете отсылать запросы AJAX из скрипта JavaScript</p>
+			</div>
+			<div>
+				<p>$.ajax({</p>
+				<div class="input-group mb-3">
+				  <div class="input-group-prepend">
+					<span class="input-group-text" id="basic-addon1">url: </span>
+				  </div>
+				  <input type="text" class="form-control" placeholder="URL, на который будет отправлен запрос" aria-label="URL, на который будет отправлен запрос" aria-describedby="basic-addon1">
+				</div>
+				
+				<div class="input-group mb-3">
+				  <div class="input-group-prepend">
+					<span class="input-group-text" id="basic-addon1">async: </span>
+				  </div>
+				  <div class="input-group-append">
+					  <select class="form-control" id="sel1">
+						<option>false</option>
+						<option>true</option>
+					  </select>
+				  </div>
+				</div>
+				
+				<div class="input-group mb-3">
+				  <div class="input-group-prepend">
+					<span class="input-group-text" id="basic-addon1">type: </span>
+				  </div>
+				  <div class="input-group-append">
+					  <select class="form-control" id="sel1">
+						<option>GET</option>
+						<option>POST</option>
+					  </select>
+				  </div>
+				</div>
+				
+				<div class="input-group mb-3">
+				  <div class="input-group-prepend">
+					<span class="input-group-text" id="basic-addon1">error: </span>
+				  </div>
+				  <textarea class="form-control" rows="5" id="error">function(content){
+			$menucontainer.html('')
+		}</textarea>
+				</div>
+				
+				<div class="input-group mb-3">
+				  <div class="input-group-prepend">
+					<span class="input-group-text" id="basic-addon1">success: </span>
+				  </div>
+				  <textarea class="form-control" rows="5" id="error">function(content){
+			$menucontainer.html('')
+		}</textarea>
+				</div>
+	})
+	</div>
+			<hr />
+			<!--<div class="mark bg-dark">
+				<div class="btn-toolbar">
+					<div class="btn-group btn-group-sm btn-block form-group" data-toggle="buttons">
+						<label class="btn btn-outline-light">
+							<input type="radio" name="options" value="useful"> Useful
+						</label>
+						<label class="btn btn-outline-light">
+							<input type="radio" name="options" value="useful"> Rel+
+						</label>
+						<label class="btn btn-outline-light">
+							<input type="radio" name="options" value="useful"> Rel-
+						</label>
+						<label class="btn btn-outline-light">
+							<input type="radio" name="options" value="useful"> Not rel
+						</label>
+						<label class="btn btn-outline-light">
+							<input type="radio" name="options" value="useful"> Stupid
+						</label>
+						<label class="btn btn-outline-light">
+							<input type="radio" name="options" value="useful"> No mark
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<textarea class="form-control" rows="3" placeholder="Комментарий"></textarea>
+				</div>
+				<div class="form-group">
+					<button type="button" class="btn btn-outline-info btn-block">Отправить</button>
+				</div>
+			</div>
+			<hr />-->
+			<button class="btn btn-outline-light btn-block" onclick="useAdvise()">Вставить код</button>
+			<!--<button class="btn btn-dark btn-block" onclick="hideAdvise()">Скрыть</button>-->
+		</div>
+							<div id="code" style="display:none">
+		url:
+		async: true,
+		error:function(content){
+			$menucontainer.html('')
+		},
+		success:function(content){
+			$menucontainer.html(content)
+		}</div>
+							<script>
+			var text_ = document.getElementById("code").textContent;
+			const vscode = acquireVsCodeApi();
+			function useAdvise(){
+				console.log(vscode);
+				vscode.postMessage({command: 'use',text: text_})
+			}
+			function hideAdvise(){
+				vscode.postMessage({command: 'hide'})
+			}
+		</script>
+	</body>
+</html>
