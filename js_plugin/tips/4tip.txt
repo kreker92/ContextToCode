@@ -32,8 +32,9 @@
 			<p>Вы можете изменить контект элемента <b>$menucontainer</b> используя код: </p>
 			<br />
 			</div>
-			<p id="code"><b>$menucontainer.html("")</b></p>
 			<hr />
+			<h3>Код для вставки</h3>
+			<p id="code"><b>$menucontainer.html("")</b></p>
 			<!--<div class="mark bg-dark">
 				<div class="btn-toolbar">
 					<div class="btn-group btn-group-sm btn-block form-group" data-toggle="buttons">

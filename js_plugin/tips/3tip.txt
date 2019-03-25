@@ -28,15 +28,19 @@
 			<hr />
 			<div class="code-wrapper">
 			<h2>Функция отправки AJAX запроса библиотеки jQuery .ajax()</h2>
-			<p>С помощи этой функции вы можете отсылать запросы AJAX из скрипта JavaScript</p>
+			<p>С помощи этой функции вы можете отсылать запросы AJAX из скрипта JavaScript.</p>
+			<p>Параметры: <b>url</b> - адрес, на который будте отправлен запрос, <b>async</b> - true, если вы хотите чтобы был отправлен асинхронный запрос (по умолчанию - false),
+			<b>type</b> - тип запроса GET или POST (по умолчанию, GET), <b>error</b> - функция, которая будет выполнена в случае ошибки при выполнении отправки запроса <b>success</b> - функция, которая будет выполнена в случае успешного выполнения запроса</p>
 			</div>
+			<hr />
+			<h3>Код для вставки</h3>
 			<div>
-				<p>$.ajax({</p>
+				<p><b>$.ajax({</b></p>
 				<div class="input-group mb-3">
 				  <div class="input-group-prepend">
 					<span class="input-group-text" id="basic-addon1">url: </span>
 				  </div>
-				  <input type="text" class="form-control" placeholder="URL, на который будет отправлен запрос" aria-label="URL, на который будет отправлен запрос" aria-describedby="basic-addon1">
+				  <input type="text" class="form-control" aria-label="URL, на который будет отправлен запрос" aria-describedby="basic-addon1">
 				</div>
 				
 				<div class="input-group mb-3">
@@ -67,22 +71,21 @@
 				  <div class="input-group-prepend">
 					<span class="input-group-text" id="basic-addon1">error: </span>
 				  </div>
-				  <textarea class="form-control" rows="5" id="error">function(content){
-			$menucontainer.html('')
-		}</textarea>
+				  <textarea class="form-control" rows="5" id="error">function (content) {
+	$menucontainer.html('')
+}</textarea>
 				</div>
 				
 				<div class="input-group mb-3">
 				  <div class="input-group-prepend">
 					<span class="input-group-text" id="basic-addon1">success: </span>
 				  </div>
-				  <textarea class="form-control" rows="5" id="error">function(content){
-			$menucontainer.html('')
-		}</textarea>
+				  <textarea class="form-control" rows="5" id="error">function (content) {
+	$menucontainer.html('')
+}</textarea>
 				</div>
-	})
+	<b>})</b>
 	</div>
-			<hr />
 			<!--<div class="mark bg-dark">
 				<div class="btn-toolbar">
 					<div class="btn-group btn-group-sm btn-block form-group" data-toggle="buttons">
