@@ -1,30 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Подсказка jQuery</title>
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-		<style>
-			p, button, div {
+	  <head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<title>Подсказка jQuery</title>
+			<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+			<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+			<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-javascript.min.js" integrity="sha256-G5C8j/0gBEHgf/x60UZQY5QrKPWdUo2Pgcu4OgU5q7w=" crossorigin="anonymous"></script>
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism-okaidia.css" />
+			<style>
+			  p, button, div {
 				color: #DDD;
-			}
-			hr {
+			  }
+			  hr {
 				border-top: 1px solid rgba(255,255,255,.1);
-			}
-			input[type="radio"] {
+			  }
+			  input[type="radio"] {
 				display:none;
-			}
-			.btn-toolbar label {
+			  }
+			  .btn-toolbar label {
 				cursor: pointer;
-			}
-		</style>
-	</head>
+			  }
+			  @media (min-width: 767px) {
+				.language-js {
+				  height: 100%;
+				  margin: -5px !important;
+				}
+			  }
+			</style>
+	  </head>
 	<body class="bg-dark">
-		<div class="container-fluid">
+	    <div class="container-fluid">
 			<hr />
 			<div class="code-wrapper">
 			<h1>Функция объекта jQuery .on()</h1>
@@ -32,15 +41,16 @@
 			<p>Для любогно события <b>event</b> будет назначена функция <b>function</b>: </p>
 			</div>
 			<hr />
-			<h3>Код для вставки</h3>
-			<div>
-				<p><b>.on(</b></p>
-				<div class="input-group mb-3">
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <div id="form-edit">
+			<p><b>.on(</b></p>
+            <div class="input-group mb-3">
 				  <div class="input-group-prepend">
 					<span class="input-group-text" id="basic-addon1">event: </span>
 				  </div>
 				  <div class="input-group-append">
-					  <select class="form-control" id="sel1">
+					  <select data-part="1" class="form-control" id="sel1">
 						<option>blur</option>
 						<option>focus</option>
 						<option>change</option>	
@@ -68,33 +78,95 @@
 						<option>unload</option>
 					  </select>
 				  </div>
-				</div>
-				
-				<div class="input-group mb-3">
-				  <div class="input-group-prepend">
-					<span class="input-group-text" id="basic-addon1">function: </span>
-				  </div>
-				  <textarea class="form-control" rows="5" id="error"> function () { 
+            </div>
             
-}</textarea>
-				</div>
-
-	<b>})</b>
-	</div>
-			<button class="btn btn-outline-light btn-block" onclick="useAdvise()">Вставить код</button>
-			<!--<button class="btn btn-dark btn-block" onclick="hideAdvise()">Скрыть</button>-->
-		</div>
-					<div id="code" style="display:none">.on('mouseup', callback)</div>
-							<script>
-			var text_ = document.getElementById("code").textContent;
-			const vscode = acquireVsCodeApi();
-			function useAdvise(){
-				console.log(vscode);
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">function: </span>
+              </div>
+              <textarea data-part="2" class="form-control" rows="4" id="function">
+			  </textarea>
+            </div>
+          <b>);</b>
+        </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <pre><code class="language-js" id="code-result"></code></pre>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <!-- <div class="mark bg-dark">
+            <div class="btn-toolbar">
+              <div class="btn-group btn-group-sm btn-block form-group" data-toggle="buttons">
+                <label class="btn btn-outline-light">
+                  <input type="radio" name="options" value="useful"> Useful
+                </label>
+                <label class="btn btn-outline-light">
+                  <input type="radio" name="options" value="rel+"> Rel+
+                </label>
+                <label class="btn btn-outline-light">
+                  <input type="radio" name="options" value="rel-"> Rel-
+                </label>
+                <label class="btn btn-outline-light">
+                  <input type="radio" name="options" value="notrel"> Not rel
+                </label>
+                <label class="btn btn-outline-light">
+                  <input type="radio" name="options" value="stupid"> Stupid
+                </label>
+                <label class="btn btn-outline-light">
+                  <input type="radio" name="options" value=""> No mark
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <textarea class="form-control" rows="3" placeholder="Комментарий"></textarea>
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-outline-info btn-block">Отправить</button>
+            </div>
+          </div> -->
+          <button class="btn btn-outline-light btn-block" onclick="useAdvise()">Вставить код</button>
+          <!--<button class="btn btn-dark btn-block" onclick="hideAdvise()">Скрыть</button>-->
+        </div>
+      </div>
+    </div>
+			<script>
+			  const vscode = acquireVsCodeApi();
+			  function useAdvise(){
+				let text_ = document.getElementById("code-result").textContent;
 				vscode.postMessage({command: 'use',text: text_})
-			}
-			function hideAdvise(){
+			  }
+			  function hideAdvise(){
 				vscode.postMessage({command: 'hide'})
-			}
-		</script>
+			  }
+
+			  var resCode = `.on(
+		'PART1',
+		function() {PART2}
+	);
+`;
+			  var fields = $('#form-edit').find('input, select, textarea, radio');
+			  fields.on('keyup change', function(ev){
+				rewriteTipRes(generateTip());
+			  });
+			  function generateTip() {
+				var code = resCode;
+				$.each(fields, function(i, f){
+				  $f = $(f);
+				  var partNum = +$f.attr('data-part');
+				  code = code.replace('PART'+partNum, $.trim($f.val()));
+				});
+
+				return code;
+			  }
+			  function rewriteTipRes(tip) {
+				var $el = $("#code-result");
+				$el.html(generateTip());
+				Prism.highlightElement($el[0]);
+			  }
+			  rewriteTipRes(generateTip());
+			  
+			</script>
 	</body>
 </html>

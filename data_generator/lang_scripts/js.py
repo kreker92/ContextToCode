@@ -36,7 +36,7 @@ def get_ids(ids, value):
 
 def parse_file (src, dst, data):
 #and value["type"] == "VariableDeclaration"
-    print(src)
+    #print(src)
     ast_raw = {}
     ast_out = []
     ids = []
@@ -63,9 +63,8 @@ def parse_file (src, dst, data):
     with open(dst.strip(), 'w') as outfile:
         json.dump(ast_out, outfile)
 		
-parsed = subprocess.check_output(["./js_parser/bin/js_parser.js", "input/input.js"])
-f = open("parsed", "w")
-f.write(parsed)
+parsed = subprocess.check_output(["/root/ContextToCode/data_generator/lang_scripts/js_parser/bin/js_parser.js", "/root/ContextToCode/data_generator/lang_scripts/input/input.js"])
+parse_file("", "/root/ContextToCode/data_generator/lang_scripts/parsed", parsed)#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
 
 #parse_file(file, "/root/js/data_picks/sandbox/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
 		

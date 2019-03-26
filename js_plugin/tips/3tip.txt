@@ -82,8 +82,8 @@
               <span class="input-group-text" id="basic-addon1">error: </span>
               </div>
               <textarea data-part="4" class="form-control" rows="4" id="error">function (content) {
-  $menucontainer.html('')
-}</textarea>
+		$menucontainer.html('')
+	}</textarea>
             </div>
             
             <div class="input-group mb-3">
@@ -91,8 +91,8 @@
               <span class="input-group-text" id="basic-addon1">success: </span>
               </div>
               <textarea data-part="5" class="form-control" rows="4" id="error">function (content) {
-  $menucontainer.html('')
-}</textarea>
+		$menucontainer.html('')
+	}</textarea>
             </div>
           <b>});</b>
         </div>
@@ -141,21 +141,20 @@
     <script>
       const vscode = acquireVsCodeApi();
       function useAdvise(){
-        let text_ = document.getElementById("code-result").textContent;
+        let text_ = document.getElementById("code-result").textContent.replace('$.ajax({', '').replace('});', '');
         vscode.postMessage({command: 'use',text: text_})
       }
       function hideAdvise(){
         vscode.postMessage({command: 'hide'})
       }
 
-      var resCode = `
-$.ajax({
-  url: PART1,
-  async: PART2,
-  type: PART3,
-  error: PART4,
-  success: PART5
-});
+      var resCode = `	$.ajax({
+		url: PART1,
+		async: PART2,
+		type: PART3,
+		error: PART4,
+		success: PART5
+	});
 `;
       var fields = $('#form-edit').find('input, select, textarea, radio');
       fields.on('keyup change', function(ev){
