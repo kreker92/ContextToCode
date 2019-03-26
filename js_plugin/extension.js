@@ -23,6 +23,12 @@ function activate(context) {
 	// The commandId parameter must match the command field in package.json
 	const commandId = 'extension.showText'
 	let disposable = vscode.commands.registerCommand(commandId, function () {
+    /* if (context.subscriptions.length > 1) {
+      for (i = context.subscriptions.length-1; i > 1;i++) {
+        var sub = context.subscriptions[i];
+        sub.dispose();
+      }
+    } */
 		const text = editor.document.getText()
 
 		let options = {
@@ -35,7 +41,7 @@ function activate(context) {
 		};
 
 		rp(options)
-			.then(function (htmlString) {
+      .then(function (htmlString) {
 				const panel = vscode.window.createWebviewPanel(
 					'tips', // Identifies the type of the webview. Used internally
 					'Подсказка jQuery', // Title of the panel displayed to the user
@@ -55,17 +61,26 @@ function activate(context) {
 							editor.edit(edit => {
 								let pos = new vscode.Position(editor.selection.start.line,
 																							 editor.selection.start.character)
-								edit.insert(pos, message.text);
+                edit.insert(pos, message.text);
+                panel.dispose()
 							});
 						  return;
-						case 'hide':
+            case 'hide':
+              panel.dispose()
 							console.log('hide');
 							return;
 						}
 					},
-					undefined,
+          undefined,
 					context.subscriptions
-				  );
+          );
+          panel.onDidDispose(
+            () => {
+              console.log('disposed');
+            },
+            null,
+            context.subscriptions
+          )
 			})
 			.catch(function(err) {
 				console.log(err);
@@ -77,7 +92,7 @@ exports.activate = activate;
 
 // this method is called when your extension is deactivated
 function deactivate() {
-	console.log('showText disactive');
+	console.log('showText disactivated');
 }
 
 module.exports = {
