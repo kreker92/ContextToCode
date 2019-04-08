@@ -49,7 +49,11 @@ public class ElementInfo {
     else if ( comparing_method.equals("type") )
       if (Utils.compare(type, ((ElementInfo)o2).type)) 
         if ( !text.isEmpty() ) 
-          return ((ElementInfo)o2).text.contains(text);
+          /**
+           * TODO:
+           * Contains or Equals?
+           */
+          return ((ElementInfo)o2).text.equals(text);
         else
           return true;
 

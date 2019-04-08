@@ -243,13 +243,13 @@ public class Generator  {
   }
 
   public void iterateCode(InnerClass[] code, Classifier t, String path, ArrayList<Vector[]> res, int limit, HashMap<Integer, Integer> map) {
+//    System.err.println("%%%%"+code[code.length-1].elements);
     for (int line = code.length-1; line >= 0; line --) {
       if ( (!t.blocking && line == code.length-1) || (/*TRIN*/t.blocking  && code[line].matches(t.classes))) {
-//        System.err.println(t.blocking+" && "+code[line].matches(t.classes));
-        if (code[line].executor_command.equals("1"))
-          map.put(0, map.get(0)+1);
-        else 
-          map.put(1, map.get(1)+1);
+//        if (code[line].executor_command.equals("1"))
+//          map.put(0, map.get(0)+1);
+//        else 
+//          map.put(1, map.get(1)+1);
         Vector[] snip = Parser.getSnippet(line, code, path, t.classes, limit);
         if (snip.length > 0) 
           res.add(snip);
@@ -257,11 +257,10 @@ public class Generator  {
     }
     for (Vector[] c : res)
       t.vs.addAll(Arrays.asList(c));
-    
-    System.err.println(map);
+//    System.err.println(map);
   }
 
-  public void snippetize() throws JsonSyntaxException, IOException {
+ /* public void snippetize() throws JsonSyntaxException, IOException {
     int summ = 0;
 
     try {
@@ -300,7 +299,7 @@ public class Generator  {
     } catch (Exception e) {
       e.printStackTrace();
     }
-  }
+  }*/
 }
 
 class PopularType {

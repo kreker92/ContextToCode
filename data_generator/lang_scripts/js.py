@@ -10,6 +10,8 @@ def is_valid (value):
         return True
 
 def is_end_node (value, ids):
+    if value["type"] == "LiteralString":
+        value["value"] = "-"
     if value["type"] != "FunctionExpression" and (value["type"] == "Program" or value["type"] == "VariableDeclarator" or value["type"] == "BlockStatement" or value["type"] == "CallExpression" or value["id"] in ids):
         return False
     else:
@@ -34,12 +36,13 @@ def get_ids(ids, value):
        else:
            ids.append(child["id"])
 
-def parse_file (src, dst, data):
+def parse_file (src, dst, o_dst, data):
 #and value["type"] == "VariableDeclaration"
     #print(src)
     ast_raw = {}
     ast_out = []
     ids = []
+    in_block = []
     #with open(data, 'r') as handle:
     parsed = json.loads(data)
     for node in parsed:
@@ -51,43 +54,54 @@ def parse_file (src, dst, data):
             for child in value["children"]:
                  if is_valid(ast_raw[child]):				 
                      value["links"].append(ast_raw[child])
+                 else:
+                     in_block += ast_raw[child]["children"]
+    print(in_block)
     for key, value in ast_raw.items():
         if is_end_node(value, ids):
            # get_text(value)
             if "links" in value:
        	        get_ids(ids, value)	
+            if value["id"] in in_block and value["type"] == "FunctionDeclaration":
+                value["type"] = "FunctionDeclarationInBlock"
             ast_out.append(value)
 
    # with open('/root/ContextToCode/data_generator/lang_scripts/data_raw.json', 'w') as outfile:
    #     json.dump(ast_raw, outfile)
     with open(dst.strip(), 'w') as outfile:
         json.dump(ast_out, outfile)
+    with open(o_dst.strip(), 'w') as outfile:
+        json.dump(parsed, outfile)
 		
-parsed = subprocess.check_output(["/root/ContextToCode/data_generator/lang_scripts/js_parser/bin/js_parser.js", "/root/ContextToCode/data_generator/lang_scripts/input/input.js"])
-parse_file("", "/root/ContextToCode/data_generator/lang_scripts/parsed", parsed)#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
+#parsed = subprocess.check_output(["/root/ContextToCode/data_generator/lang_scripts/js_parser/bin/js_parser.js", "/root/ContextToCode/data_generator/lang_scripts/input/input.js"])
+#parse_file("", "/root/ContextToCode/data_generator/lang_scripts/parsed", parsed)#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
 
 #parse_file(file, "/root/js/data_picks/sandbox/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
 		
 #f = open("/root/js/data_picks/picked", "r")
 #check = f.read()
-#			
-#with open("/root/js/programs_eval.json", 'r') as f: 
-#    jsons = f.readlines()
-#
-#with open("/root/js/programs_eval.txt", 'r') as f: 
-#    files = f.readlines()
-#
-#count = 0
+			
+with open("/root/js/programs_eval.json", 'r') as f: 
+    jsons = f.readlines()
+
+with open("/root/js/programs_eval.txt", 'r') as f: 
+    files = f.readlines()
+
+count = 0
 #print(len(jsons))
 #print(len(files))
-#for i in range(len(files)):
-#    name = files[i].split('/')[-1]
-#    k = files[i].rfind("data/")
-#    file = files[i][:k] + "/root/js/data/" + files[i][k+5:]
-#    if files[i] in check:#os.path.isfile("/root/js/data_picks/1/"+name.strip()):
-#        #data = json.loads(jsons[i])
-#        f = open("/root/js/data_picks/mask", "a")
-#        f.write(str(count)+", "+file)
-#        parse_file(file, "/root/js/data_picks/sandbox/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
-#        count += 1
+for i in range(len(files)):
+    name = files[i].split('/')[-1]
+    k = files[i].rfind("data/")
+    file = files[i][:k] + "/root/js/data/" + files[i][k+5:]
+    if True:#files[i] in check:#os.path.isfile("/root/js/data_picks/1/"+name.strip()):
+        #data = json.loads(jsons[i])
+        f = open("/root/js/data_picks/mask", "a")
+        f.write(str(count)+", "+file)
+        try:
+#            if (count < 5):
+             parse_file(file, "/root/js/data_picks/sandbox/"+str(count), "/root/js/data_picks/originals/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
+        except:
+            print("Can't parse file"+file)
+        count += 1
 					

@@ -1,10 +1,12 @@
 package tmt.dsl.formats.context;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import tmt.conf.Conf;
 import tmt.dsl.Classifier;
+import tmt.dsl.formats.context.in.ElementInfo;
 import tmt.dsl.formats.context.in.InnerClass;
 
 public class Parser {
@@ -34,17 +36,21 @@ public class Parser {
   public static Vector[] getSnippet(int line_num, InnerClass[] code, String path, ArrayList<InnerClass> keys, int  limit) {
     ArrayList<Vector> res = new ArrayList<Vector>();
     ArrayList<String> sequence = new ArrayList<>();
+    
+    InnerClass start_l = new InnerClass("falsekey", "1", "Function");
+    start_l.elements.add(new ElementInfo("type", "FunctionDeclaration", ""));
+    
+    ArrayList<InnerClass> start = new ArrayList<InnerClass>(Arrays.asList(start_l));
 
     int count = 0;
     for (int i = line_num; i >= 0; i --) {
       String line = code[i].line_text;
-      if (i != line_num && (isStart(code[i], keys) || withContext(sequence, limit, count))) 
+      if (i != line_num && (isStart(code[i], keys, start) || withContext(sequence, limit, count))) 
         break;
-
       String line_clean = clean(line);
 //      System.err.println(i+"!"+path);
       if (hasSense(line_clean)) {
-        Vector v = new Vector(code[i], i, line, i == line_num, count, path, line_num);
+        Vector v = new Vector(code[i], i, i == line_num, count, path, line_num);
         if (!v.isEmpty()) {
           res.add(0, v);
           sequence.add(code[i].executor_command);
@@ -92,14 +98,17 @@ public class Parser {
       return true;
   }
 
-  private static boolean isStart(InnerClass code, ArrayList<InnerClass> keys) {
+  private static boolean isStart(InnerClass code, ArrayList<InnerClass> keys, ArrayList<InnerClass> start) {
     if (Conf.lang.equals("java")) {
       if (code.line_text.contains("public ") || code.line_text.contains("private ") || code.line_text.contains("protected ") ) // || code.matches(keys))
         return true;
       else
         return false;
     } else if (Conf.lang.equals("javascript")) {
-      return false;
+      if (code.matches(start))
+        return true;
+      else
+        return false;
     } else {
       return false;
     }
