@@ -45,6 +45,7 @@ public class Parser {
     int count = 0;
     for (int i = line_num; i >= 0; i --) {
       String line = code[i].line_text;
+      
       if (i != line_num && (isStart(code[i], keys, start) || withContext(sequence, limit, count))) 
         break;
       String line_clean = clean(line);
@@ -92,10 +93,14 @@ public class Parser {
   }
 
   public static boolean hasSense(String line) {
-    if (line.equals("}") || line.equals("{") || line.isEmpty())
-      return false;
-    else
+    if (Conf.lang.equals("java")) {
+      if (line.equals("}") || line.equals("{") || line.isEmpty())
+        return false;
+      else
+        return true;
+    } else { //if (Conf.lang.equals("javascript")) {
       return true;
+    }
   }
 
   private static boolean isStart(InnerClass code, ArrayList<InnerClass> keys, ArrayList<InnerClass> start) {
@@ -105,8 +110,11 @@ public class Parser {
       else
         return false;
     } else if (Conf.lang.equals("javascript")) {
-      if (code.matches(start))
+      if (code.matches(start)) {
+//        System.err.println("#"+code.elements);
+//        System.exit(1);
         return true;
+      }
       else
         return false;
     } else {

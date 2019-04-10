@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import com.google.gson.Gson;
+
 import tmt.conf.Conf;
 import tmt.dsl.formats.context.in.ElementInfo;
 import tmt.dsl.formats.context.in.InnerClass;
@@ -44,8 +46,8 @@ public class Vector {
     parent_id = parent_id_;
   }*/
   
-  public Vector(InnerClass c, int i, String line, boolean b, int level_, String path_, int line_num_) {
-    origin = line;//.toLowerCase().replaceAll("[^a-z]", " ").replaceAll(" +", " ").trim();;
+  public Vector(InnerClass c, int i, boolean b, int level_, String path_, int line_num_) {
+    origin = new Gson().toJson(c.elements);//.toLowerCase().replaceAll("[^a-z]", " ").replaceAll(" +", " ").trim();;
     line_num = c.line_num;
     path = path_;
 
@@ -110,7 +112,7 @@ public class Vector {
   }
 
   public String toString() {
-    return strings+" - "+origin+" - "+level;
+    return program;//strings+" - "+origin+" - "+level;
   }
 
   public String getProgram() {

@@ -84,7 +84,7 @@ def generate_addition( dir ):
     for row_r in parsed:
         temp = []
         pr = transform(row_r, temp, "", mask, count_)
-        if len(mask) > 29995:
+        if len(mask) > 290995:
             break
 
         if pr != "1" or progs["target"] > (progs["nontarget"]*2.5):
@@ -101,7 +101,7 @@ def generate_addition( dir ):
  
     progs["mask"] = len(mask)
     print(progs)
-    print("##"+str(count))
+    print("##"+str(count)+" - "+dir)
     os.mkdir( domain_path );
     with open(domain_path+'/test.pik', 'wb') as f:
         pickle.dump(test_data, f)
@@ -119,10 +119,14 @@ def generate_addition( dir ):
     #         f.write(str(c))
 
 def transform(row_r, dataset, mask_file, mask, count_):
-    row = collections.OrderedDict(sorted(row_r.items()))
+    row_ = {}
+    for key, values in row_r.items():
+       row_[int(key)] = values
+    row = collections.OrderedDict(sorted(row_.items()))
     with_mask_file = False
     trace = []
     cur_prog = 0
+    contains_connect = False;
 
     if mask_file:
         with_mask_file = True

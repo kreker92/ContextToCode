@@ -54,9 +54,9 @@ def parse_file (src, dst, o_dst, data):
             for child in value["children"]:
                  if is_valid(ast_raw[child]):				 
                      value["links"].append(ast_raw[child])
-                 else:
+                 elif "children" in ast_raw[child]:
                      in_block += ast_raw[child]["children"]
-    print(in_block)
+#    print(in_block)
     for key, value in ast_raw.items():
         if is_end_node(value, ids):
            # get_text(value)
@@ -100,7 +100,7 @@ for i in range(len(files)):
         f.write(str(count)+", "+file)
         try:
 #            if (count < 5):
-             parse_file(file, "/root/js/data_picks/sandbox/"+str(count), "/root/js/data_picks/originals/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
+            parse_file(file, "/root/js/data_picks/sandbox/"+str(count), "/root/js/data_picks/originals/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
         except:
             print("Can't parse file"+file)
         count += 1
