@@ -28,8 +28,9 @@ function activate(context) {
         var sub = context.subscriptions[i];
         sub.dispose();
       }
-    } */
-		const text = editor.document.getText()
+		} */
+    const text = editor.document.getText()
+
 
 		let options = {
 			method: 'POST',
@@ -41,9 +42,228 @@ function activate(context) {
 		};
 
 		rp(options)
-      .then(function (htmlString) {
+      .then(function (htmlString1) {
+				let htmlString = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подсказка jQuery</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-javascript.min.js" integrity="sha256-G5C8j/0gBEHgf/x60UZQY5QrKPWdUo2Pgcu4OgU5q7w=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.9.1/beautify.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.9.1/beautify-css.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.9.1/beautify-html.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism-okaidia.css" />
+    <style>
+      p, button, div, a {
+        color: #DDD;
+      }
+      a:hover {
+        color: #6c757d;
+      }
+      hr {
+        border-top: 1px solid rgba(255,255,255,.1);
+      }
+      input[type="radio"] {
+        display:none;
+      }
+      .btn-toolbar label {
+        cursor: pointer;
+      }
+      @media (min-width: 767px) {
+        .language-js {
+          height: 100%;
+          margin: -5px !important;
+        }
+      }
+      .paddingTop10 {
+        padding-top: 10px;
+      }
+    </style>
+  </head>
+  <body class="bg-dark">
+    <div class="container-fluid">
+      <div class="tabs">
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="tip-1-tab" data-toggle="tab" href="#tip-1" role="tab" aria-controls="tip-1" aria-selected="true">jQuery.ajax</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link"        id="tip-2-tab" data-toggle="tab" href="#tip-2" role="tab" aria-controls="tip-2" aria-selected="false">alert</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link"        id="tip-3-tab" data-toggle="tab" href="#tip-3" role="tab" aria-controls="tip-3" aria-selected="false">console.log</a>
+          </li>
+        </ul>
+      </div>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="tip-1" role="tabpanel" aria-labelledby="tip-1-tab">
+          <div class="code-wrapper">
+            <h3>Функция отправки AJAX запроса библиотеки jQuery .ajax()</h3>
+            <p>С помощи этой функции вы можете отсылать запросы AJAX из скрипта JavaScript.</p>
+            <p>Параметры: <b>url</b> - адрес, на который будте отправлен запрос, <b>async</b> - true, если вы хотите чтобы был отправлен асинхронный запрос (по умолчанию - false),
+            <b>type</b> - тип запроса GET или POST (по умолчанию, GET), <b>error</b> - функция, которая будет выполнена в случае ошибки при выполнении отправки запроса <b>success</b> - функция, которая будет выполнена в случае успешного выполнения запроса</p>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-12 col-md-6">
+              <div id="form-edit">
+                <p><b>$.ajax({</b></p>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">url: </span>
+                  </div>
+                  <input data-part="1" type="text" class="form-control" aria-label="URL, на который будет отправлен запрос" aria-describedby="basic-addon1" />
+                </div>
+                
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">async: </span>
+                  </div>
+                  <div class="input-group-append">
+                    <select data-part="2" class="form-control" id="sel1">
+                    <option value="false">false</option>
+                    <option value="true">true</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">type: </span>
+                  </div>
+                  <div class="input-group-append">
+                    <select data-part="3" class="form-control" id="sel1">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">error: </span>
+                  </div>
+                  <textarea data-part="4" class="form-control" rows="4" id="error">function (content) {
+    $menucontainer.html('')
+}</textarea>
+                </div>
+                
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">success: </span>
+                  </div>
+                  <textarea data-part="5" class="form-control" rows="4" id="error">function (content) {
+    $menucontainer.html('')
+}</textarea>
+                </div>
+              <b>});</b>
+            </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <pre><code class="language-js" id="code-result"></code></pre>
+            </div>
+          </div>
+          <div class="row paddingTop10">
+            <div class="col-12">
+              <!-- <div class="mark bg-dark">
+                <div class="btn-toolbar">
+                  <div class="btn-group btn-group-sm btn-block form-group" data-toggle="buttons">
+                    <label class="btn btn-outline-light">
+                      <input type="radio" name="options" value="useful"> Useful
+                    </label>
+                    <label class="btn btn-outline-light">
+                      <input type="radio" name="options" value="rel+"> Rel+
+                    </label>
+                    <label class="btn btn-outline-light">
+                      <input type="radio" name="options" value="rel-"> Rel-
+                    </label>
+                    <label class="btn btn-outline-light">
+                      <input type="radio" name="options" value="notrel"> Not rel
+                    </label>
+                    <label class="btn btn-outline-light">
+                      <input type="radio" name="options" value="stupid"> Stupid
+                    </label>
+                    <label class="btn btn-outline-light">
+                      <input type="radio" name="options" value=""> No mark
+                    </label>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <textarea class="form-control" rows="3" placeholder="Комментарий"></textarea>
+                </div>
+                <div class="form-group">
+                  <button type="button" class="btn btn-outline-info btn-block">Отправить</button>
+                </div>
+              </div> -->
+              <button class="btn btn-outline-light btn-block" onclick="useAdvise()">Вставить код</button>
+              <!--<button class="btn btn-dark btn-block" onclick="hideAdvise()">Скрыть</button>-->
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade"             id="tip-2" role="tabpanel" aria-labelledby="tip-2-tab">tip-2</div>
+        <div class="tab-pane fade"             id="tip-3" role="tabpanel" aria-labelledby="tip-3-tab">tip-3</div>
+      </div>
+    </div>
+    <script>
+      // let acquireVsCodeApi = function(){}; // to test like usual html page
+
+
+      const vscode = acquireVsCodeApi();
+      function useAdvise(){
+        let text_ = document.getElementById("code-result").textContent.replace('$.ajax({', '').replace('});', '');
+        vscode.postMessage({command: 'use',text: text_})
+      }
+      function hideAdvise(){
+        vscode.postMessage({command: 'hide'})
+      }
+
+      var resCode = \`  $.ajax({
+					url: PART1,
+					async: PART2,
+					type: PART3,
+					error: PART4,
+					success: PART5
+				});
+\`;
+      var fields = $('#form-edit').find('input, select, textarea, radio');
+      fields.on('keyup change', function(ev){
+        rewriteTipRes(generateTip());
+      });
+      function generateTip() {
+        var code = resCode;
+        $.each(fields, function(i, f){
+          $f = $(f);
+          var partNum = +$f.attr('data-part');
+          code = code.replace('PART'+partNum, $.trim($f.val()));
+        });
+
+        return js_beautify(code, { indent_size: 4 });
+      }
+      function rewriteTipRes(tip) {
+        var $el = $("#code-result");
+        $el.html(generateTip());
+        Prism.highlightElement($el[0]);
+      }
+      rewriteTipRes(generateTip());
+      
+    </script>
+  </body>
+</html>`;
+
+        const listener = function (event) {
+          console.log('It happened', event);
+        };
+        vscode.window.onDidChangeActiveTextEditor(listener)
+
 				const panel = vscode.window.createWebviewPanel(
-					'tips', // Identifies the type of the webview. Used internally
+					'tips', // Identifies the type of the webview.. Used internally
 					'Подсказка jQuery', // Title of the panel displayed to the user
 					vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
 					{
@@ -51,28 +271,31 @@ function activate(context) {
 						enableScripts: true
 					  } // Webview options. More on these later.
 				  );
-			      panel.webview.html = htmlString;
+			    panel.webview.html = htmlString;
 					// Handle messages from the webview
 				  panel.webview.onDidReceiveMessage(
-					message => {
-					  switch (message.command) {
-						case 'use':
-							console.log('use');
-							editor.edit(edit => {
-								let pos = new vscode.Position(editor.selection.start.line,
-																							 editor.selection.start.character)
-                edit.insert(pos, message.text);
-                panel.dispose()
-							});
-						  return;
-            case 'hide':
-              panel.dispose()
-							console.log('hide');
-							return;
-						}
-					},
-          undefined,
-					context.subscriptions
+						message => {
+							switch (message.command) {
+							case 'use':
+								console.log('use');
+								editor.edit(edit => {
+									let pos = new vscode.Position(editor.selection.start.line,
+																								editor.selection.start.character)
+									edit.insert(pos, message.text);
+									panel.dispose()
+								});
+                return;
+              case 'typing':
+                console.log('typing');
+                panel.webview.html = htmlString;
+							case 'hide':
+								panel.dispose()
+								console.log('hide');
+								return;
+              }
+						},
+						undefined,
+						context.subscriptions
           );
           panel.onDidDispose(
             () => {
