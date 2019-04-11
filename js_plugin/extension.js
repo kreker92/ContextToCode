@@ -95,15 +95,12 @@ function activate(context) {
             <a class="nav-link active" id="tip-1-tab" data-toggle="tab" href="#tip-1" role="tab" aria-controls="tip-1" aria-selected="true">jQuery.ajax</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link"        id="tip-2-tab" data-toggle="tab" href="#tip-2" role="tab" aria-controls="tip-2" aria-selected="false">alert</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link"        id="tip-3-tab" data-toggle="tab" href="#tip-3" role="tab" aria-controls="tip-3" aria-selected="false">console.log</a>
+            <a class="nav-link" id="tip-2-tab" data-toggle="tab" href="#tip-2" role="tab" aria-controls="tip-2" aria-selected="false">alert</a>
           </li>
         </ul>
       </div>
       <div class="tab-content">
-        <div class="tab-pane fade show active" id="tip-1" role="tabpanel" aria-labelledby="tip-1-tab">
+        <div class="tab-pane fade show active" id="tip-1" role="tabpanel" aria-labelledby="tip-1-tab" data-tip="1">
           <div class="code-wrapper">
             <h3>Функция отправки AJAX запроса библиотеки jQuery .ajax()</h3>
             <p>С помощи этой функции вы можете отсылать запросы AJAX из скрипта JavaScript.</p>
@@ -113,21 +110,21 @@ function activate(context) {
           <hr />
           <div class="row">
             <div class="col-12 col-md-6">
-              <div id="form-edit">
+              <div class="form-edit">
                 <p><b>$.ajax({</b></p>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                  <span class="input-group-text" id="basic-addon1">url: </span>
+                  <span class="input-group-text">url:</span>
                   </div>
-                  <input data-part="1" type="text" class="form-control" aria-label="URL, на который будет отправлен запрос" aria-describedby="basic-addon1" />
+                  <input data-part="1" type="text" class="form-control" aria-label="URL, на который будет отправлен запрос" />
                 </div>
                 
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                  <span class="input-group-text" id="basic-addon1">async: </span>
+                  <span class="input-group-text">async:</span>
                   </div>
                   <div class="input-group-append">
-                    <select data-part="2" class="form-control" id="sel1">
+                    <select data-part="2" class="form-control">
                     <option value="false">false</option>
                     <option value="true">true</option>
                     </select>
@@ -136,10 +133,10 @@ function activate(context) {
                 
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                  <span class="input-group-text" id="basic-addon1">type: </span>
+                  <span class="input-group-text">type:</span>
                   </div>
                   <div class="input-group-append">
-                    <select data-part="3" class="form-control" id="sel1">
+                    <select data-part="3" class="form-control">
                     <option value="GET">GET</option>
                     <option value="POST">POST</option>
                     </select>
@@ -148,26 +145,28 @@ function activate(context) {
                 
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                  <span class="input-group-text" id="basic-addon1">error: </span>
+                  <span class="input-group-text">error:</span>
                   </div>
-                  <textarea data-part="4" class="form-control" rows="4" id="error">function (content) {
-    $menucontainer.html('')
-}</textarea>
+                  <textarea data-part="4" class="form-control" rows="4">function (content) {
+                      $menucontainer.html('')
+                    }
+                  </textarea>
                 </div>
                 
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                  <span class="input-group-text" id="basic-addon1">success: </span>
+                  <span class="input-group-text">success:</span>
                   </div>
-                  <textarea data-part="5" class="form-control" rows="4" id="error">function (content) {
-    $menucontainer.html('')
-}</textarea>
+                  <textarea data-part="5" class="form-control" rows="4">function (content) {
+                      $menucontainer.html('')
+                    }
+                  </textarea>
                 </div>
-              <b>});</b>
-            </div>
+                <b>});</b>
+              </div>
             </div>
             <div class="col-12 col-md-6">
-              <pre><code class="language-js" id="code-result"></code></pre>
+              <pre><code class="language-js code-result"></code></pre>
             </div>
           </div>
           <div class="row paddingTop10">
@@ -202,68 +201,120 @@ function activate(context) {
                   <button type="button" class="btn btn-outline-info btn-block">Отправить</button>
                 </div>
               </div> -->
-              <button class="btn btn-outline-light btn-block" onclick="useAdvise()">Вставить код</button>
+              <button class="btn btn-outline-light btn-block" onclick="useAdvise(1)">Вставить код</button>
               <!--<button class="btn btn-dark btn-block" onclick="hideAdvise()">Скрыть</button>-->
             </div>
           </div>
         </div>
-        <div class="tab-pane fade"             id="tip-2" role="tabpanel" aria-labelledby="tip-2-tab">tip-2</div>
-        <div class="tab-pane fade"             id="tip-3" role="tabpanel" aria-labelledby="tip-3-tab">tip-3</div>
+        <div class="tab-pane fade" id="tip-2" role="tabpanel" aria-labelledby="tip-2-tab" data-tip="2">
+          <div class="code-wrapper">
+            <h3>Функция AJAX1</h3>
+            <p>С помощи этой функции вы можете отсылать запросы AJAX1 из скрипта JavaScript.</p>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-12 col-md-6">
+              <div class="form-edit">
+                <p><b>$.ajax1({</b></p>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                  <span class="input-group-text">url:</span>
+                  </div>
+                  <input data-part="1" type="text" class="form-control" aria-label="URL, на который будет отправлен запрос" />
+                </div>
+                
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                  <span class="input-group-text">success:</span>
+                  </div>
+                  <textarea data-part="2" class="form-control" rows="4">function (content) {
+                      $menucontainer.html('')
+                    }
+                  </textarea>
+                </div>
+                <b>});;</b>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <pre><code class="language-js code-result"></code></pre>
+            </div>
+          </div>
+          <div class="row paddingTop10">
+            <div class="col-12">
+              <button class="btn btn-outline-light btn-block" onclick="useAdvise(2)">Вставить код</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <script>
       // let acquireVsCodeApi = function(){}; // to test like usual html page
-
-
       const vscode = acquireVsCodeApi();
-      function useAdvise(){
-        let text_ = document.getElementById("code-result").textContent.replace('$.ajax({', '').replace('});', '');
+      function useAdvise(tabId){
+        var curResCode = resCode['tab'+tabId]
+        let text_ = $(document).find("#tip-"+tabId).find(".code-result").text().replace(curResCode.replace1, '').replace(curResCode.replace2, '');
         vscode.postMessage({command: 'use',text: text_})
       }
       function hideAdvise(){
         vscode.postMessage({command: 'hide'})
       }
 
-      var resCode = \`  $.ajax({
-					url: PART1,
-					async: PART2,
-					type: PART3,
-					error: PART4,
-					success: PART5
-				});
-\`;
-      var fields = $('#form-edit').find('input, select, textarea, radio');
-      fields.on('keyup change', function(ev){
-        rewriteTipRes(generateTip());
+      var resCode = {
+        tab1: {
+          replace1: '$.ajax({',
+          replace2: '});',
+          template: \`  $.ajax({
+            url: PART1,
+            async: PART2,
+            type: PART3,
+            error: PART4,
+            success: PART5
+          });
+          \`
+        },
+        tab2: {
+          replace1: '$.ajax1({',
+          replace2: '});;',
+          template: \`  $.ajax1({
+            url: PART1,
+            success: PART2
+          });;
+          \`
+        }
+      };
+
+      $('.tab-pane').each(function(i, tab) {
+        $(tab).find('input, select, textarea, radio').on('keyup change', function(ev){
+          rewriteTipRes(tab, generateTip($(tab).attr('data-tip')));
+        });
+        rewriteTipRes(tab, generateTip($(tab).attr('data-tip')));
       });
-      function generateTip() {
-        var code = resCode;
-        $.each(fields, function(i, f){
+      var fields = $('.form-edit').find('input, select, textarea, radio');
+      
+
+      function generateTip(tabId) {
+        var res = resCode['tab'+tabId].template;
+        $("#tip-"+tabId).find('input, select, textarea, radio').each(function(i, f) {
           $f = $(f);
           var partNum = +$f.attr('data-part');
-          code = code.replace('PART'+partNum, $.trim($f.val()));
+          res = res.replace('PART'+partNum, $.trim($f.val()));
         });
 
-        return js_beautify(code, { indent_size: 4 });
+        return js_beautify(res, { indent_size: 4 });
       }
-      function rewriteTipRes(tip) {
-        var $el = $("#code-result");
-        $el.html(generateTip());
+
+      function rewriteTipRes(tab, tip) {
+        var $el = $(tab).find(".code-result");
+        $el.html(tip);
         Prism.highlightElement($el[0]);
       }
-      rewriteTipRes(generateTip());
       
     </script>
   </body>
 </html>`;
 
-        const listener = function (event) {
-          console.log('It happened', event);
-        };
-        vscode.window.onDidChangeActiveTextEditor(listener)
-
 				const panel = vscode.window.createWebviewPanel(
-					'tips', // Identifies the type of the webview.. Used internally
+					'tips', // Identifies the type of the webview. Used internally
 					'Подсказка jQuery', // Title of the panel displayed to the user
 					vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
 					{
