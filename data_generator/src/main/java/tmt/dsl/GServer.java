@@ -93,10 +93,90 @@ public class GServer {
       //      doPattern(g, templates.get(0));
     }
     else if (swtch == INFERENCE) {
-      Classifier c = new Classifier(Conf.templates);
-      res = doInference(g, c, code);
+     /* Classifier c = null;
+      if (Conf.lang.equals("java"))
+        c = new Classifier(Conf.templates);
+      else if (Conf.lang.equals("javascript"))
+        c = createJSUseCaseInference(); */ 
+      
+      if (Conf.lang.equals("java"))
+        createEvalCasesJava(g, templates);
+      else if (Conf.lang.equals("javascript"))
+        createJSUseCaseInference(g, templates); 
+      
+      res = doInference(g, templates.get(0), code);
     }
     return res;
+  }
+
+  private static void createJSUseCaseInference(Generator g, ArrayList<Classifier> templates) throws IOException {
+    Classifier t1 = new Classifier("sandbox/");
+    t1.domain = "/extend/";
+   
+    InnerClass ic = new InnerClass("truekey", "7", "Property:extend");
+    LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
+    temp6_1.put("stab_req","");
+    temp6_1.put("literal1",".css()");
+    ic.elements.add(new ElementInfo("type", "CallExpression", "Property:extend"));
+    ic.elements.add(new ElementInfo("type", "Identifier", "$"));
+    ic.scheme.add(temp6_1);
+    ic.description = " Edit CSS. ";
+    
+    InnerClass ic1 = new InnerClass("truekey", "6", "Property:height");
+    LinkedHashMap<String, String> temp8_1 = new LinkedHashMap<>();
+    temp8_1.put("stab_req","");
+    temp8_1.put("literal1",".css()");
+    ic1.elements.add(new ElementInfo("type", "CallExpression", "Property:height"));
+    ic1.elements.add(new ElementInfo("type", "Identifier", "$"));
+    ic1.scheme.add(temp8_1);
+    ic1.description = " Edit CSS. ";
+    
+    InnerClass ic2 = new InnerClass("truekey", "5", "Property:html");
+    LinkedHashMap<String, String> temp9_1 = new LinkedHashMap<>();
+    temp9_1.put("stab_req","");
+    temp9_1.put("literal1",".css()");
+    ic2.elements.add(new ElementInfo("type", "CallExpression", "Property:html"));
+    ic2.elements.add(new ElementInfo("type", "Identifier", "$"));
+    ic2.scheme.add(temp9_1);
+    ic2.description = " Edit CSS. ";
+    
+    InnerClass ic3 = new InnerClass("truekey", "2", "Property:target");
+    LinkedHashMap<String, String> temp5_1 = new LinkedHashMap<>();
+    temp5_1.put("stab_req","");
+    temp5_1.put("literal1",".css()");
+    ic3.elements.add(new ElementInfo("type", "CallExpression", "Property:target"));
+    ic3.elements.add(new ElementInfo("type", "Identifier", "$"));
+    ic3.scheme.add(temp5_1);
+    ic3.description = " Edit CSS. ";
+    
+    InnerClass ic4 = new InnerClass("truekey", "3", "Property:val");
+    LinkedHashMap<String, String> temp4_1 = new LinkedHashMap<>();
+    temp4_1.put("stab_req","");
+    temp4_1.put("literal1",".css()");
+    ic4.elements.add(new ElementInfo("type", "CallExpression", "Property:val"));
+    ic4.elements.add(new ElementInfo("type", "Identifier", "$"));
+    ic4.scheme.add(temp4_1);
+    ic4.description = " Edit CSS. ";
+    
+    InnerClass ic5 = new InnerClass("truekey", "4", "Property:css");
+    LinkedHashMap<String, String> temp3_1 = new LinkedHashMap<>();
+    temp3_1.put("stab_req","");
+    temp3_1.put("literal1",".css()");
+    ic5.elements.add(new ElementInfo("type", "CallExpression", "Property:css"));
+    ic5.elements.add(new ElementInfo("type", "Identifier", "$"));
+    ic5.scheme.add(temp3_1);
+    ic5.description = " Edit CSS. ";
+
+    t1.classes.add(ic);
+    t1.classes.add(ic1);
+    t1.classes.add(ic2);
+    t1.classes.add(ic3);
+    t1.classes.add(ic4);
+    t1.classes.add(ic5);
+    
+//    t1.classes.add(background_class);
+//    t1.domain = folder;
+    templates.add(t1);
   }
 
   private static void createUseCasesJava(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
@@ -173,7 +253,7 @@ public class GServer {
 
   private static void createUseCasesJavaScript(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
     Classifier t1 = new Classifier("sandbox/");
-    t1.domain = "/data_picks/";
+    t1.domain = "/alert/";
     
    /* InnerClass background_class = new InnerClass("falsekey", "1", type);
     background_class.elements.add(new ElementInfo("ast_type", type, null));
@@ -187,8 +267,7 @@ public class GServer {
     
     /* background class */
     InnerClass background_class = new InnerClass("falsekey", "1", "Property:AnyTime");
-    background_class.elements.add(new ElementInfo("type", "CallExpression", "Property:"));
-    background_class.elements.add(new ElementInfo("type", "Identifier", "$"));
+    background_class.elements.add(new ElementInfo("type", "Identifier", "Number"));
     LinkedHashMap<String, String> temp7_1 = new LinkedHashMap<>();
     temp7_1.put("literal1","String mCursorString = ");
     temp7_1.put("literal2",".getString(int id))");
@@ -197,12 +276,12 @@ public class GServer {
     /* background class */
 
 
-    InnerClass ic = new InnerClass("truekey", "4", "Property:css");
+    InnerClass ic = new InnerClass("truekey", "7", "alert");
     LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
     temp6_1.put("stab_req","");
     temp6_1.put("literal1",".css()");
-    ic.elements.add(new ElementInfo("type", "CallExpression", "Property:css"));
-    ic.elements.add(new ElementInfo("type", "Identifier", "$"));
+    ic.elements.add(new ElementInfo("type", "CallExpression", null));
+    ic.elements.add(new ElementInfo("type", "Identifier", "alert"));
     ic.scheme.add(temp6_1);
     ic.description = " Edit CSS. ";
 
@@ -241,27 +320,6 @@ public class GServer {
 //    System.exit(1);
   }
 
-  private static ArrayList<HashMap<String, String>> doInference(Generator g, Classifier classifier, InnerClass[] code) throws IOException{
-    for ( InnerClass c : code )
-      c.executor_command = "1";
-
-    ArrayList<Vector[]> res = new ArrayList<>();
-
-    g.loadCode(code, g.ASC, classifier);
-    
-    g.iterateCode(code, classifier, "inference", res, 5, null);
-
-    ArrayList<HashMap<String, String>> snippets = null;//g.fromCache(classifier.vs);
-
-    if (snippets != null)
-        return snippets;
-    else {
-        ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(classifier);
-
-        return g.filter_through_npi(out, classifier);
-    }
-  }
-
   private static void doEval(Generator g, Classifier t) throws IOException {
 
     evalCounter c;
@@ -275,13 +333,13 @@ public class GServer {
 //    HashMap<Integer, ArrayList<ArrayList<Integer>>> results1 = new HashMap<>();
 
     int count = 0;
-    c = new evalCounter(t.classes.size()+4);
+    c = new evalCounter(t.classes.size()+8);
     
     HashMap<String, Integer> counter = new HashMap<>();
     counter.put("no", 0);
     counter.put("yes", 0);
-    System.err.println(Conf.root+t.folder+"folder1");
-    for (File f : new File(Conf.root+t.folder+"folder1").listFiles()) {
+
+    for (File f : new File(Conf.root+t.folder).listFiles()) {
       folder1.put(count, f.getPath());
       count ++;
     }
@@ -391,12 +449,17 @@ public class GServer {
 //    InnerClass[] code = new Gson().fromJson(Utils.readFile(f.getValue()), InnerClass[].class);
     InnerClass[] code = getRaw(f.getValue());
     g.loadCode(code, g.ASC, t);
+    
+    HashMap<Integer, Integer> map = new HashMap<>();
+    map.put(0, 0);
+    map.put(1, 0);
+
 
     for (int carret = code.length; carret > 2; carret --) {
       ArrayList<Vector[]> res = new ArrayList<>();
       t.clear();
 
-      g.iterateCode(Arrays.copyOfRange(code, 0, carret), t, f.getValue(), res, 5, null);
+      g.iterateCode(Arrays.copyOfRange(code, 0, carret), t, f.getValue(), res, 5, map);
        
       ArrayList<HashMap<Integer, Step>> info = g.setTrainAndTest(t);
 
@@ -417,7 +480,9 @@ public class GServer {
         
         System.err.println(counter+" * "+c);
         
-//        if (counter.get("no") > 2820)
+//        if (response.size() > 0)
+//        
+////        if (counter.get("no") > 2820)
 //          System.exit(1);
       }
       }
@@ -458,26 +523,27 @@ public class GServer {
     map.put(1, 0);
 
     for (File f : files) {
-//        if (f.getPath().contains("97827446")) {
+//      if (f.getPath().contains("/16804")) {
 
-      t.clear();
+        t.clear();
 
-      InnerClass[] code = getRaw(f.getPath());
-//      System.exit(1);
-      g.loadCode(code, g.ASC, t);
+        InnerClass[] code = getRaw(f.getPath());
+        //      Utils.writeFile1(new Gson().toJson(code), Conf.root+"/classifiers/"+t.domain+"/all.json", false);
+        //      System.exit(1);
+        g.loadCode(code, g.ASC, t);
 
-      g.iterateCode(code, t, f.getPath(), res, 3, map);
+        g.iterateCode(code, t, f.getPath(), res, 3, map);
 
-   /*   for ( InnerClass c : code )
-        if(c.matches(t.classes))
-    	    popular.add(c);*/
-      
-      count ++;
-      
-      System.err.println("count: "+count);
-//      if (count > 1000) 
-//    	  break;  
-////        }
+//        /*   for ( InnerClass c : code )
+//        if(c.matches(t.classes))
+//    	    popular.add(c);*/
+
+        count ++;
+
+        System.err.println("count: "+count);
+        //      if (count > 1000) 
+        //    	  break;  
+//      }
     }
 
     /*Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), Conf.root+"/pop_lines", false);
@@ -485,6 +551,54 @@ public class GServer {
     System.exit(1);*/
     g.setTrainAndTest(t);
     t.clear();
+  }
+  
+  private static ArrayList<HashMap<String, String>> doInference(Generator g, Classifier t, InnerClass[] code_) throws IOException {
+    /*  for ( InnerClass c : code )
+      c.executor_command = "1";
+
+    ArrayList<Vector[]> res = new ArrayList<>();
+
+    g.loadCode(code, g.ASC, classifier);
+
+    HashMap<Integer, Integer> map = new HashMap<>();
+    map.put(0, 0);
+    map.put(1, 0);
+
+    g.iterateCode(code, classifier, "inference", res, 5, map);
+
+    ArrayList<HashMap<String, String>> snippets = null;//g.fromCache(classifier.vs);
+
+    if (snippets != null)
+        return snippets;
+    else {
+        ArrayList<HashMap<Integer, Step>> out = g.setTrainAndTest(classifier);
+
+        return g.filter_through_npi(out, classifier);
+    } */
+
+    t.blocking = false;
+    
+    g.loadCode(code_, g.ASC, t);
+
+    // for (int carret = code_.length; carret > 2; carret --) {
+    ArrayList<Vector[]> res = new ArrayList<>();
+
+    g.iterateCode(code_, t, "inference", res, 5, null);
+
+    ArrayList<HashMap<Integer, Step>> info = g.setTrainAndTest(t);
+
+    for (HashMap<Integer, Step> i : info) {
+    	ArrayList<HashMap<Integer, Step>> send = new ArrayList<>();
+    	send.add(i);
+
+    	ArrayList<HashMap<String, String>> response = g.filter_through_npi(send, t);
+    	System.err.println("length: "+code_.length+", response:"+response);
+    	return response;
+    }
+    //  }
+
+    return null;
   }
   
   private static InnerClass[] getRaw(String f) throws JsonSyntaxException, IOException {
@@ -762,7 +876,7 @@ class evalCounter {
         else
           incorrect_prediction += 1;
     
-//        System.err.println(res+" * "+executor_command+" * "+correctness+" * "+classes_counter);
+        System.err.println(res+" * "+executor_command+" * "+correctness+" * "+classes_counter);
         
         classes_counter.get(executor_command).put(correctness, classes_counter.get(executor_command).get(correctness)+1);
       } 
