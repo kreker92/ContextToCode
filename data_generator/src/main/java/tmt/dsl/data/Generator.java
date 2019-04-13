@@ -126,7 +126,7 @@ public class Generator  {
       
       if (pmp.is_continue()) {
         long time = System.currentTimeMillis();  
-        HttpPost httppost = new HttpPost("http://localhost:8081/");
+        HttpPost httppost = new HttpPost("http://78.46.103.68:8081/");
 
         //THREAD SAFE ABORT OPERATION: http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html#d5e143
         String response = Utils.read(httppost, httpclient, pmp.getContext(), "http://78.46.103.68:8081/");
@@ -242,22 +242,25 @@ public class Generator  {
     }
   }
 
-  public void iterateCode(InnerClass[] code, Classifier t, String path, ArrayList<Vector[]> res, int limit, HashMap<Integer, Integer> map) {
+  public void iterateCode(InnerClass[] code, Classifier t, String path, ArrayList<Vector[]> res, int limit, HashMap<String, Integer> map) {
 //    System.err.println("%%%%"+code[code.length-1].elements);
     for (int line = code.length-1; line >= 0; line --) {
       if ( (!t.blocking && line == code.length-1) || (/*TRIN*/t.blocking  && code[line].matches(t.classes))) {
-//        if (code[line].executor_command.equals("1"))
-//          map.put(0, map.get(0)+1);
-//        else 
-//          map.put(1, map.get(1)+1);
-        Vector[] snip = Parser.getSnippet(line, code, path, t.classes, limit);
+       Vector[] snip = Parser.getSnippet(line, code, path, t.classes, limit);
         if (snip.length > 0) 
           res.add(snip);
       }
+      
+      if (!map.containsKey(code[line].executor_command))
+        map.put(code[line].executor_command, 0);
+      map.put(code[line].executor_command, map.get(code[line].executor_command)+1);
+     
     }
-    for (Vector[] c : res)
+    for (Vector[] c : res) {
       t.vs.addAll(Arrays.asList(c));
-//    System.err.println(map);
+    }
+    
+    System.err.println(map);
   }
 
  /* public void snippetize() throws JsonSyntaxException, IOException {

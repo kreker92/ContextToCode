@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -266,27 +268,211 @@ public class GServer {
     background_class.description = " Returns the value of the requested column as a String. ";*/
     
     /* background class */
-    InnerClass background_class = new InnerClass("falsekey", "1", "Property:AnyTime");
-    background_class.elements.add(new ElementInfo("type", "Identifier", "Number"));
-    LinkedHashMap<String, String> temp7_1 = new LinkedHashMap<>();
-    temp7_1.put("literal1","String mCursorString = ");
-    temp7_1.put("literal2",".getString(int id))");
-    background_class.scheme.add(temp7_1);
-    background_class.description = " Returns the value of the requested column as a String. ";
+    InnerClass number = new InnerClass("truekey", "2", "number");
+    number.elements.add(new ElementInfo("type", "Identifier", "Number"));
+    LinkedHashMap<String, String> temp2_1 = new LinkedHashMap<>();
+    temp2_1.put("literal1","String mCursorString = ");
+    temp2_1.put("literal2",".getString(int id))");
+    number.scheme.add(temp2_1);
+    number.description = " Returns the value of the requested column as a String. ";
     /* background class */
 
 
-    InnerClass ic = new InnerClass("truekey", "7", "alert");
+    InnerClass alert = new InnerClass("truekey", "7", "alert");
+    LinkedHashMap<String, String> temp7_1 = new LinkedHashMap<>();
+    temp7_1.put("stab_req","");
+    temp7_1.put("literal1",".css()");
+    alert.elements.add(new ElementInfo("type", "CallExpression", null));
+    alert.elements.add(new ElementInfo("type", "Identifier", "alert"));
+    alert.scheme.add(temp7_1);
+    alert.description = " Edit CSS. ";
+    
+    InnerClass window = new InnerClass("truekey", "3", "window");
+    LinkedHashMap<String, String> temp3_1 = new LinkedHashMap<>();
+    temp3_1.put("stab_req","");
+    temp3_1.put("literal1",".css()");
+    window.elements.add(new ElementInfo("type", "Identifier", "window"));
+    window.scheme.add(temp3_1);
+    window.description = " Edit CSS. ";
+    
+    InnerClass math = new InnerClass("truekey", "4", "math");
+    LinkedHashMap<String, String> temp4_1 = new LinkedHashMap<>();
+    temp4_1.put("stab_req","");
+    temp4_1.put("literal1",".css()");
+    math.elements.add(new ElementInfo("type", "Identifier", "Math"));
+    math.scheme.add(temp4_1);
+    math.description = " Edit CSS. ";
+    
+    InnerClass math_floor = new InnerClass("truekey", "5", "math");
+    LinkedHashMap<String, String> temp5_1 = new LinkedHashMap<>();
+    temp5_1.put("stab_req","");
+    temp5_1.put("literal1",".css()");
+    math_floor.elements.add(new ElementInfo("type", "Identifier", "Math"));
+    math_floor.elements.add(new ElementInfo("type", "CallExpression", "Property:floor"));
+    math_floor.scheme.add(temp5_1);
+    math_floor.description = " Edit CSS. ";
+    
+    InnerClass math_random = new InnerClass("truekey", "6", "math");
     LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
     temp6_1.put("stab_req","");
     temp6_1.put("literal1",".css()");
-    ic.elements.add(new ElementInfo("type", "CallExpression", null));
-    ic.elements.add(new ElementInfo("type", "Identifier", "alert"));
-    ic.scheme.add(temp6_1);
-    ic.description = " Edit CSS. ";
+    math_random.elements.add(new ElementInfo("type", "CallExpression", "Property:random"));
+    math_random.elements.add(new ElementInfo("type", "Identifier", "Math"));
+    math_random.scheme.add(temp6_1);
+    math_random.description = " Edit CSS. ";
+    
+    InnerClass prompt = new InnerClass("truekey", "8", "prompt");
+    LinkedHashMap<String, String> temp8_1 = new LinkedHashMap<>();
+    temp8_1.put("stab_req","");
+    temp8_1.put("literal1",".css()");
+    prompt.elements.add(new ElementInfo("type", "CallExpression", null));
+    prompt.elements.add(new ElementInfo("type", "Identifier", "prompt"));
+    prompt.scheme.add(temp8_1);
+    prompt.description = " Edit CSS. ";
+    
+    InnerClass confirm = new InnerClass("truekey", "9", "confirm");
+    LinkedHashMap<String, String> temp9_1 = new LinkedHashMap<>();
+    temp9_1.put("stab_req","");
+    temp9_1.put("literal1",".css()");
+    confirm.elements.add(new ElementInfo("type", "CallExpression", null));
+    confirm.elements.add(new ElementInfo("type", "Identifier", "confirm"));
+    confirm.scheme.add(temp9_1);
+    confirm.description = " Edit CSS. ";
 
-    t1.classes.add(ic);
-    t1.classes.add(background_class);
+    InnerClass log = new InnerClass("truekey", "10", "console");
+    LinkedHashMap<String, String> temp10_1 = new LinkedHashMap<>();
+    temp10_1.put("stab_req","");
+    temp10_1.put("literal1",".css()");
+    log.elements.add(new ElementInfo("type", "CallExpression", "Property:log"));
+    log.elements.add(new ElementInfo("type", "Identifier", "console"));
+    log.scheme.add(temp9_1);
+    log.description = " Edit CSS. ";
+    
+    InnerClass window_location = new InnerClass("truekey", "11", "location");
+    LinkedHashMap<String, String> temp11_1 = new LinkedHashMap<>();
+    temp11_1.put("stab_req","");
+    temp11_1.put("literal1",".css()");
+    window_location.elements.add(new ElementInfo("type", "Identifier", "window"));
+    window_location.elements.add(new ElementInfo("type", "Property", "Property:location"));
+    window_location.scheme.add(temp3_1);
+    window_location.description = " Edit CSS. ";
+    
+    InnerClass document_head = new InnerClass("truekey", "12", "window");
+    LinkedHashMap<String, String> temp12_1 = new LinkedHashMap<>();
+    temp12_1.put("stab_req","");
+    temp12_1.put("literal1",".css()");
+    document_head.elements.add(new ElementInfo("type", "Identifier", "document"));
+    document_head.elements.add(new ElementInfo("type", "Property", "Property:head"));
+    document_head.scheme.add(temp3_1);
+    document_head.description = " Edit CSS. ";
+    
+    InnerClass document_getElementByTagName = new InnerClass("truekey", "13", "window");
+    LinkedHashMap<String, String> temp13_1 = new LinkedHashMap<>();
+    temp13_1.put("stab_req","");
+    temp13_1.put("literal1",".css()");
+    document_getElementByTagName.elements.add(new ElementInfo("type", "Identifier", "document"));
+    document_getElementByTagName.elements.add(new ElementInfo("type", "Property", "Property:getElementByTagName"));
+    document_getElementByTagName.scheme.add(temp13_1);
+    document_getElementByTagName.description = " Edit CSS. ";
+    
+    InnerClass document_getElementByClassName = new InnerClass("truekey", "14", "window");
+    LinkedHashMap<String, String> temp14_1 = new LinkedHashMap<>();
+    temp14_1.put("stab_req","");
+    temp14_1.put("literal1",".css()");
+    document_getElementByClassName.elements.add(new ElementInfo("type", "Identifier", "document"));
+    document_getElementByClassName.elements.add(new ElementInfo("type", "Property", "Property:getElementByClassName"));
+    document_getElementByClassName.scheme.add(temp14_1);
+    document_getElementByClassName.description = " Edit CSS. ";
+    
+    InnerClass document_getElementById = new InnerClass("truekey", "15", "getElementById");
+    LinkedHashMap<String, String> temp15_1 = new LinkedHashMap<>();
+    temp15_1.put("stab_req","");
+    temp15_1.put("literal1",".css()");
+    document_getElementById.elements.add(new ElementInfo("type", "Identifier", "document"));
+    document_getElementById.elements.add(new ElementInfo("type", "Property", "Property:getElementById"));
+    document_getElementById.scheme.add(temp15_1);
+    document_getElementById.description = " Edit CSS. ";
+    
+    InnerClass indexOf = new InnerClass("truekey", "16", "indexOf");
+    LinkedHashMap<String, String> temp16_1 = new LinkedHashMap<>();
+    temp16_1.put("stab_req","");
+    temp16_1.put("literal1",".css()");
+    indexOf.elements.add(new ElementInfo("type", "CallExpression", "Property:indexOf"));
+    indexOf.scheme.add(temp16_1);
+    indexOf.description = " Edit CSS. ";
+    
+    InnerClass load = new InnerClass("truekey", "17", "load");
+    LinkedHashMap<String, String> temp17_1 = new LinkedHashMap<>();
+    temp17_1.put("stab_req","");
+    temp17_1.put("literal1",".css()");
+    load.elements.add(new ElementInfo("type", "CallExpression", "Property:load"));
+    load.scheme.add(temp17_1);
+    load.description = " Edit CSS. ";
+    
+    InnerClass addEventListener = new InnerClass("truekey", "18", "addEventListener");
+    LinkedHashMap<String, String> temp18_1 = new LinkedHashMap<>();
+    temp18_1.put("stab_req","");
+    temp18_1.put("literal1",".css()");
+//    addEventListener.elements.add(new ElementInfo("type", "CallExpression", null));
+    addEventListener.elements.add(new ElementInfo("type", "CallExpression", "Property:addEventListener"));
+    addEventListener.scheme.add(temp18_1);
+    addEventListener.description = " Edit CSS. ";
+    
+    InnerClass click = new InnerClass("truekey", "19", "click");
+    LinkedHashMap<String, String> temp19_1 = new LinkedHashMap<>();
+    temp19_1.put("stab_req","");
+    temp19_1.put("literal1",".css()");
+    click.elements.add(new ElementInfo("type", "CallExpression", "Property:click"));
+    click.scheme.add(temp19_1);
+    click.description = " Edit CSS. ";
+    
+    InnerClass mouseover = new InnerClass("truekey", "20", "mouseover");
+    LinkedHashMap<String, String> temp20_1 = new LinkedHashMap<>();
+    temp20_1.put("stab_req","");
+    temp20_1.put("literal1",".css()");
+    mouseover.elements.add(new ElementInfo("type", "CallExpression", "Property:mouseover"));
+    mouseover.scheme.add(temp20_1);
+    mouseover.description = " Edit CSS. ";
+    
+    InnerClass mouseout = new InnerClass("truekey", "22", "mouseout");
+    LinkedHashMap<String, String> temp22_1 = new LinkedHashMap<>();
+    temp22_1.put("stab_req","");
+    temp22_1.put("literal1",".css()");
+    mouseout.elements.add(new ElementInfo("type", "CallExpression", null));
+    mouseout.elements.add(new ElementInfo("type", "Identifier", "mouseout"));
+    mouseout.scheme.add(temp22_1);
+    mouseout.description = " Edit CSS. ";
+    
+    InnerClass scroll = new InnerClass("truekey", "21", "scroll");
+    LinkedHashMap<String, String> temp21_1 = new LinkedHashMap<>();
+    temp21_1.put("stab_req","");
+    temp21_1.put("literal1",".css()");
+    scroll.elements.add(new ElementInfo("type", "CallExpression", null));
+    scroll.elements.add(new ElementInfo("type", "Identifier", "scroll"));
+    scroll.scheme.add(temp21_1);
+    scroll.description = " Edit CSS. ";
+    
+    t1.classes.add(alert);
+    t1.classes.add(number);
+    t1.classes.add(scroll);
+    t1.classes.add(mouseout);
+    t1.classes.add(mouseover);
+    t1.classes.add(click);
+    t1.classes.add(addEventListener);
+    t1.classes.add(load);
+    t1.classes.add(indexOf);
+    t1.classes.add(document_getElementById);
+    t1.classes.add(document_getElementByTagName);
+    t1.classes.add(document_getElementByClassName);
+    t1.classes.add(document_head);
+    t1.classes.add(window_location);
+    t1.classes.add(log);
+    t1.classes.add(confirm);
+    t1.classes.add(prompt);
+    t1.classes.add(math_floor);
+    t1.classes.add(math_random);
+    t1.classes.add(math);
+    t1.classes.add(window);
 //    t1.classes.add(background_class);
 //    t1.domain = folder;
     templates.add(t1);
@@ -450,9 +636,9 @@ public class GServer {
     InnerClass[] code = getRaw(f.getValue());
     g.loadCode(code, g.ASC, t);
     
-    HashMap<Integer, Integer> map = new HashMap<>();
-    map.put(0, 0);
-    map.put(1, 0);
+    HashMap<String, Integer> map = new HashMap<>();
+//    map.put(0, 0);
+//    map.put(1, 0);
 
 
     for (int carret = code.length; carret > 2; carret --) {
@@ -518,9 +704,7 @@ public class GServer {
 
     File[] files = new File(Conf.root+t.folder).listFiles();
     
-    HashMap<Integer, Integer> map = new HashMap<>();
-    map.put(0, 0);
-    map.put(1, 0);
+    HashMap<String, Integer> map = new HashMap<>();
 
     for (File f : files) {
 //      if (f.getPath().contains("/16804")) {
@@ -548,7 +732,15 @@ public class GServer {
 
     /*Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), Conf.root+"/pop_lines", false);
     Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.commands)), Conf.root+"/pop_comm", false); 
-    System.exit(1);*/
+    System.exit(1);
+    
+    SortedSet<String> keys = new TreeSet<>(map.keySet());
+    for (String key : keys) 
+       System.err.println(key+","+map.get(key));
+    
+    System.exit(1);
+    */
+
     g.setTrainAndTest(t);
     t.clear();
   }
