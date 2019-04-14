@@ -308,7 +308,7 @@ public class GServer {
     temp5_1.put("stab_req","");
     temp5_1.put("literal1",".css()");
     math_floor.elements.add(new ElementInfo("type", "Identifier", "Math"));
-    math_floor.elements.add(new ElementInfo("type", "CallExpression", "Property:floor"));
+    math_floor.elements.add(new ElementInfo("type", "Property", "Property:floor"));
     math_floor.scheme.add(temp5_1);
     math_floor.description = " Edit CSS. ";
     
@@ -316,7 +316,7 @@ public class GServer {
     LinkedHashMap<String, String> temp6_1 = new LinkedHashMap<>();
     temp6_1.put("stab_req","");
     temp6_1.put("literal1",".css()");
-    math_random.elements.add(new ElementInfo("type", "CallExpression", "Property:random"));
+    math_random.elements.add(new ElementInfo("type", "Property", "Property:random"));
     math_random.elements.add(new ElementInfo("type", "Identifier", "Math"));
     math_random.scheme.add(temp6_1);
     math_random.description = " Edit CSS. ";
@@ -371,7 +371,7 @@ public class GServer {
     temp13_1.put("stab_req","");
     temp13_1.put("literal1",".css()");
     document_getElementByTagName.elements.add(new ElementInfo("type", "Identifier", "document"));
-    document_getElementByTagName.elements.add(new ElementInfo("type", "Property", "Property:getElementByTagName"));
+    document_getElementByTagName.elements.add(new ElementInfo("type", "Property", "Property:getElementsByTagName"));
     document_getElementByTagName.scheme.add(temp13_1);
     document_getElementByTagName.description = " Edit CSS. ";
     
@@ -380,7 +380,7 @@ public class GServer {
     temp14_1.put("stab_req","");
     temp14_1.put("literal1",".css()");
     document_getElementByClassName.elements.add(new ElementInfo("type", "Identifier", "document"));
-    document_getElementByClassName.elements.add(new ElementInfo("type", "Property", "Property:getElementByClassName"));
+    document_getElementByClassName.elements.add(new ElementInfo("type", "Property", "Property:getElementsByClassName"));
     document_getElementByClassName.scheme.add(temp14_1);
     document_getElementByClassName.description = " Edit CSS. ";
     
@@ -430,7 +430,8 @@ public class GServer {
     LinkedHashMap<String, String> temp20_1 = new LinkedHashMap<>();
     temp20_1.put("stab_req","");
     temp20_1.put("literal1",".css()");
-    mouseover.elements.add(new ElementInfo("type", "CallExpression", "Property:mouseover"));
+//    mouseover.elements.add(new ElementInfo("type", "CallExpression", "Property:mouseover"));
+    mouseover.elements.add(new ElementInfo("type", "Property", "Property:mouseover"));
     mouseover.scheme.add(temp20_1);
     mouseover.description = " Edit CSS. ";
     
@@ -438,8 +439,8 @@ public class GServer {
     LinkedHashMap<String, String> temp22_1 = new LinkedHashMap<>();
     temp22_1.put("stab_req","");
     temp22_1.put("literal1",".css()");
-    mouseout.elements.add(new ElementInfo("type", "CallExpression", null));
-    mouseout.elements.add(new ElementInfo("type", "Identifier", "mouseout"));
+//    mouseout.elements.add(new ElementInfo("type", "CallExpression", null));
+    mouseout.elements.add(new ElementInfo("type", "Property", "Property:mouseout"));
     mouseout.scheme.add(temp22_1);
     mouseout.description = " Edit CSS. ";
     
@@ -447,32 +448,32 @@ public class GServer {
     LinkedHashMap<String, String> temp21_1 = new LinkedHashMap<>();
     temp21_1.put("stab_req","");
     temp21_1.put("literal1",".css()");
-    scroll.elements.add(new ElementInfo("type", "CallExpression", null));
-    scroll.elements.add(new ElementInfo("type", "Identifier", "scroll"));
+//    scroll.elements.add(new ElementInfo("type", "CallExpression", null));
+    scroll.elements.add(new ElementInfo("type", "Property", "Property:scroll"));
     scroll.scheme.add(temp21_1);
     scroll.description = " Edit CSS. ";
     
-    t1.classes.add(alert);
-    t1.classes.add(number);
+//    t1.classes.add(alert);
+//    t1.classes.add(number);
     t1.classes.add(scroll);
     t1.classes.add(mouseout);
     t1.classes.add(mouseover);
-    t1.classes.add(click);
-    t1.classes.add(addEventListener);
-    t1.classes.add(load);
-    t1.classes.add(indexOf);
-    t1.classes.add(document_getElementById);
-    t1.classes.add(document_getElementByTagName);
-    t1.classes.add(document_getElementByClassName);
-    t1.classes.add(document_head);
-    t1.classes.add(window_location);
-    t1.classes.add(log);
-    t1.classes.add(confirm);
-    t1.classes.add(prompt);
-    t1.classes.add(math_floor);
-    t1.classes.add(math_random);
-    t1.classes.add(math);
-    t1.classes.add(window);
+//    t1.classes.add(click);
+//    t1.classes.add(addEventListener);
+//    t1.classes.add(load);
+//    t1.classes.add(indexOf);
+//    t1.classes.add(document_getElementById);
+//    t1.classes.add(document_getElementByTagName);
+//    t1.classes.add(document_getElementByClassName);
+//    t1.classes.add(document_head);
+//    t1.classes.add(window_location);
+//    t1.classes.add(log);
+//    t1.classes.add(confirm);
+//    t1.classes.add(prompt);
+//    t1.classes.add(math_floor);
+//    t1.classes.add(math_random);
+//    t1.classes.add(math);
+//    t1.classes.add(window);
 //    t1.classes.add(background_class);
 //    t1.domain = folder;
     templates.add(t1);
@@ -707,13 +708,13 @@ public class GServer {
     HashMap<String, Integer> map = new HashMap<>();
 
     for (File f : files) {
-//      if (f.getPath().contains("/16804")) {
+//      if (f.getName().equals("3")) {
 
         t.clear();
 
         InnerClass[] code = getRaw(f.getPath());
-        //      Utils.writeFile1(new Gson().toJson(code), Conf.root+"/classifiers/"+t.domain+"/all.json", false);
-        //      System.exit(1);
+              Utils.writeFile1(new Gson().toJson(code), Conf.root+"/classifiers/"+t.domain+"/all.json", false);
+//              System.exit(1);
         g.loadCode(code, g.ASC, t);
 
         g.iterateCode(code, t, f.getPath(), res, 3, map);
