@@ -1,172 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-	  <head>
-			<meta charset="UTF-8">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<title>Подсказка jQuery</title>
-			<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-			<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-			<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.js"></script>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-javascript.min.js" integrity="sha256-G5C8j/0gBEHgf/x60UZQY5QrKPWdUo2Pgcu4OgU5q7w=" crossorigin="anonymous"></script>
-			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism-okaidia.css" />
-			<style>
-			  p, button, div {
-				color: #DDD;
-			  }
-			  hr {
-				border-top: 1px solid rgba(255,255,255,.1);
-			  }
-			  input[type="radio"] {
-				display:none;
-			  }
-			  .btn-toolbar label {
-				cursor: pointer;
-			  }
-			  @media (min-width: 767px) {
-				.language-js {
-				  height: 100%;
-				  margin: -5px !important;
-				}
-			  }
-			</style>
-	  </head>
-	<body class="bg-dark">
-	    <div class="container-fluid">
-			<hr />
-			<div class="code-wrapper">
-			<h1>Функция объекта jQuery .on()</h1>
-			<p>Позволяет описывать функцию обработчик события для выбранных элементов.</p>
-			<p>Для любогно события <b>event</b> будет назначена функция <b>function</b>: </p>
-			</div>
-			<hr />
-      <div class="row">
-        <div class="col-12 col-md-6">
-          <div id="form-edit">
-			<p><b>.on(</b></p>
-            <div class="input-group mb-3">
-				  <div class="input-group-prepend">
-					<span class="input-group-text" id="basic-addon1">event: </span>
-				  </div>
-				  <div class="input-group-append">
-					  <select data-part="1" class="form-control" id="sel1">
-						<option>blur</option>
-						<option>focus</option>
-						<option>change</option>	
-						<option>click</option>	
-						<option>dblclick</option>	
-						<option>error</option>						
-						<option>focus</option>
-						<option>focusin</option>
-						<option>focusout</option>
-						<option>keydown</option>
-						<option>keypress</option>
-						<option>keyup</option>
-						<option>load</option>
-						<option>mousedown</option>
-						<option>mouseup</option>
-						<option>mousemove</option>
-						<option>mouseover</option>
-						<option>mouseout</option>
-						<option>mouseenter</option>
-						<option>mouseleave</option>
-						<option>resize</option>
-						<option>select</option>
-						<option>scroll</option>
-						<option>submit</option>
-						<option>unload</option>
-					  </select>
-				  </div>
-            </div>
-            
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-              <span class="input-group-text" id="basic-addon1">function: </span>
-              </div>
-              <textarea data-part="2" class="form-control" rows="4" id="function">
-			  </textarea>
-            </div>
-          <b>);</b>
-        </div>
-        </div>
-        <div class="col-12 col-md-6">
-          <pre><code class="language-js" id="code-result"></code></pre>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-12">
-          <!-- <div class="mark bg-dark">
-            <div class="btn-toolbar">
-              <div class="btn-group btn-group-sm btn-block form-group" data-toggle="buttons">
-                <label class="btn btn-outline-light">
-                  <input type="radio" name="options" value="useful"> Useful
-                </label>
-                <label class="btn btn-outline-light">
-                  <input type="radio" name="options" value="rel+"> Rel+
-                </label>
-                <label class="btn btn-outline-light">
-                  <input type="radio" name="options" value="rel-"> Rel-
-                </label>
-                <label class="btn btn-outline-light">
-                  <input type="radio" name="options" value="notrel"> Not rel
-                </label>
-                <label class="btn btn-outline-light">
-                  <input type="radio" name="options" value="stupid"> Stupid
-                </label>
-                <label class="btn btn-outline-light">
-                  <input type="radio" name="options" value=""> No mark
-                </label>
+
+				<div class="tab-pane fade" id="tip-2" role="tabpanel" aria-labelledby="tip-2-tab" data-tip="2">
+					<script>
+						resCode['tab2'] = {
+							replace1: '$.ajax1({',
+							replace2: '});;',
+							template: \`  $.ajax1({
+								url: PART1,
+								success: PART2
+							});;
+							\`
+						};
+					</script>
+          <div class="code-wrapper">
+            <h3>Функция AJAX1</h3>
+            <p>С помощи этой функции вы можете отсылать запросы AJAX1 из скрипта JavaScript.</p>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-12 col-md-6">
+              <div class="form-edit">
+                <p><b>$.ajax1({</b></p>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                  <span class="input-group-text">url:</span>
+                  </div>
+                  <input data-part="1" type="text" class="form-control" aria-label="URL, на который будет отправлен запрос" />
+                </div>
+                
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                  <span class="input-group-text">success:</span>
+                  </div>
+                  <textarea data-part="2" class="form-control" rows="4">function (content) {
+                      $menucontainer.html('')
+                    }
+                  </textarea>
+                </div>
+                <b>});;</b>
               </div>
             </div>
-            <div class="form-group">
-              <textarea class="form-control" rows="3" placeholder="Комментарий"></textarea>
+            <div class="col-12 col-md-6">
+              <pre><code class="language-js code-result"></code></pre>
             </div>
-            <div class="form-group">
-              <button type="button" class="btn btn-outline-info btn-block">Отправить</button>
+          </div>
+          <div class="row paddingTop10">
+            <div class="col-12">
+              <button class="btn btn-outline-light btn-block" onclick="useAdvise(2)">Вставить код</button>
             </div>
-          </div> -->
-          <button class="btn btn-outline-light btn-block" onclick="useAdvise()">Вставить код</button>
-          <!--<button class="btn btn-dark btn-block" onclick="hideAdvise()">Скрыть</button>-->
+          </div>
         </div>
-      </div>
-    </div>
-			<script>
-			  const vscode = acquireVsCodeApi();
-			  function useAdvise(){
-				let text_ = document.getElementById("code-result").textContent;
-				vscode.postMessage({command: 'use',text: text_})
-			  }
-			  function hideAdvise(){
-				vscode.postMessage({command: 'hide'})
-			  }
-
-			  var resCode = `.on(
-		'PART1',
-		function() {PART2}
-	);
-`;
-			  var fields = $('#form-edit').find('input, select, textarea, radio');
-			  fields.on('keyup change', function(ev){
-				rewriteTipRes(generateTip());
-			  });
-			  function generateTip() {
-				var code = resCode;
-				$.each(fields, function(i, f){
-				  $f = $(f);
-				  var partNum = +$f.attr('data-part');
-				  code = code.replace('PART'+partNum, $.trim($f.val()));
-				});
-
-				return code;
-			  }
-			  function rewriteTipRes(tip) {
-				var $el = $("#code-result");
-				$el.html(generateTip());
-				Prism.highlightElement($el[0]);
-			  }
-			  rewriteTipRes(generateTip());
-			  
-			</script>
-	</body>
-</html>
