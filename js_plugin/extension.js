@@ -2,12 +2,10 @@ const res = {
 	tabs: {
 		ajax: {
 			tab: `
-				<li class="nav-item">
-					<a class="nav-link active" id="tip-1-tab" data-toggle="tab" href="#tip-1" role="tab" aria-controls="tip-1" aria-selected="true">jQuery.ajax</a>
-				</li>
+				<a class="nav-link" id="tip-1-tab" data-toggle="pill" href="#tip-1" role="tab" aria-controls="tip-1" aria-selected="false">jQuery.ajax</a>
 			`,
 			content: `
-				<div class="tab-pane fade show active" id="tip-1" role="tabpanel" aria-labelledby="tip-1-tab" data-tip="1">
+				<div class="tab-pane fade" id="tip-1" role="tabpanel" aria-labelledby="tip-1-tab" data-tip="1">
 					<script>
 						resCode['tab1'] = {
 							replace1: '$.ajax({',
@@ -131,9 +129,7 @@ const res = {
 		},
 		ajax1: {
 			tab: `
-				<li class="nav-item">
-					<a class="nav-link" id="tip-2-tab" data-toggle="tab" href="#tip-2" role="tab" aria-controls="tip-2" aria-selected="false">alert</a>
-				</li>
+				<a class="nav-link" id="tip-2-tab" data-toggle="pill" href="#tip-2" role="tab" aria-controls="tip-1" aria-selected="false">alert</a>
 			`,
 			content: `
 				<div class="tab-pane fade" id="tip-2" role="tabpanel" aria-labelledby="tip-2-tab" data-tip="2">
@@ -231,6 +227,10 @@ const res = {
 					.paddingTop10 {
 						padding-top: 10px;
 					}
+					.nav-pills {
+						max-height: 100%;
+						overflow: scroll;
+					}
 				</style>
 				<script>
 					var resCode = {};
@@ -238,14 +238,16 @@ const res = {
 			</head>
 			<body class="bg-dark">
 				<div class="container-fluid">
-					<div class="tabs">
-						<ul class="nav nav-tabs" role="tablist">
-							TABS
-						</ul>
-					</div>
-					<div class="tab-content">
-						CONTENTS
-					</div>
+						<div class="row">
+							<div class="col-3">
+								<div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">TABS</div>
+							</div>
+							<div class="col-9">
+								<div class="tab-content">
+									CONTENTS
+								</div>
+							</div>
+						</div>
 				</div>
 				<script>
 					// let acquireVsCodeApi = function(){}; // to test like usual html page
@@ -283,6 +285,9 @@ const res = {
 						$el.html(tip);
 						Prism.highlightElement($el[0]);
 					}
+					$(document).ready(function(){
+						$('#tip-1-tab').trigger('click');
+					});
 				</script>
 			</body>
 		</html>`
@@ -330,7 +335,7 @@ function activate(context) {
 		function showRes(panel, res, prefix) {
 			console.log("'" + prefix + "'", prefix.length);
 			let matchingTabs = Object.keys(res.tabs).filter(function (tab) {
-				console.log(tab, prefix, ~tab.indexOf(prefix));
+				// console.log(tab, prefix, ~tab.indexOf(prefix));
 				return ~tab.indexOf(prefix);
 			});
 			console.log(matchingTabs);
