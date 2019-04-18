@@ -286,7 +286,7 @@ const res = {
 						Prism.highlightElement($el[0]);
 					}
 					$(document).ready(function(){
-						$('#tip-1-tab').trigger('click');
+						$(".nav-link").length && $($(".nav-link")[0]).trigger('click');
 					});
 				</script>
 			</body>
