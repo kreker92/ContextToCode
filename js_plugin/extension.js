@@ -1,193 +1,5 @@
-const res = {
+var res = {
 	tabs: {
-		ajax: {
-			tab: `
-				<li class="nav-item">
-					<a class="nav-link active" id="tip-1-tab" data-toggle="tab" href="#tip-1" role="tab" aria-controls="tip-1" aria-selected="true">jQuery.ajax</a>
-				</li>
-			`,
-			content: `
-				<div class="tab-pane fade show active" id="tip-1" role="tabpanel" aria-labelledby="tip-1-tab" data-tip="1">
-					<script>
-						resCode['tab1'] = {
-							replace1: '$.ajax({',
-							replace2: '});',
-							template: \`  $.ajax({
-								url: PART1,
-								async: PART2,
-								type: PART3,
-								error: PART4,
-								success: PART5
-							});
-							\`
-						};
-					</script>
-          <div class="code-wrapper">
-            <h3>Функция отправки AJAX запроса библиотеки jQuery .ajax()</h3>
-            <p>С помощи этой функции вы можете отсылать запросы AJAX из скрипта JavaScript.</p>
-            <p>Параметры: <b>url</b> - адрес, на который будте отправлен запрос, <b>async</b> - true, если вы хотите чтобы был отправлен асинхронный запрос (по умолчанию - false),
-            <b>type</b> - тип запроса GET или POST (по умолчанию, GET), <b>error</b> - функция, которая будет выполнена в случае ошибки при выполнении отправки запроса <b>success</b> - функция, которая будет выполнена в случае успешного выполнения запроса</p>
-          </div>
-          <hr />
-          <div class="row">
-            <div class="col-12 col-md-6">
-              <div class="form-edit">
-                <p><b>$.ajax({</b></p>
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                  <span class="input-group-text">url:</span>
-                  </div>
-                  <input data-part="1" type="text" class="form-control" aria-label="URL, на который будет отправлен запрос" />
-                </div>
-                
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                  <span class="input-group-text">async:</span>
-                  </div>
-                  <div class="input-group-append">
-                    <select data-part="2" class="form-control">
-                    <option value="false">false</option>
-                    <option value="true">true</option>
-                    </select>
-                  </div>
-                </div>
-                
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                  <span class="input-group-text">type:</span>
-                  </div>
-                  <div class="input-group-append">
-                    <select data-part="3" class="form-control">
-                    <option value="GET">GET</option>
-                    <option value="POST">POST</option>
-                    </select>
-                  </div>
-                </div>
-                
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                  <span class="input-group-text">error:</span>
-                  </div>
-                  <textarea data-part="4" class="form-control" rows="4">function (content) {
-                      $menucontainer.html('')
-                    }
-                  </textarea>
-                </div>
-                
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                  <span class="input-group-text">success:</span>
-                  </div>
-                  <textarea data-part="5" class="form-control" rows="4">function (content) {
-                      $menucontainer.html('')
-                    }
-                  </textarea>
-                </div>
-                <b>});</b>
-              </div>
-            </div>
-            <div class="col-12 col-md-6">
-              <pre><code class="language-js code-result"></code></pre>
-            </div>
-          </div>
-          <div class="row paddingTop10">
-            <div class="col-12">
-              <!-- <div class="mark bg-dark">
-                <div class="btn-toolbar">
-                  <div class="btn-group btn-group-sm btn-block form-group" data-toggle="buttons">
-                    <label class="btn btn-outline-light">
-                      <input type="radio" name="options" value="useful"> Useful
-                    </label>
-                    <label class="btn btn-outline-light">
-                      <input type="radio" name="options" value="rel+"> Rel+
-                    </label>
-                    <label class="btn btn-outline-light">
-                      <input type="radio" name="options" value="rel-"> Rel-
-                    </label>
-                    <label class="btn btn-outline-light">
-                      <input type="radio" name="options" value="notrel"> Not rel
-                    </label>
-                    <label class="btn btn-outline-light">
-                      <input type="radio" name="options" value="stupid"> Stupid
-                    </label>
-                    <label class="btn btn-outline-light">
-                      <input type="radio" name="options" value=""> No mark
-                    </label>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <textarea class="form-control" rows="3" placeholder="Комментарий"></textarea>
-                </div>
-                <div class="form-group">
-                  <button type="button" class="btn btn-outline-info btn-block">Отправить</button>
-                </div>
-              </div> -->
-              <button class="btn btn-outline-light btn-block" onclick="useAdvise(1)">Вставить код</button>
-              <!--<button class="btn btn-dark btn-block" onclick="hideAdvise()">Скрыть</button>-->
-            </div>
-          </div>
-        </div>
-			`
-		},
-		ajax1: {
-			tab: `
-				<li class="nav-item">
-					<a class="nav-link" id="tip-2-tab" data-toggle="tab" href="#tip-2" role="tab" aria-controls="tip-2" aria-selected="false">alert</a>
-				</li>
-			`,
-			content: `
-				<div class="tab-pane fade" id="tip-2" role="tabpanel" aria-labelledby="tip-2-tab" data-tip="2">
-					<script>
-						resCode['tab2'] = {
-							replace1: '$.ajax1({',
-							replace2: '});;',
-							template: \`  $.ajax1({
-								url: PART1,
-								success: PART2
-							});;
-							\`
-						};
-					</script>
-          <div class="code-wrapper">
-            <h3>Функция AJAX1</h3>
-            <p>С помощи этой функции вы можете отсылать запросы AJAX1 из скрипта JavaScript.</p>
-          </div>
-          <hr />
-          <div class="row">
-            <div class="col-12 col-md-6">
-              <div class="form-edit">
-                <p><b>$.ajax1({</b></p>
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                  <span class="input-group-text">url:</span>
-                  </div>
-                  <input data-part="1" type="text" class="form-control" aria-label="URL, на который будет отправлен запрос" />
-                </div>
-                
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                  <span class="input-group-text">success:</span>
-                  </div>
-                  <textarea data-part="2" class="form-control" rows="4">function (content) {
-                      $menucontainer.html('')
-                    }
-                  </textarea>
-                </div>
-                <b>});;</b>
-              </div>
-            </div>
-            <div class="col-12 col-md-6">
-              <pre><code class="language-js code-result"></code></pre>
-            </div>
-          </div>
-          <div class="row paddingTop10">
-            <div class="col-12">
-              <button class="btn btn-outline-light btn-block" onclick="useAdvise(2)">Вставить код</button>
-            </div>
-          </div>
-        </div>
-			`
-		}
 	},
 	body: `
 		<!DOCTYPE html>
@@ -231,6 +43,10 @@ const res = {
 					.paddingTop10 {
 						padding-top: 10px;
 					}
+					.nav-pills {
+						max-height: 100%;
+						overflow: scroll;
+					}
 				</style>
 				<script>
 					var resCode = {};
@@ -238,14 +54,16 @@ const res = {
 			</head>
 			<body class="bg-dark">
 				<div class="container-fluid">
-					<div class="tabs">
-						<ul class="nav nav-tabs" role="tablist">
-							TABS
-						</ul>
-					</div>
-					<div class="tab-content">
-						CONTENTS
-					</div>
+						<div class="row">
+							<div class="col-3">
+								<div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">TABS</div>
+							</div>
+							<div class="col-9">
+								<div class="tab-content">
+									CONTENTS
+								</div>
+							</div>
+						</div>
 				</div>
 				<script>
 					// let acquireVsCodeApi = function(){}; // to test like usual html page
@@ -283,6 +101,9 @@ const res = {
 						$el.html(tip);
 						Prism.highlightElement($el[0]);
 					}
+					$(document).ready(function(){
+						$('#tip-1-tab').trigger('click');
+					});
 				</script>
 			</body>
 		</html>`
@@ -330,7 +151,7 @@ function activate(context) {
 		function showRes(panel, res, prefix) {
 			console.log("'" + prefix + "'", prefix.length);
 			let matchingTabs = Object.keys(res.tabs).filter(function (tab) {
-				console.log(tab, prefix, ~tab.indexOf(prefix));
+				// console.log(tab, prefix, ~tab.indexOf(prefix));
 				return ~tab.indexOf(prefix);
 			});
 			console.log(matchingTabs);
@@ -391,7 +212,7 @@ function activate(context) {
 								filter_by_prefix = '';
 								options.body.text = editor.document.getText();
 								rp(options).then(function(newRes){
-									// res = newRes;
+									res.tabs = newRes;
 									showRes(panel, res, filter_by_prefix);
 								});
 							} else {

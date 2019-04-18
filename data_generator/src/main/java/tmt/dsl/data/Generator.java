@@ -103,8 +103,8 @@ public class Generator  {
         cntx_dsl.execute();
         output.addAll(cntx_dsl.getData());
       }
+      cntx_dsl = null;
       
-
       DSL.send(new Gson().toJson(output), "", filename);
       System.err.println(output.size());
       Utils.writeFile1(new Gson().toJson(t.domain), domain_info, false);
@@ -138,7 +138,7 @@ public class Generator  {
           //cache.add(t.vs, snippets);
           return pmp.snippetize(res, snippets);
         } else {
-          return snippets;
+          return pmp.snippetize(null, snippets);
         }
       } else {
         return snippets;
@@ -251,9 +251,9 @@ public class Generator  {
           res.add(snip);
       }
       
-      if (!map.containsKey(code[line].executor_command))
+     /* if (!map.containsKey(code[line].executor_command))
         map.put(code[line].executor_command, 0);
-      map.put(code[line].executor_command, map.get(code[line].executor_command)+1);
+      map.put(code[line].executor_command, map.get(code[line].executor_command)+1);*/
      
     }
     for (Vector[] c : res) {

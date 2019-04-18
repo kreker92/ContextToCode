@@ -43,14 +43,8 @@ var cx = new infer.Context();
 
 infer.withContext(cx, function() {
   var options = {allowHashBang: true};
-  try { ast = acorn.parse(code, options); }
-  catch(e) {
-    // uncomment to enable error tolerant parsing
-      //ast = acorn_loose.parse_dammit(code, options);
-    console.error("Unable to parse '" + infile + "': " + e);
-    process.exit(1);
-  }
-
+  ast = acorn.parse(code, options);
+  
 	infer.analyze(ast, infile);
 });
 

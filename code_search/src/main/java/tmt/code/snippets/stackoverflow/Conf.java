@@ -22,7 +22,7 @@ public class Conf {
   
   public static String key = "Class.forName";
   public static String query = "android.app.AlertDialog";
-  public static String root_key = "/android/cs/";
+  public static String root_key = "/android-copy/cs/";
 
   
   public static HashMap<Row, ArrayList<Row>> complete;

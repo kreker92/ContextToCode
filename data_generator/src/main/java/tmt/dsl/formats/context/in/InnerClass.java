@@ -18,6 +18,9 @@ public class InnerClass {
   
   public ArrayList<LinkedHashMap<String, String>> scheme = new ArrayList<LinkedHashMap<String, String>>();
   public String description;
+  public String tab;
+  public String content;
+
   
   public InnerClass() {
     
@@ -69,7 +72,7 @@ public class InnerClass {
   }
   
   public String toString() {
-    return " elements: "+elements;
+    return /*" elements: "+elements*/ "txt: "+line_text;
   }
 
   public void addScheme(HashMap<String, String> scheme_, String t, String string) { 

@@ -112,7 +112,7 @@ public class GenerateInspection extends LocalInspectionTool {
 
                     if (!lines.contains(el_line)
                             && validBlock(element, current_text)) {
-                        System.err.println("^"+el_line+" - "+element + "-" + current_text);
+                       // System.err.println("^"+el_line+" - "+element + "-" + current_text);
                         if (Filter.pass(psiFile, el_line, document)) {
                             an.analyze(el_line, element);
 
