@@ -66,17 +66,15 @@ public class GServer {
 
     if (swtch == LEARN) {
 
-    	for (String key : Conf.js_keys) {
+//    	for (String key : Conf.js_keys) {
     		if (Conf.lang.equals("java"))
     			createUseCasesJava(g, templates);
     		else if (Conf.lang.equals("javascript"))
-    			createUseCasesJavaScript(g, templates, key);
+    			createUseCasesJavaScript(g, templates, "document.getelementbyid");
 
-    		for ( Classifier t : templates ) {
-    		    t.clear();
+    		for ( Classifier t : templates )
     			doLearn(g, t);
-    		}
-    	}
+//    	}
     }
     else if (swtch == EVAL) {
       if (Conf.lang.equals("java"))
@@ -284,19 +282,13 @@ public class GServer {
     temp3_1.put("literal1",".css()");
     c.scheme.add(temp3_1);
     c.description = " Edit CSS. ";
-<<<<<<< HEAD
     c.tab = compile_tab(Conf.tabs.get(key).get("id"), Conf.tabs.get(key).get("name"));
     c.content = compile_content(Conf.tabs.get(key).get("id"), Conf.tabs.get(key).get("title"), Conf.tabs.get(key).get("content"));
-=======
-    c.tab = Conf.tabs.get(key).get("tab");
-    c.content = Conf.tabs.get(key).get("content");
->>>>>>> d4ab0bfb5b1f8ccc98b45ae344a30dd9e665fcf6
     t1.classes.add(c);
     
     return c;
   }
   
-<<<<<<< HEAD
   private static String compile_tab(String id, String name) {
     return "<a class='nav-link' id='tip-"+id+"-tab' data-toggle='pill' href='#tip-"+id+"' role='tab' aria-controls='tip-"+id+"' aria-selected='false'>"+name+"</a>";
   }
@@ -304,8 +296,6 @@ public class GServer {
   private static String compile_content(String id, String title, String content) {
     return "<div class='tab-pane fade' id='tip-"+id+"' role='tabpanel' aria-labelledby='tip-"+id+"-tab' data-tip='"+id+"'><div class='code-wrapper'><h3>"+title+"</h3>"+content+"";
   }
-=======
->>>>>>> d4ab0bfb5b1f8ccc98b45ae344a30dd9e665fcf6
 
   private static void createEvalCasesJava(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
 
