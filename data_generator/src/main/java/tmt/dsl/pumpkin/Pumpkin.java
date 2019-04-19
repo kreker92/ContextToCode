@@ -22,6 +22,7 @@ public class Pumpkin {
   ArrayList<Integer> lines;
   private HashMap<Integer, HashMap<String, String>> stabs = new HashMap<>();
   private ArrayList<HashMap<Integer, Step>> context;
+  public int response;
 
   public Pumpkin(ArrayList<HashMap<Integer, Step>> context_, Classifier ts) {
     context = context_;
@@ -38,15 +39,17 @@ public class Pumpkin {
   }
   
   public boolean is_continue() {
-//    System.err.println(!stabs.isEmpty());
     return !stabs.isEmpty();
   }
 
   public ArrayList<HashMap<String, String>> snippetize(int[] res, ArrayList<HashMap<String, String>> snippets) {
-    for (Integer c : res) {
+    for (Integer c : res) 
       if (c!= 1 && stabs.containsKey(c))
         snippets.add(stabs.get(c));
-    }
+
+    if ( snippets.isEmpty() )
+      for ( Entry<Integer, HashMap<String, String>> e : stabs.entrySet())
+        snippets.add(e.getValue());
     return snippets;
   }
   
@@ -76,6 +79,8 @@ public class Pumpkin {
       temp.put("code", innerClass.executor_command);
       temp.put("documentation", innerClass.description);
       temp.put("ast_type", innerClass.ast_type);
+      temp.put("tab", innerClass.tab);
+      temp.put("content", innerClass.content);
       return temp;
     }
     

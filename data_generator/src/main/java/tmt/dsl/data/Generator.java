@@ -106,7 +106,6 @@ public class Generator  {
       cntx_dsl = null;
       
       DSL.send(new Gson().toJson(output), "", filename);
-      System.err.println(output.size());
       Utils.writeFile1(new Gson().toJson(t.domain), domain_info, false);
     } catch (Exception e) {
       e.printStackTrace();
@@ -138,7 +137,7 @@ public class Generator  {
           //cache.add(t.vs, snippets);
           return pmp.snippetize(res, snippets);
         } else {
-          return pmp.snippetize(null, snippets);
+          return snippets;
         }
       } else {
         return snippets;
@@ -259,8 +258,6 @@ public class Generator  {
     for (Vector[] c : res) {
       t.vs.addAll(Arrays.asList(c));
     }
-    
-    System.err.println(map);
   }
 
  /* public void snippetize() throws JsonSyntaxException, IOException {
