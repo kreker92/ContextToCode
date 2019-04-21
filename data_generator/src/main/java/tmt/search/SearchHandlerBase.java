@@ -46,6 +46,8 @@ public abstract class SearchHandlerBase extends HandlerBase {
       HashMap<String, String> g = new Gson().fromJson(files.get("postData"), HashMap.class);
       
       LinkedHashMap<String, Tab> tabs = new LinkedHashMap<>();
+      ArrayList<String> else_tabs = new ArrayList<>();
+      ArrayList<String> main_tabs = new ArrayList<>();
 
       BufferedWriter writer = new BufferedWriter(new FileWriter("/root/ContextToCode/data_generator/lang_scripts/input/input.js"));
       writer.write(g.get("text").replace("�", ""));
@@ -78,18 +80,26 @@ public abstract class SearchHandlerBase extends HandlerBase {
       code = arrayList.toArray(code);
 
       ArrayList<HashMap<String, String>> res = GServer.router(GServer.INFERENCE, code);
+
+      for (HashMap<String, String> found : res) {
+        if (tabs.size() > 0)
+          tabs.put(found.get("ast_type"), new Tab(found.get("content"), found.get("found").equals("true") ? found.get("tab").replace("nav-link", "nav-link bg-info") : found.get("tab")));
+        else
+          tabs.put(found.get("ast_type"), new Tab(found.get("content").replace("tab-pane fade", "tab-pane fade show active"), found.get("found").equals("true") ? found.get("tab").replace("nav-link", "nav-link bg-info active") : found.get("tab").replace("nav-link", "nav-link active")));
+
+        if (found.get("found").equals("true")) 
+          main_tabs.add(found.get("ast_type"));
+        else
+          else_tabs.add(found.get("ast_type"));
+      }
       
-      for (String key : Conf.js_keys) 
-        for (HashMap<String, String> found : res)
-          if (key.equals(found.get("ast_type"))) {
-            if (tabs.size() > 0)
-              tabs.put(key, new Tab(found.get("content"), found.get("tab")));
-            else
-              tabs.put(key, new Tab(found.get("content").replace("tab-pane fade", "tab-pane fade show active"), found.get("tab").replace("nav-link", "nav-link active")));
-            break;
-          }
+      HashMap<String, Object> output = new HashMap<>();
+      output.put("tabs", tabs);
+      output.put("else_tabs", else_tabs);
+      output.put("main_tabs", main_tabs);
       
-      response = new Gson().toJson(tabs).getBytes();
+      response = new Gson().toJson(output).getBytes();
+      System.err.println(tabs);
     } catch (Exception e) {
       e.printStackTrace();
     }
