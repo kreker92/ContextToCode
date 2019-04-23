@@ -5,7 +5,7 @@ var res = {
 		ajax: {
 			tab: '<a class="nav-link bg-info" id="tip-1-tab" data-toggle="pill" href="#tip-1" role="tab" aria-controls="tip-1" aria-selected="false">jQuery.ajax</a>',
 			content: `
-			<div class="tab-pane fade" id="tip-1" role="tabpanel" aria-labelledby="tip-1-tab" data-tip="1">
+			<div class="tab-pane" id="tip-1" role="tabpanel" aria-labelledby="tip-1-tab" data-tip="1">
 				<script>
 				resCode['tab1'] = {
 					replace1: '$.ajax({',
@@ -130,7 +130,7 @@ var res = {
 		ajax1: {
 			tab: '<a class="nav-link bg-info" id="tip-2-tab" data-toggle="pill" href="#tip-2" role="tab" aria-controls="tip-1" aria-selected="false">alert</a>',
 			content: `
-			<div class="tab-pane fade" id="tip-2" role="tabpanel" aria-labelledby="tip-2-tab" data-tip="2">
+			<div class="tab-pane" id="tip-2" role="tabpanel" aria-labelledby="tip-2-tab" data-tip="2">
               <script>
                 resCode['tab2'] = {
                   replace1: '$.ajax1({',
@@ -185,7 +185,7 @@ var res = {
 		alert: {
 			tab: '<a class="nav-link" id="tip-3-tab" data-toggle="pill" href="#tip-3" role="tab" aria-controls="tip-1" aria-selected="false">alert</a>',
 			content: `
-			<div class="tab-pane fade" id="tip-3" role="tabpanel" aria-labelledby="tip-3-tab" data-tip="3">
+			<div class="tab-pane" id="tip-3" role="tabpanel" aria-labelledby="tip-3-tab" data-tip="3">
               <script type="text/javascript">
                 resCode['tab3'] = {
                   replace1: '$.ajax1({',
@@ -252,7 +252,6 @@ var res = {
 					}
 					.nav-pills {
 						max-height: 100%;
-						overflow: scroll;
 					}
 					.divider {
 						width: 100%;
@@ -260,8 +259,14 @@ var res = {
 					.nav-link.bg-info {
 						color: #FFF;
 					}
-					.nav-link.bg-info.active, .nav-link.bg-info.active:hover {
+					.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+						background-color: inherit;
+					}
+					.activeBlue, .activeBlue:focus, a.bg-info.activeBlue:focus {
 						background-color: #007bff !important;
+					}
+					*:focus {
+						outline: none !important;
 					}
 				</style>
 				<script>
@@ -321,7 +326,23 @@ var res = {
 						Prism.highlightElement($el[0]);
 					}
 					$(document).ready(function(){
+						let activePill = null;
+						$('.nav-link').on('click', function(){
+							activePill = this;
+							$('.activeBlue').removeClass('activeBlue');
+							$(activePill).addClass('activeBlue');
+						});
 						$(".nav-link").length && $($(".nav-link")[0]).trigger('click');
+
+						$('.nav-pills > a').on('mouseenter', function(ev) {
+							$(this).addClass('hovered');
+							$(this).tab('show');
+						});
+
+						$('.nav-pills > a').on('mouseleave', function(ev) {
+							$('.hovered').removeClass('hovered');
+							activePill && !$('.hovered').length && $(activePill).tab('show');
+						});
 					});
 				</script>
 			</body>
