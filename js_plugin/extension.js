@@ -412,7 +412,7 @@ function activate(context) {
 			let else_tabs = matchingElseTabs.map(function (key) {
 				return res.tabs[key].tab;
 			}).join('');
-			if (else_tabs.length > 0) {
+			if (else_tabs.length > 0 && main_tabs.length > 0) {
 				console.log(typeof(else_tabs));
 				else_tabs = '<hr role="separator" class="divider border border-info" />' + else_tabs;
 			}
@@ -470,7 +470,10 @@ function activate(context) {
 								filter_by_prefix = '';
 								options.body.text = editor.document.getText();
 								rp(options).then(function(newRes){
-									res.tabs = newRes;
+									console.log(newRes);
+									res.tabs = newRes.tabs;
+									res.main_tabs =newRes.main_tabs;
+									res.else_tabs = newRes.else_tabs;
 									showRes(panel, res, filter_by_prefix);
 								});
 							} else {

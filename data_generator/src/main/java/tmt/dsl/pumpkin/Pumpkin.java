@@ -20,7 +20,7 @@ import tmt.dsl.formats.context.in.InnerClass;
 public class Pumpkin {
 //  ArrayList<Integer> candidates = new ArrayList<>();
   ArrayList<Integer> lines;
-  private HashMap<Integer, HashMap<String, String>> stabs = new HashMap<>();
+  private LinkedHashMap<Integer, HashMap<String, String>> stabs = new LinkedHashMap<>();
   private ArrayList<HashMap<Integer, Step>> context;
   public int response;
 
@@ -30,11 +30,16 @@ public class Pumpkin {
     lines = new ArrayList(context_.get(0).keySet());
     Collections.sort(lines, Collections.reverseOrder());
 
-    for (InnerClass c : ts.classes) {
-      HashMap<String, String> snpt = fill(c); 
+    for (String key : Conf.js_keys) {
+      for (InnerClass c : ts.classes) {
+        if (key.equals(c.ast_type)) {
+          HashMap<String, String> snpt = fill(c); 
 
-      if (snpt != null)
-        stabs.put(Integer.parseInt(c.executor_command), snpt);
+          if (snpt != null)
+            stabs.put(Integer.parseInt(c.executor_command), snpt);
+          break;
+        }
+      }
     }
   }
   
@@ -43,13 +48,24 @@ public class Pumpkin {
   }
 
   public ArrayList<HashMap<String, String>> snippetize(int[] res, ArrayList<HashMap<String, String>> snippets) {
-    for (Integer c : res) 
-      if (c!= 1 && stabs.containsKey(c))
-        snippets.add(stabs.get(c));
+    ArrayList<Integer> found = new ArrayList<Integer>();
+    for (int i : res)
+      found.add(i);
 
-    if ( snippets.isEmpty() )
-      for ( Entry<Integer, HashMap<String, String>> e : stabs.entrySet())
-        snippets.add(e.getValue());
+    if (context.get(0).size() > 2)
+      for ( Entry<Integer, HashMap<String, String>> e : stabs.entrySet()) 
+        if (found.contains(e.getKey())) {
+          HashMap<String, String> tmp = new HashMap<>(e.getValue());
+          tmp.put("found", "true");
+          snippets.add(tmp);
+        }
+
+    for ( Entry<Integer, HashMap<String, String>> e : stabs.entrySet())
+      if (!found.contains(e.getKey())) {
+        HashMap<String, String> tmp = new HashMap<>(e.getValue());
+        tmp.put("found", "false");
+        snippets.add(tmp);
+      }
     return snippets;
   }
   
