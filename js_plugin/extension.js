@@ -1,7 +1,212 @@
 var res = {
-	main_tabs: [],
-	else_tabs: [],
+	main_tabs: ['ajax', 'ajax1'],
+	else_tabs: ['alert'],
 	tabs: {
+		ajax: {
+			tab: '<a class="nav-link bg-info" id="tip-1-tab" data-toggle="pill" href="#tip-1" role="tab" aria-controls="tip-1" aria-selected="false">jQuery.ajax</a>',
+			content: `
+			<div class="tab-pane" id="tip-1" role="tabpanel" aria-labelledby="tip-1-tab" data-tip="1">
+				<script>
+				resCode['tab1'] = {
+					replace1: '$.ajax({',
+					replace2: '});',
+					template: \`  $.ajax({
+                    url: PART1,
+                    async: PART2,
+                    type: PART3,
+                    error: PART4,
+                    success: PART5
+                  });
+                  \`
+                };
+              </script>
+	<div class="code-wrapper">
+		<h3>Функция отправки AJAX запроса библиотеки jQuery .ajax()</h3>
+		<p>С помощи этой функции вы можете отсылать запросы AJAX из скрипта JavaScript.</p>
+		<p>Параметры: <b>url</b> - адрес, на который будте отправлен запрос, <b>async</b> - true, если вы хотите чтобы был отправлен асинхронный запрос (по умолчанию - false),
+                <b>type</b> - тип запроса GET или POST (по умолчанию, GET), <b>error</b> - функция, которая будет выполнена в случае ошибки при выполнении отправки запроса <b>success</b> - функция, которая будет выполнена в случае успешного выполнения запроса</p>
+	</div>
+	<hr />
+	<div class="row">
+		<div class="col-12 col-md-6">
+			<div class="form-edit">
+				<p><b>$.ajax({</b></p>
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text">url:</span>
+						</div>
+						<input data-part="1" type="text" class="form-control" aria-label="URL, на который будет отправлен запрос" />
+					</div>
+
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text">async:</span>
+						</div>
+						<div class="input-group-append">
+							<select data-part="2" class="form-control">
+								<option value="false">false</option>
+								<option value="true">true</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text">type:</span>
+						</div>
+						<div class="input-group-append">
+							<select data-part="3" class="form-control">
+								<option value="GET">GET</option>
+								<option value="POST">POST</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text">error:</span>
+						</div>
+						<textarea data-part="4" class="form-control" rows="4">function (content) {
+							$menucontainer.html('')
+						}
+						</textarea>
+					</div>
+
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text">success:</span>
+						</div>
+						<textarea data-part="5" class="form-control" rows="4">function (content) {
+							$menucontainer.html('')
+						}
+						</textarea>
+					</div>
+					<b>});</b>
+                  </div>
+			</div>
+			<div class="col-12 col-md-6">
+				<pre><code class="language-js code-result"></code></pre>
+			</div>
+		</div>
+		<div class="row paddingTop10">
+			<div class="col-12">
+				<!-- <div class="mark bg-dark">
+					<div class="btn-toolbar">
+						<div class="btn-group btn-group-sm btn-block form-group" data-toggle="buttons">
+							<label class="btn btn-outline-light">
+								<input type="radio" name="options" value="useful"> Useful
+                        </label>
+								<label class="btn btn-outline-light">
+									<input type="radio" name="options" value="rel+"> Rel+
+                        </label>
+									<label class="btn btn-outline-light">
+										<input type="radio" name="options" value="rel-"> Rel-
+                        </label>
+										<label class="btn btn-outline-light">
+											<input type="radio" name="options" value="notrel"> Not rel
+                        </label>
+											<label class="btn btn-outline-light">
+												<input type="radio" name="options" value="stupid"> Stupid
+                        </label>
+												<label class="btn btn-outline-light">
+													<input type="radio" name="options" value=""> No mark
+                        </label>
+                      </div>
+                    </div>
+											<div class="form-group">
+												<textarea class="form-control" rows="3" placeholder="Комментарий"></textarea>
+											</div>
+											<div class="form-group">
+												<button type="button" class="btn btn-outline-info btn-block">Отправить</button>
+											</div>
+                  </div> -->
+                  <button class="btn btn-outline-light btn-block" onclick="useAdvise(1)">Вставить код</button>
+										<!--<button class="btn btn-dark btn-block" onclick="hideAdvise()">Скрыть</button>-->
+                </div>
+              </div>
+            </div>
+						`
+		},
+		ajax1: {
+			tab: '<a class="nav-link bg-info" id="tip-2-tab" data-toggle="pill" href="#tip-2" role="tab" aria-controls="tip-1" aria-selected="false">alert</a>',
+			content: `
+			<div class="tab-pane" id="tip-2" role="tabpanel" aria-labelledby="tip-2-tab" data-tip="2">
+              <script>
+                resCode['tab2'] = {
+                  replace1: '$.ajax1({',
+                  replace2: '});;',
+                  template: \`  $.ajax1({
+										url: PART1,
+										success: PART2
+									});;
+                  \`
+                };
+              </script>
+              <div class="code-wrapper">
+                <h3>Функция AJAX1</h3>
+                <p>С помощи этой функции вы можете отсылать запросы AJAX1 из скрипта JavaScript.</p>
+              </div>
+              <hr />
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <div class="form-edit">
+                    <p><b>$.ajax1({</b></p>
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                      <span class="input-group-text">url:</span>
+                      </div>
+                      <input data-part="1" type="text" class="form-control" aria-label="URL, на который будет отправлен запрос" />
+                    </div>
+                    
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                      <span class="input-group-text">success:</span>
+                      </div>
+                      <textarea data-part="2" class="form-control" rows="4">function (content) {
+                          $menucontainer.html('')
+                        }
+                      </textarea>
+                    </div>
+                    <b>});;</b>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <pre><code class="language-js code-result"></code></pre>
+                </div>
+              </div>
+              <div class="row paddingTop10">
+                <div class="col-12">
+                  <button class="btn btn-outline-light btn-block" onclick="useAdvise(2)">Вставить код</button>
+                </div>
+              </div>
+            </div>
+			`
+		},
+		alert: {
+			tab: '<a class="nav-link" id="tip-3-tab" data-toggle="pill" href="#tip-3" role="tab" aria-controls="tip-1" aria-selected="false">alert</a>',
+			content: `
+			<div class="tab-pane" id="tip-3" role="tabpanel" aria-labelledby="tip-3-tab" data-tip="3">
+              <script type="text/javascript">
+                resCode['tab3'] = {
+                  replace1: '$.ajax1({',
+                  replace2: '});;',
+                  template: \`  $.ajax1({
+										url: PART1,
+										success: PART2
+									});;
+                  \`
+                };
+              </script>
+              qwe
+              <input data-part="1" type="text" class="form-control" aria-label="URL, на который будет отправлен запрос" />
+              <textarea data-part="2" class="form-control" rows="4">function (content) {
+                  $menucontainer.html('')
+                }
+              </textarea>
+              <code class="language-js code-result"></code>
+            </div>
+			`
+		}
 	},
 	body: `
 		<!DOCTYPE html>
@@ -47,7 +252,6 @@ var res = {
 					}
 					.nav-pills {
 						max-height: 100%;
-						overflow: scroll;
 					}
 					.divider {
 						width: 100%;
@@ -55,8 +259,14 @@ var res = {
 					.nav-link.bg-info {
 						color: #FFF;
 					}
-					.nav-link.bg-info.active, .nav-link.bg-info.active:hover {
+					.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+						background-color: inherit;
+					}
+					.activeBlue, .activeBlue:focus, a.bg-info.activeBlue:focus {
 						background-color: #007bff !important;
+					}
+					*:focus {
+						outline: none !important;
 					}
 				</style>
 				<script>
@@ -116,7 +326,23 @@ var res = {
 						Prism.highlightElement($el[0]);
 					}
 					$(document).ready(function(){
+						let activePill = null;
+						$('.nav-link').on('click', function(){
+							activePill = this;
+							$('.activeBlue').removeClass('activeBlue');
+							$(activePill).addClass('activeBlue');
+						});
 						$(".nav-link").length && $($(".nav-link")[0]).trigger('click');
+
+						$('.nav-pills > a').on('mouseenter', function(ev) {
+							$(this).addClass('hovered');
+							$(this).tab('show');
+						});
+
+						$('.nav-pills > a').on('mouseleave', function(ev) {
+							$('.hovered').removeClass('hovered');
+							activePill && !$('.hovered').length && $(activePill).tab('show');
+						});
 					});
 				</script>
 			</body>
