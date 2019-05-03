@@ -2,6 +2,7 @@ import json
 import os.path
 from shutil import copyfile
 import subprocess
+import sys
 
 def is_valid (value):
     if value["type"] == "BlockStatement":
@@ -72,36 +73,40 @@ def parse_file (src, dst, o_dst, data):
         json.dump(ast_out, outfile)
     with open(o_dst.strip(), 'w') as outfile:
         json.dump(parsed, outfile)
-		
-parsed = subprocess.check_output(["/root/ContextToCode/data_generator/lang_scripts/js_parser/bin/js_parser.js", "/root/ContextToCode/data_generator/lang_scripts/input/input.js"])
-parse_file("", "/root/ContextToCode/data_generator/lang_scripts/parsed", "/root/ContextToCode/data_generator/lang_scripts/o_parsed", parsed)#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
 
-#parse_file(file, "/root/js/data_picks/sandbox/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
+def main(arg):	
+    if arg[0] == "file":
+        parsed = subprocess.check_output(["/root/ContextToCode/data_generator/lang_scripts/js_parser/bin/js_parser.js", "/root/ContextToCode/data_generator/lang_scripts/input/input.js"])
+        parse_file("", "/root/ContextToCode/data_generator/lang_scripts/parsed", "/root/ContextToCode/data_generator/lang_scripts/o_parsed", parsed)#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
+    elif arg[0] == "folder":
+        #parse_file(file, "/root/js/data_picks/sandbox/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", "-raw.js"))
 		
-#f = open("/root/js/data_picks/picked", "r")
-#check = f.read()
+        #f = open("/root/js/data_picks/picked", "r")
+        #check = f.read()
 			
-#with open("/root/js/programs_eval.json", 'r') as f: 
-#    jsons = f.readlines()
+        with open("/root/js/programs_eval1.json", 'r') as f: 
+            jsons = f.readlines()
 
-#with open("/root/js/programs_eval.txt", 'r') as f: 
-#    files = f.readlines()
+        with open("/root/js/programs_eval1.txt", 'r') as f: 
+            files = f.readlines()
 
-#count = 0
-#print(len(jsons))
-#print(len(files))
-#for i in range(len(files)):
-#    name = files[i].split('/')[-1]
-#    k = files[i].rfind("data/")
-#    file = files[i][:k] + "/root/js/data/" + files[i][k+5:]
-#    if True:#files[i] in check:#os.path.isfile("/root/js/data_picks/1/"+name.strip()):
-#        #data = json.loads(jsons[i])
-#        f = open("/root/js/data_picks/mask", "a")
-#        f.write(str(count)+", "+file)
-#        try:
-##            if (count < 5):
-#            parse_file(file, "/root/js/data_picks/sandbox/"+str(count), "/root/js/data_picks/originals/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", #"-raw.js"))
-#        except:
-#            print("Can't parse file"+file)
-#        count += 1
+        count = 0
+        print(len(jsons))
+        print(len(files))
+        for i in range(len(files)):
+            name = files[i].split('/')[-1]
+            k = files[i].rfind("data/")
+            file = files[i][:k] + "/root/js/data/" + files[i][k+5:]
+            if True:#files[i] in check:#os.path.isfile("/root/js/data_picks/1/"+name.strip()):
+                #data = json.loads(jsons[i])
+                f = open("/root/js/data_picks/mask", "a")
+                f.write(str(count)+", "+file)
+                try:
+        #            if (count < 5):
+                    parse_file(file, "/root/js/data_picks/sandbox/"+str(count), "/root/js/data_picks/originals/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", #"-raw.js"))
+                except:
+                    print("Can't parse file"+file)
+                count += 1
 					
+if __name__ == "__main__":
+   main(sys.argv[1:])

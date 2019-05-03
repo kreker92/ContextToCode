@@ -55,7 +55,7 @@ public abstract class SearchHandlerBase extends HandlerBase {
 
       // run the Unix "ps -ef" command
       // using the Runtime exec method:
-      Process p = Runtime.getRuntime().exec("python /root/ContextToCode/data_generator/lang_scripts/js.py");
+      Process p = Runtime.getRuntime().exec("python /root/ContextToCode/data_generator/lang_scripts/js.py file");
 
       BufferedReader stdInput = new BufferedReader(new 
           InputStreamReader(p.getInputStream()));
