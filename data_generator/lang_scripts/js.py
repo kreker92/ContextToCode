@@ -9,6 +9,12 @@ def is_valid (value):
         return False
     else:
         return True
+		
+def is_with_links (value):
+    if value["type"] == "FunctionExpression":
+        return False
+    else:
+        return True
 
 def get_inner_types(node, tmp):
     if "CallExpression" != node["type"]:
@@ -44,7 +50,7 @@ def get_parent_in_scope(node, value, ast_raw, vars, level):
     if value+":"+str(parent) in vars:
         return value+":"+str(parent)
 
-    if level > 2 or parent == 0:
+    if level > 6 or parent == 0:
         return "";
 
     return get_parent_in_scope(parent, value, ast_raw, vars, level+1)
@@ -125,20 +131,20 @@ def parse_file (src, dst, o_dst, data):
         if "children" in value:
             value["links"] = []
             for child in value["children"]:
-                 if is_valid(ast_raw[child]):				 
+                 if is_valid(ast_raw[child]) and is_with_links(ast_raw[child]):				 
                      value["links"].append(ast_raw[child])
                  elif "children" in ast_raw[child]:
                      in_block += ast_raw[child]["children"]
     fill_vars(vars, ast_raw)
+    print(vars)
     for key, value in ast_raw.items():
-        if value["type"] == "Identifier":
+        value["block"] = get_parent(key, ast_raw);
+        if value["type"] == "Identifier" or value["type"] == "VariableDeclarator":
          #   if in_memberexpression(key, ast_raw):
          #       vars[value["value"]+":"+str(get_parent(key, ast_raw))] = "MemberExpression"
             parent = get_parent_in_scope(key, value["value"], ast_raw, vars, 0)
-            if parent:
-                vars[value["value"]+":"+str(get_parent(key, ast_raw))] = vars[parent]
-            else:
-                vars[value["value"]+":"+str(get_parent(key, ast_raw))] = ""
+            if parent in vars:
+                value["source"] = vars[parent]
         if is_end_node(value, ids):
            # get_text(value)
             if "links" in value:
@@ -149,7 +155,6 @@ def parse_file (src, dst, o_dst, data):
 
    # with open('/root/ContextToCode/data_generator/lang_scripts/data_raw.json', 'w') as outfile:
    #     json.dump(ast_raw, outfile)
-    print(vars)
     with open(dst.strip(), 'w') as outfile:
         json.dump(ast_out, outfile)
     with open(o_dst.strip(), 'w') as outfile:
@@ -179,16 +184,16 @@ def main(arg):
             name = files[i].split('/')[-1]
             k = files[i].rfind("data/")
             file = files[i][:k] + "/root/js/data/" + files[i][k+5:]
-            if True:#files[i] in check:#os.path.isfile("/root/js/data_picks/1/"+name.strip()):
+            if True:#"magicmonkey" in file:#files[i] in check:#os.path.isfile("/root/js/data_picks/1/"+name.strip()):
+                if (count > 20):
+                    ddd()
                 #data = json.loads(jsons[i])
                 f = open("/root/js/data_picks/mask", "a")
                 f.write(str(count)+", "+file)
                 #try:
-        #            if (count < 5):
                 parse_file(file, "/root/js/data_picks/sandbox_test/"+str(count), "/root/js/data_picks/originals_test/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", #"-raw.js"))
                # except:
                 #    print("Can't parse file"+file)
-                ddd()
                 count += 1
 					
 if __name__ == "__main__":
