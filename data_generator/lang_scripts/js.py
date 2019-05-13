@@ -4,38 +4,6 @@ from shutil import copyfile
 import subprocess
 import sys
 
-import time
-
-T = []
-Digit = [7]
-
-def start(digit=7):
-    """Timer start. digit control the number width to align"""
-    del T[:]  # clean up first
-    Digit[0] = digit
-    T.append(time.time())
-    print '==>| Timer start | set to', Digit[0], 'digits after decimal point'
-def last_seg(s='since last point'):
-    """calculate the duration between last point till this one"""
-    T.append(time.time())
-    duration = T[-1] - T[-2]
-    print "=> | %.*f s" % (Digit[0], duration), s
-def seg_start(s='start...'):
-    """set a segment start, always used with seg_stop in pairs"""
-    T.append(time.time())
-    print "=> << | 0", ' ' * (Digit[0] + 3), s
-def seg_stop(s='...stop'):
-    """set a segment end, always used with seg_start in pairs"""
-    T.append(time.time())
-    duration = T[-1] - T[-2]
-    print "      | %.*f s " % (Digit[0], duration), s, ' >>'
-def end(s='since last point. Timer end.'):
-    T.append(time.time())
-    duration = T[-1] - T[-2]
-    total = T[-1] - T[0]
-    print "=> | %.*f s" % (Digit[0], duration), s
-    print "==>| %.*f s" % (Digit[0], total), 'Total time elapsed'
-
 def is_valid (value):
     if value["type"] == "BlockStatement":
         return False
@@ -47,24 +15,36 @@ def is_with_links (value):
         return False
     else:
         return True
-
-def get_inner_types(node, tmp):
-    if "CallExpression" != node["type"]:
-        if "value" in node:
-	        tmp.append({"type":node["type"], "value":node["value"]})
-        else:
-            tmp.append({"type":node["type"], "value":""})
-
-    if "links" in node:
+		
+def contains_key (key, node):
+    if node["type"] == key["type"] and (not "value" in key or node["value"] == key["value"]) and (not "source" in key or ("source" in node and node["source"] == key["source"])):
+        return True;
+    elif "children" in node:
         for child in node["links"]:
-            get_inner_types(child, tmp)
-
-    return tmp
+            if (contains_key(key, child)):
+                return True
+				
+    return False
+	
+def get_complex_types(node):
+    with open("/root/ContextToCode/data/datasets/js/templates", 'r') as handle:
+        anchors = json.load(handle)
+    for anchor in anchors:
+        contains_anchor = True;
+        for key in anchor["els"]:
+            if key["type"] != "VariableDeclarator":
+                if not contains_key(key, node):
+                    contains_anchor = False;
+                    break;
+        if contains_anchor:
+            return anchor["ast_type"]
+			
+    return ""
 		
 def get_type (node):
     if node["type"] == "CallExpression":
-        tmp = []
-        return get_inner_types(node, tmp)
+        print(str(get_complex_types(node)))
+        return str(get_complex_types(node))
     else:		
         return node["type"]
 		
@@ -94,24 +74,47 @@ def set_parent(ast_raw, id, parent):
         for child in ast_raw[id]["children"]:
             set_parent(ast_raw, ast_raw[child]["id"], parent)
 			
+def get_inner_types(node, tmp):
+    if "CallExpression" != node["type"]:
+        if "value" in node:
+	        tmp.append({"type":node["type"], "value":node["value"]})
+        else:
+            tmp.append({"type":node["type"], "value":""})
+
+    if "links" in node:
+        for child in node["links"]:
+            get_inner_types(child, tmp)
+
+    return tmp
+			
 def set_vars(vars, ast_raw):
-    for key, value in ast_raw.items():
+    assigned = False;
+    for _, value in ast_raw.items():
         if "children" in value and value["type"] == "VariableDeclaration":
             for child in value["children"]:
-                 if ast_raw[child]["type"] == "VariableDeclarator":				 
-                     if ast_raw[child]["value"] in vars:
-                         print(ast_raw[child]["value"])
-                         #ddd()
-                     if "children" in ast_raw[child]:
-                         for inner_child in ast_raw[child]["children"]:
-                             if ast_raw[inner_child]["type"] != "Identifier":
-                                 vars[ast_raw[child]["value"]+":"+str(ast_raw[child]["parent"])] = get_type(ast_raw[inner_child])
-                 elif "children" in ast_raw[child]:
-                     in_block += ast_raw[child]["children"]
-   # if value["type"] == "Identifier" and not value["value"] in vars:
-    #    for key, value in ast_raw.items():
-     #       if value["type"] == "VariableDeclaration":
-      #  vars[value["value"]] =
+                 key = ast_raw[child]["value"]+":"+str(ast_raw[child]["parent"])
+                 if not key in vars or not vars[key]["type"]:
+                     if ast_raw[child]["type"] == "VariableDeclarator":	
+                    # if not key in vars:				 
+                         if ast_raw[child]["value"] in vars:
+                             print(ast_raw[child]["value"])
+                             #ddd()
+                         if "children" in ast_raw[child]:
+                             for inner_child in ast_raw[child]["children"]:
+                                 if ast_raw[inner_child]["type"] != "Identifier":
+                                     vars[key] = {"type":get_type(ast_raw[inner_child]), "links":get_inner_types(ast_raw[inner_child], [])}
+                                     if get_type(ast_raw[inner_child]):
+                                         assigned = True;
+    count = 0;										 
+    for key, value in ast_raw.items():
+        if value["type"] == "Identifier" or value["type"] == "VariableDeclarator":
+            parent = get_parent_in_scope(value["parent"], value["value"], ast_raw, vars, 0)
+            if parent in vars:
+                value["source"] = vars[parent]["type"]
+                count += 1
+                value["source_info"] = vars[parent]["links"]
+    print(count)
+    return assigned
 		
 def is_end_node (value, ids):
     if value["type"] == "LiteralString":
@@ -152,8 +155,8 @@ def set_links(ast_raw, in_block):
 
 def parse_file (src, dst, o_dst, data):
 #and value["type"] == "VariableDeclaration"
-    vars = {}
     ast_raw = {}
+    vars = {}
     ast_out = []
     ids = []
     in_block = []
@@ -164,16 +167,11 @@ def parse_file (src, dst, o_dst, data):
             ast_raw[node['id']] = node
     set_links(ast_raw, in_block)
     set_parent(ast_raw, 0, 0)
-    set_vars(vars, ast_raw)
+    while set_vars(vars, ast_raw):
+        continue
     for key, value in ast_raw.items():
         if not "parent" in value:
             ddd()
-        if value["type"] == "Identifier" or value["type"] == "VariableDeclarator":
-         #   if in_memberexpression(key, ast_raw):
-         #       vars[value["value"]+":"+str(get_parent(key, ast_raw))] = "MemberExpression"
-            parent = get_parent_in_scope(value["parent"], value["value"], ast_raw, vars, 0)
-            if parent in vars:
-                value["source"] = vars[parent]
         if is_end_node(value, ids):
            # get_text(value)
             if "links" in value:
@@ -213,15 +211,15 @@ def main(arg):
             k = files[i].rfind("data/")
             file = files[i][:k] + "/root/js/data/" + files[i][k+5:]
             if True:#"/root/js/data/jsdelivr/jsdelivr/files/reactive.js/0.3.9/Ractive-legacy.runtime.js" in file:#files[i] in check:#os.path.isfile("/root/js/data_picks/1/"+name.strip()):
-                if (count > 200):
+                if (count > 0):
                     ddd()
                 #data = json.loads(jsons[i])
                 f = open("/root/js/data_picks/mask", "a")
                 f.write(str(count)+", "+file)
-                try:
-                    parse_file(file, "/root/js/data_picks/sandbox_test/"+str(count), "/root/js/data_picks/originals_test/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", #"-raw.js"))
-                except:
-                    print("Can't parse file"+file)
+              #  try:
+                parse_file(file, "/root/js/data_picks/sandbox_test/"+str(count), "/root/js/data_picks/originals_test/"+str(count), jsons[i])#"/root/js/data_picks/sandbox/"+name.strip().replace(".js", #"-raw.js"))
+               # except:
+                #    print("Can't parse file"+file)
                 count += 1
 					
 if __name__ == "__main__":
