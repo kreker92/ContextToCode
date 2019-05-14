@@ -1,0 +1,59 @@
+p,
+button,
+div,
+a {
+  color: #DDD;
+}
+a:hover {
+  color: #6c757d;
+}
+hr {
+  border-top: 1px solid rgba(255, 255, 255, .1);
+}
+input[type="radio"] {
+  display: none;
+}
+.btn-toolbar label {
+  cursor: pointer;
+}
+@media (min-width: 767px) {
+  .language-js {
+    height: 100%;
+    margin: -5px !important;
+  }
+}
+.paddingTop10 {
+  padding-top: 10px;
+}
+.nav-pills {
+  max-height: 100%;
+  /*overflow: scroll;*/
+}
+.divider {
+  width: 100%;
+}
+.nav-pills .nav-link {
+  border-radius: 0 !important;
+}
+.nav-link.bg-info {
+  color: #FFF;
+}
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
+  background-color: inherit;
+}
+.activeBlue,
+.activeBlue:focus,
+a.bg-info.activeBlue:focus {
+  background-color: #007bff !important;
+}
+a.bg-info.active.activeBlue:hover {
+  background-color: #007bff !important;
+}
+.nav-pills .nav-link.active.hovered:not(.bg-info) {
+  background-color: rgba(255, 255, 255, .1);
+  color: #FFF;
+}
+*:focus {
+  outline: none !important;
+}
