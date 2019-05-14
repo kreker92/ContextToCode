@@ -215,60 +215,7 @@ var res = {
 				<meta charset="UTF-8">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<title>Подсказка jQuery</title>
-				<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-				<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-				<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-				<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-				<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.js"></script>
-				<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-javascript.min.js" integrity="sha256-G5C8j/0gBEHgf/x60UZQY5QrKPWdUo2Pgcu4OgU5q7w=" crossorigin="anonymous"></script>
-				<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.9.1/beautify.js"></script>
-				<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.9.1/beautify-css.js"></script>
-				<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.9.1/beautify-html.js"></script>
-				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism-okaidia.css" />
-				<style>
-					p, button, div, a {
-						color: #DDD;
-					}
-					a:hover {
-						color: #6c757d;
-					}
-					hr {
-						border-top: 1px solid rgba(255,255,255,.1);
-					}
-					input[type="radio"] {
-						display:none;
-					}
-					.btn-toolbar label {
-						cursor: pointer;
-					}
-					@media (min-width: 767px) {
-						.language-js {
-							height: 100%;
-							margin: -5px !important;
-						}
-					}
-					.paddingTop10 {
-						padding-top: 10px;
-					}
-					.nav-pills {
-						max-height: 100%;
-					}
-					.divider {
-						width: 100%;
-					}
-					.nav-link.bg-info {
-						color: #FFF;
-					}
-					.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
-						background-color: inherit;
-					}
-					.activeBlue, .activeBlue:focus, a.bg-info.activeBlue:focus {
-						background-color: #007bff !important;
-					}
-					*:focus {
-						outline: none !important;
-					}
-				</style>
+				EXTERNAL_SCRIPTS
 				<script>
 					var resCode = {};
 				</script>
@@ -355,6 +302,7 @@ const vscode = require('vscode');
 const workspace = vscode.workspace;
 const window = vscode.window;
 const rp = require("request-promise");
+const path = require('path');
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -388,6 +336,25 @@ function activate(context) {
 			json: true
 		};
 
+		function get_scripts() {
+			const styles = ['bootstrap.min.css', 'prism-okaidia.css', 'style.css'];
+			const js = ['jquery-3.3.1.slim.min.js', 'bootstrap.min.js', 'popper.min.js', 'prism.js', 'prism-javascript.min.js', 'beautify.js', 'beautify-css.js', 'beautify-html.js', 'beautify-html.js'];
+
+			let externalScripts = [];
+			for(let i=0, len=styles.length;i<len;i++) {
+				let cssFile = styles[i];
+				cssFile = vscode.Uri.file(path.join(context.extensionPath, 'assets', 'css', cssFile)).with({ scheme: 'vscode-resource' });
+				externalScripts.push('<link rel="stylesheet" href="' + cssFile +'">');
+			}
+			for (let i = 0, len = js.length; i < len; i++) {
+				let jsFile = js[i];
+				jsFile = vscode.Uri.file(path.join(context.extensionPath, 'assets', 'js', jsFile)).with({ scheme: 'vscode-resource' });
+				externalScripts.push('<script src="' + jsFile + '"></script>');
+			}
+
+			return externalScripts.join("\n");
+		}
+
 		function showRes(panel, res, prefix) {
 			// console.log("'" + prefix + "'", prefix.length);
 			let matchingMainTabs = res.main_tabs.filter(function (tab) {
@@ -420,7 +387,7 @@ function activate(context) {
 				return res.tabs[key].content;
 			}).join(''));
 			
-			let html = res.body.replace('MAINTABS', main_tabs).replace('ELSETABS', else_tabs).replace('CONTENTS', contents);
+			let html = res.body.replace('MAINTABS', main_tabs).replace('ELSETABS', else_tabs).replace('CONTENTS', contents).replace('EXTERNAL_SCRIPTS', get_scripts());
 			
 			panel.webview.html = html;
 		}
@@ -434,9 +401,11 @@ function activate(context) {
 					vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
 					{
 						// Enable scripts in the webview
-						enableScripts: true
+						enableScripts: true,
+						localResourceRoots: [vscode.Uri.file(path.join(context.extensionPath, 'assets'))]
 					} // Webview options. More on these later.
 				);
+
 				showRes(panel, res, filter_by_prefix);
 				
 				
