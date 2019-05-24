@@ -10,8 +10,10 @@ public class InnerClass {
   public int start;
   public int end;
   public int line_num;
+  public int parent;
   public String line_text;
   public String type;
+  public String source;
   public String ast_type;
   //ACTUAL "PROGRAM" in traces
   public String executor_command = "1";
@@ -20,6 +22,8 @@ public class InnerClass {
   public String description;
   public String tab;
   public String content;
+  public String script;
+  public String code;
 
   
   public InnerClass() {
@@ -72,7 +76,7 @@ public class InnerClass {
   }
   
   public String toString() {
-    return /*" elements: "+elements*/ "txt: "+line_text;
+    return /*" elements: "+elements*/ "txt: "+line_text+", ast_type: "+ast_type;
   }
 
   public void addScheme(HashMap<String, String> scheme_, String t, String string) { 

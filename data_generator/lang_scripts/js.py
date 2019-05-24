@@ -111,7 +111,8 @@ def set_vars(vars, ast_raw):
             parent = get_parent_in_scope(value["parent"], value["value"], ast_raw, vars, 0)
             if parent in vars:
                 value["source"] = vars[parent]["type"]
-                count += 1
+                if (vars[parent]["type"])
+                    count += 1
                 value["source_info"] = vars[parent]["links"]
     print(count)
     return assigned
