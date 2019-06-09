@@ -41,28 +41,24 @@ public class JavaScriptAST {
     
     int count = 1;
     for (Node n : nodes) {
-      Collections.sort(n.links, comparator_id_desc);
-      ArrayList<ElementInfo> elements = new ArrayList<>();
-      traverse(n, elements);
       
-      cs.add(new InnerClass(n.var_name, count, n.parent, n.source));
+      Collections.sort(n.links, comparator_id_desc);
+      traverse(n, n);
+      
+      cs.add(new InnerClass(n.var_name, count, n.parent, n.source, n.elements));
       count ++;
     }
     out = cs.toArray(new InnerClass[cs.size()]);
   }
 
-  private void traverse(Node n, ArrayList<ElementInfo> elements) {
+  private void traverse(Node n, Node parent) {
     if (n.type.equals("Identifier")) 
       n.var_name = n.value; 
 
     else if (!n.value.isEmpty())
       n.var_name = n.type+":"+n.value;
     
-  /*  if (node.links != null) {
-      for (Node child : node.links)
-        node.var_name += get_text(child); 
-      return node.var_name;
-    } */
+    parent.var_name += n.var_name;
 
     if (n.source != null) {
         if(n.source.contains("[{")) {
@@ -70,18 +66,18 @@ public class JavaScriptAST {
         } 
         else { 
             ElementInfo el = new ElementInfo("ast_type", n.source, n.value);
-            elements.add(el);
+            parent.elements.add(el);
         }
     }
     else {
       ElementInfo el = new ElementInfo("type", n.type, n.type.equals("Identifier") ? n.value : n.var_name);
       el.ast_type = n.value;
-      elements.add(el);
+      parent.elements.add(el);
     }
     
     if (n.links != null) 
       for (Node child : n.links)
-        traverse(n, elements);
+        traverse(child, parent);
   }
 
   private static Comparator<Node> comparator_id_desc = new Comparator<Node>() {
@@ -101,10 +97,11 @@ class Node {
   Integer id;
   Integer parent;
   String source;
-  public ArrayList<Node> links = null;
+  public ArrayList<Node> links = new ArrayList<>();
   String value = "";
   int line_num;
   String var_name;
+  ArrayList<ElementInfo> elements = new ArrayList<>();
   
   /*
    *   public ArrayList<ElementInfo> elements = new ArrayList<>();

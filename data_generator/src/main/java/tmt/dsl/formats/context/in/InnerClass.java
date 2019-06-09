@@ -26,11 +26,12 @@ public class InnerClass {
   public String code;
 
   
-  public InnerClass(String var_name_, int count_, Integer parent_, String source_) {
+  public InnerClass(String var_name_, int count_, Integer parent_, String source_, ArrayList<ElementInfo> elements_) {
     line_text = var_name_;
     line_num = count_;
     parent = parent_;
     ast_type = source_;
+    elements = elements_;
   }
   
   public InnerClass(String type_, String executor_command_, String ast_type_) {
