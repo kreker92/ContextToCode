@@ -4,9 +4,9 @@
 const fs = require('fs')
 const parse = require('acorn-loose').parse
 
-const file = process.argv[2]
+const filename = process.argv[2]
 
-const result = parse(fs.readFileSync(file, "utf8"))
+const result = parse(fs.readFileSync(filename, "utf-8"))
 
 console.log(JSON.stringify(result))
 
