@@ -41,16 +41,55 @@ public class JavaScriptAST {
     
     int count = 1;
     for (Node n : nodes) {
-      cs.add(n.toClass(count, ast_counter));
+      
+      Collections.sort(n.links, comparator_id_desc);
+      traverse(n, n);
+      
+      cs.add(new InnerClass(n.var_name, count, n.parent, n.source, n.elements));
       count ++;
     }
     out = cs.toArray(new InnerClass[cs.size()]);
   }
 
+  private void traverse(Node n, Node parent) {
+    if (n.type.equals("Identifier")) 
+      n.var_name = n.value; 
+
+    else if (!n.value.isEmpty())
+      n.var_name = n.type+":"+n.value;
+    
+    parent.var_name += n.var_name;
+
+    if (n.source != null) {
+        if(n.source.contains("[{")) {
+            ElementInfo[] els = new Gson().fromJson(n.source.replace("u'", "'"), ElementInfo[].class);
+        } 
+        else { 
+            ElementInfo el = new ElementInfo("ast_type", n.source, n.value);
+            parent.elements.add(el);
+        }
+    }
+    else {
+      ElementInfo el = new ElementInfo("type", n.type, n.type.equals("Identifier") ? n.value : n.var_name);
+      el.ast_type = n.value;
+      parent.elements.add(el);
+    }
+    
+    if (n.links != null) 
+      for (Node child : n.links)
+        traverse(child, parent);
+  }
+
+  private static Comparator<Node> comparator_id_desc = new Comparator<Node>() {
+    public int compare(Node o1, Node o2) {
+      int c = o2.id.compareTo(o1.id);
+      return c;
+    }
+  };
+  
   public InnerClass[] getClasses() {
     return out;
   }
-
 }
 
 class Node {
@@ -58,17 +97,11 @@ class Node {
   Integer id;
   Integer parent;
   String source;
-  public ArrayList<Node> links = null;
+  public ArrayList<Node> links = new ArrayList<>();
   String value = "";
   int line_num;
   String var_name;
-  
-  private static Comparator<Node> comparator_id_desc = new Comparator<Node>() {
-    public int compare(Node o1, Node o2) {
-      int c = o2.id.compareTo(o1.id);
-      return c;
-    }
-  };
+  ArrayList<ElementInfo> elements = new ArrayList<>();
   
   /*
    *   public ArrayList<ElementInfo> elements = new ArrayList<>();
@@ -100,58 +133,4 @@ class Node {
      ], "children": [4, 1362, 1363]}], "children": [3]}
   
    */
-
-  InnerClass toClass(int count, HashMap<String, Integer> ast_counter) {
-	    int complex_ast = 0, simple_ast = 0;
-    InnerClass c = new InnerClass();
-    c.line_text = get_text (this);
-    if (links != null) {
-      Collections.sort(links, comparator_id_desc);
-      get_links(this, c.elements, ast_counter);
-    }
-    c.line_num = count;
-    c.parent = parent;
-    c.ast_type = source;
-    return c;
-  }
-  
-  private String get_text(Node node) {
-    if (node.type.equals("Identifier")) 
-      node.var_name = node.value; 
-
-    else if (!node.value.isEmpty())
-      node.var_name = node.type+":"+node.value;
-    
-    if (node.links != null) {
-      for (Node child : node.links)
-        node.var_name += get_text(child); 
-      return node.var_name;
-    }
-
-    return node.var_name;
-  }
-  
-  private void get_links(Node node, ArrayList<ElementInfo> elements, HashMap<String, Integer> ast_count) {
-    ElementInfo el;
-
-    if (node.source != null) {
-    	if(node.source.contains("[{")) {
-    		ElementInfo[] els = new Gson().fromJson(node.source.replace("u'", "'"), ElementInfo[].class);
-    	} 
-    	else { 
-    		el = new ElementInfo("ast_type", node.source, node.value);
-    	    elements.add(el);
-    	}
-    }
-    else {
-      el = new ElementInfo("type", node.type, node.type.equals("Identifier") ? node.value : node.var_name);
-      el.ast_type = node.value;
-      elements.add(el);
-    }
-    
-    if (node.links != null) {
-      for (Node child : node.links)
-        get_links(child, elements, ast_count); 
-    }
-  }
 }
