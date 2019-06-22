@@ -3,7 +3,7 @@ var res = {
 	else_tabs: ['alert'],
 	tabs: {
 		ajax: {
-			tab: '<a class="nav-link bg-info" id="tip-1-tab" data-toggle="pill" href="#tip-1" role="tab" aria-controls="tip-1" aria-selected="false">jQuery.ajax</a>',
+			tab: '<a class="nav-link" id="tip-1-tab" data-toggle="pill" href="#tip-1" role="tab" aria-controls="tip-1" aria-selected="false">jQuery.ajax</a>',
 			content: `
 			<div class="tab-pane" id="tip-1" role="tabpanel" aria-labelledby="tip-1-tab" data-tip="1">
 				<script>
@@ -128,7 +128,7 @@ var res = {
 						`
 		},
 		ajax1: {
-			tab: '<a class="nav-link bg-info" id="tip-2-tab" data-toggle="pill" href="#tip-2" role="tab" aria-controls="tip-1" aria-selected="false">alert</a>',
+			tab: '<a class="nav-link" id="tip-2-tab" data-toggle="pill" href="#tip-2" role="tab" aria-controls="tip-1" aria-selected="false">alert</a>',
 			content: `
 			<div class="tab-pane" id="tip-2" role="tabpanel" aria-labelledby="tip-2-tab" data-tip="2">
               <script>
@@ -214,84 +214,28 @@ var res = {
 			<head>
 				<meta charset="UTF-8">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<title>Подсказка jQuery</title>
+				<title>TITLE</title>
 				EXTERNAL_SCRIPTS
 				<script>
 					var resCode = {};
 				</script>
 			</head>
-			<body class="bg-dark">
+			<body>
 				<div class="container-fluid">
-						<div class="row">
-							<div class="col-3">
-								<div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
-									MAINTABS
-									ELSETABS
-								</div>
-							</div>
-							<div class="col-9">
-								<div class="tab-content">
-									CONTENTS
-								</div>
+					<div class="row">
+						<div class="btns">
+							<div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+								MAINTABS
+								ELSETABS
 							</div>
 						</div>
+						<div class="content" id="content">
+							<div class="tab-content">
+								CONTENTS
+							</div>
+						</div>
+					</div>
 				</div>
-				<script>
-					// let acquireVsCodeApi = function(){}; // to test like usual html page
-					const vscode = acquireVsCodeApi();
-					function useAdvise(tabId){
-						var curResCode = resCode['tab'+tabId]
-						let text_ = $(document).find("#tip-"+tabId).find(".code-result").text().replace(curResCode.replace1, '').replace(curResCode.replace2, '');
-						vscode.postMessage({command: 'use',text: text_})
-					}
-					function hideAdvise(){
-						vscode.postMessage({command: 'hide'})
-					}
-
-					$('.tab-pane').each(function(i, tab) {
-						$(tab).find('input, select, textarea, radio').on('keyup change', function(ev){
-							rewriteTipRes(tab, generateTip($(tab).attr('data-tip')));
-						});
-						rewriteTipRes(tab, generateTip($(tab).attr('data-tip')));
-					});
-					var fields = $('.form-edit').find('input, select, textarea, radio');
-					
-					function generateTip(tabId) {
-						var res = resCode['tab'+tabId].template;
-						$("#tip-"+tabId).find('input, select, textarea, radio').each(function(i, f) {
-							$f = $(f);
-							var partNum = +$f.attr('data-part');
-							res = res.replace('PART'+partNum, $.trim($f.val()));
-						});
-
-						return js_beautify(res, { indent_size: 4 });
-					}
-
-					function rewriteTipRes(tab, tip) {
-						var $el = $(tab).find(".code-result");
-						$el.html(tip);
-						Prism.highlightElement($el[0]);
-					}
-					$(document).ready(function(){
-						let activePill = null;
-						$('.nav-link').on('click', function(){
-							activePill = this;
-							$('.activeBlue').removeClass('activeBlue');
-							$(activePill).addClass('activeBlue');
-						});
-						$(".nav-link").length && $($(".nav-link")[0]).trigger('click');
-
-						$('.nav-pills > a').on('mouseenter', function(ev) {
-							$(this).addClass('hovered');
-							$(this).tab('show');
-						});
-
-						$('.nav-pills > a').on('mouseleave', function(ev) {
-							$('.hovered').removeClass('hovered');
-							activePill && !$('.hovered').length && $(activePill).tab('show');
-						});
-					});
-				</script>
 			</body>
 		</html>`
 };
@@ -337,8 +281,8 @@ function activate(context) {
 		};
 
 		function get_scripts() {
-			const styles = ['bootstrap.min.css', 'prism-okaidia.css', 'style.css'];
-			const js = ['jquery-3.3.1.slim.min.js', 'bootstrap.min.js', 'popper.min.js', 'prism.js', 'prism-javascript.min.js', 'beautify.js', 'beautify-css.js', 'beautify-html.js', 'beautify-html.js'];
+			const styles = ['bootstrap.min.css', 'prism-okaidia.css', 'style.css', 'inter.css'];
+			const js = ['jquery-3.3.1.slim.min.js', 'bootstrap.min.js', 'popper.min.js', 'prism.js', 'prism-javascript.min.js', 'beautify.js', 'beautify-css.js', 'beautify-html.js', 'js.js'];
 
 			let externalScripts = [];
 			for(let i=0, len=styles.length;i<len;i++) {
@@ -381,7 +325,7 @@ function activate(context) {
 			}).join('');
 			if (else_tabs.length > 0 && main_tabs.length > 0) {
 				console.log(typeof(else_tabs));
-				else_tabs = '<hr role="separator" class="divider border border-info" />' + else_tabs;
+				else_tabs = '<hr role="separator" class="divider border" />' + else_tabs;
 			}
 			let contents = main_contents.concat( matchingElseTabs.map(function (key) {
 				return res.tabs[key].content;
@@ -393,7 +337,7 @@ function activate(context) {
 		}
 
 		rp(options)
-			.then(function (qwe) { // res
+			.then(function (res) { // res
 				let filter_by_prefix = '';
 				const panel = window.createWebviewPanel(
 					'tips', // Identifies the type of the webview. Used internally
@@ -439,7 +383,7 @@ function activate(context) {
 								filter_by_prefix = '';
 								options.body.text = editor.document.getText();
 								rp(options).then(function(newRes){
-									console.log(newRes);
+									// console.log(newRes);
 									res.tabs = newRes.tabs;
 									res.main_tabs =newRes.main_tabs;
 									res.else_tabs = newRes.else_tabs;

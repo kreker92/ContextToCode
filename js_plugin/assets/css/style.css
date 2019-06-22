@@ -1,17 +1,34 @@
-p,
-button,
-div,
-a {
-  color: #DDD;
+body {
+  font-family: Inter;
+  background: #F8F8F8;
 }
+p, button, div, a {
+  color: #000;
+}
+.code-wrapper h3 {
+  font-weight: 500;
+  font-size: 30px;
+  line-height: 36px;
+  margin-bottom: 27px;
+}
+.code-wrapper p {
+  font-size: 14px;
+  line-height: 23px;
+  margin-bottom: 15px;
+}
+
+
 a:hover {
   color: #6c757d;
 }
+*:focus {
+  outline: none !important;
+}
 hr {
-  border-top: 1px solid rgba(255, 255, 255, .1);
+  border-top: 1px solid rgba(255,255,255,.1);
 }
 input[type="radio"] {
-  display: none;
+  display:none;
 }
 .btn-toolbar label {
   cursor: pointer;
@@ -31,6 +48,7 @@ input[type="radio"] {
 }
 .divider {
   width: 100%;
+  margin-left: 50px;
 }
 .nav-pills .nav-link {
   border-radius: 0 !important;
@@ -38,22 +56,56 @@ input[type="radio"] {
 .nav-link.bg-info {
   color: #FFF;
 }
-.nav-pills .nav-link.active,
-.nav-pills .show>.nav-link {
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
   background-color: inherit;
 }
-.activeBlue,
-.activeBlue:focus,
-a.bg-info.activeBlue:focus {
-  background-color: #007bff !important;
+.selectedNav, .selectedNav:focus, a.bg-info.selectedNav:focus {
+  font-weight: bold;
+  color: #000 !important;
 }
-a.bg-info.active.activeBlue:hover {
-  background-color: #007bff !important;
+a.bg-info.active.selectedNav:hover {
+  font-weight: bold;
+  color: #000;
 }
 .nav-pills .nav-link.active.hovered:not(.bg-info) {
-  background-color: rgba(255, 255, 255, .1);
-  color: #FFF;
+  background-color: rgba(255,255,255,.1);
+  color: #ababab;
 }
-*:focus {
-  outline: none !important;
+.content {
+  background: #FFFFFF;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 70%;
+  min-width: 30%;
+  max-width: 95%;
+  height: 100%;
+  overflow: scroll;
+  padding: 10px 10px 10px 15px;
+}
+.content.bg-dark:before {
+    content: '';
+    width: 5px;
+    height: 100%;
+    background: grey;
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: col-resize;
+    z-index: 10;
+}
+.btns {
+  width: 70%;
+  text-align: left;
+}
+.nav.nav-pills .nav-link {
+  color: #babcc0;
+  background: none;
+}
+.nav.nav-pills .nav-link.hovered {
+  color: #ababab;
+}
+.nav.nav-pills .nav-link.active {
+  color: #000;
+  background-color: none;
 }
