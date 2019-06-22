@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import tmt.conf.Utils;
 import tmt.dsl.formats.context.in.ElementInfo;
@@ -18,6 +20,12 @@ public class JavaScriptAST {
   private InnerClass[] out;
   
   public JavaScriptAST (String f) {
+    System.err.println(f);
+    
+    HashMap<String, Integer> ast_counter = new HashMap<String, Integer>();
+    ast_counter.put("complex", 0);
+    ast_counter.put("simple", 0);
+    
     Node[] nodes = null;
     try {
       nodes = new Gson().fromJson(Utils.readFile(f), Node[].class);
@@ -33,33 +41,67 @@ public class JavaScriptAST {
     
     int count = 1;
     for (Node n : nodes) {
-      cs.add(n.toClass(count));
+      
+      Collections.sort(n.links, comparator_id_desc);
+      traverse(n, n);
+      
+      cs.add(new InnerClass(n.var_name, count, n.parent, n.source, n.elements));
       count ++;
     }
-
     out = cs.toArray(new InnerClass[cs.size()]);
   }
 
-  public InnerClass[] getClasses() {
-    return out;
+  private void traverse(Node n, Node parent) {
+    if (n.type.equals("Identifier")) 
+      n.var_name = n.value; 
+
+    else if (!n.value.isEmpty())
+      n.var_name = n.type+":"+n.value;
+    
+    parent.var_name += n.var_name;
+
+    if (n.source != null) {
+        if(n.source.contains("[{")) {
+            ElementInfo[] els = new Gson().fromJson(n.source.replace("u'", "'"), ElementInfo[].class);
+        } 
+        else { 
+            ElementInfo el = new ElementInfo("ast_type", n.source, n.value);
+            parent.elements.add(el);
+        }
+    }
+    else {
+      ElementInfo el = new ElementInfo("type", n.type, n.type.equals("Identifier") ? n.value : n.var_name);
+      el.ast_type = n.value;
+      parent.elements.add(el);
+    }
+    
+    if (n.links != null) 
+      for (Node child : n.links)
+        traverse(child, parent);
   }
 
-}
-
-class Node {
-  String type;
-  Integer id;
-  public ArrayList<Node> links = null;
-  String value = "";
-  int line_num;
-  String var_name;
-  
   private static Comparator<Node> comparator_id_desc = new Comparator<Node>() {
     public int compare(Node o1, Node o2) {
       int c = o2.id.compareTo(o1.id);
       return c;
     }
   };
+  
+  public InnerClass[] getClasses() {
+    return out;
+  }
+}
+
+class Node {
+  String type;
+  Integer id;
+  Integer parent;
+  String source;
+  public ArrayList<Node> links = new ArrayList<>();
+  String value = "";
+  int line_num;
+  String var_name;
+  ArrayList<ElementInfo> elements = new ArrayList<>();
   
   /*
    *   public ArrayList<ElementInfo> elements = new ArrayList<>();
@@ -87,46 +129,8 @@ class Node {
   {"type": "ExpressionStatement", "id": 2, "links": [{"type": "CallExpression", "id": 3,
    "links": [{"type": "FunctionExpression", "id": 4, "links": [{"type": "Identifier", "id": 5, "value": "window"},
     {"type": "Identifier", "id": 6, "value": "$"}], "children": [5, 6, 7]}, {"type": "ThisExpression", "id": 1362},
-     {"type": "Identifier", "id": 1363, "value": "jQuery"}], "children": [4, 1362, 1363]}], "children": [3]}
+     {"parent": 30, "source": "MemberExpression", "type": "Identifier", "id": 61, "value": "editor"}
+     ], "children": [4, 1362, 1363]}], "children": [3]}
   
    */
-
-  InnerClass toClass(int count) {
-    InnerClass c = new InnerClass();
-    c.line_text = get_text (this);
-    if (links != null) {
-      Collections.sort(links, comparator_id_desc);
-      get_links(this, c.elements);
-    }
-    c.line_num = count;
-    return c;
-  }
-  
-  private String get_text(Node node) {
-    if (node.type.equals("Identifier")) {
-      node.var_name = node.value; 
-      node.value = "";
-    }
-    else if (!node.value.isEmpty())
-      node.value = node.type+":"+node.value;
-    
-    if (node.links != null) {
-      for (Node child : node.links)
-        node.value += get_text(child); 
-      return node.value;
-    }
-
-    return node.value;
-  }
-  
-  private void get_links(Node node, ArrayList<ElementInfo> elements) {
-    ElementInfo el = new ElementInfo("type", node.type, node.type.equals("Identifier") ? node.var_name : node.value);
-    el.ast_type = node.value;
-    elements.add(el);
-    
-    if (node.links != null) {
-      for (Node child : node.links)
-        get_links(child, elements); 
-    }
-  }
 }

@@ -83,15 +83,15 @@ public abstract class SearchHandlerBase extends HandlerBase {
 
       for (HashMap<String, String> found : res) {
         if (tabs.size() > 0)
-          tabs.put(found.get("ast_type"), new Tab(found.get("content"), found.get("found").equals("true") ? found.get("tab").replace("nav-link", "nav-link bg-info") : found.get("tab")));
+          tabs.put(found.get("ast_type"), new Tab(found.get("found").equals("true") ? found.get("tab").replace("nav-link", "nav-link bg-info") : found.get("tab"), found.get("content")));
         else
-          tabs.put(found.get("ast_type"), new Tab(found.get("content").replace("tab-pane fade", "tab-pane fade show active"), found.get("found").equals("true") ? found.get("tab").replace("nav-link", "nav-link bg-info active") : found.get("tab").replace("nav-link", "nav-link active")));
+          tabs.put(found.get("ast_type"), new Tab(found.get("found").equals("true") ? found.get("tab").replace("nav-link", "nav-link bg-info active") : found.get("tab").replace("nav-link", "nav-link active"), found.get("content").replace("tab-pane fade", "tab-pane fade show active")));
 
         if (found.get("found").equals("true")) 
           main_tabs.add(found.get("ast_type"));
         else
           else_tabs.add(found.get("ast_type"));
-      }
+      } 
       
       HashMap<String, Object> output = new HashMap<>();
       output.put("tabs", tabs);
@@ -99,7 +99,7 @@ public abstract class SearchHandlerBase extends HandlerBase {
       output.put("main_tabs", main_tabs);
       
       response = new Gson().toJson(output).getBytes();
-      System.err.println(tabs);
+//      System.err.println(tabs);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -127,7 +127,7 @@ class Tab {
   String tab;
   
   
-  public Tab(String content_, String tab_) {
+  public Tab(String tab_, String content_) {
     content = content_;
     tab = tab_;
   }

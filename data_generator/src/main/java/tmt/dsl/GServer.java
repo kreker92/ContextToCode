@@ -67,20 +67,20 @@ public class GServer {
     if (swtch == LEARN) {
 
 //    	for (String key : Conf.js_keys) {
-    		if (Conf.lang.equals("java"))
-    			createUseCasesJava(g, templates);
-    		else if (Conf.lang.equals("javascript"))
-    			createUseCasesJavaScript(g, templates, "document.getelementbyid");
+      if (Conf.lang.equals("java"))
+        createUseCasesJava(g, templates);
+      else if (Conf.lang.equals("javascript"))
+        createUseCasesJavaScript(g, templates, "onscroll");
 
-    		for ( Classifier t : templates )
-    			doLearn(g, t);
+      for ( Classifier t : templates )
+        doLearn(g, t);
 //    	}
     }
     else if (swtch == EVAL) {
       if (Conf.lang.equals("java"))
         createEvalCasesJava(g, templates);
       else if (Conf.lang.equals("javascript"))
-        createUseCasesJavaScript(g, templates, "");
+        createUseCasesJavaScript(g, templates, "document.getelementsbytagname");
       
       doEval(g, templates.get(0));
 
@@ -189,52 +189,88 @@ public class GServer {
     Classifier t1 = new Classifier("sandbox/");
     t1.domain = "/"+key+"/";
     
-    InnerClass number = fill_case("number", "2", key, t1);
-    number.elements.add(new ElementInfo("type", "Identifier", "Number"));
+    LinkedHashMap<String, String> number_ = new LinkedHashMap<>();
+    number_.put("stab_req","");
+    number_.put("stab_req","LiteralNumber");
+    number_.put("literal1",".match");
+    InnerClass number = fill_case("number", "7", key, number_, t1);
+//    number.elements.add(new ElementInfo("type", "Identifier", "Number"));
 
-    InnerClass alert = fill_case("alert", "3", key, t1);
-    alert.elements.add(new ElementInfo("type", "CallExpression", null));
-    alert.elements.add(new ElementInfo("type", "Identifier", "alert"));
+    LinkedHashMap<String, String> split_ = new LinkedHashMap<>();
+    split_.put("stab_req","");
+    split_.put("stab_req","LiteralString");
+    split_.put("literal1",".split");
+    InnerClass split = fill_case("split", "8", key, split_, t1);
+//    alert.elements.add(new ElementInfo("type", "CallExpression", null));
+//    alert.elements.add(new ElementInfo("type", "Identifier", "alert"));
     
-    InnerClass window = fill_case("window", "4", key, t1);
+    LinkedHashMap<String, String> window_ = new LinkedHashMap<>();
+    window_.put("stab_req","");
+    InnerClass window = fill_case("window", "4", key, window_, t1);
     window.elements.add(new ElementInfo("type", "Identifier", "window"));
     
-    InnerClass math = fill_case("math", "5", key, t1);
-    math.elements.add(new ElementInfo("type", "Identifier", "Math"));
-
-    InnerClass math_floor = fill_case("math.floor", "6", key, t1);
-    math_floor.elements.add(new ElementInfo("type", "Identifier", "Math"));
-    math_floor.elements.add(new ElementInfo("type", "Property", "Property:floor"));
-
-    InnerClass math_random = fill_case("math.random", "7", key, t1);
-    math_random.elements.add(new ElementInfo("type", "Property", "Property:random"));
-    math_random.elements.add(new ElementInfo("type", "Identifier", "Math"));
+    LinkedHashMap<String, String> match_ = new LinkedHashMap<>();
+    match_.put("stab_req","");
+    match_.put("stab_req","LiteralString");
+    match_.put("literal1",".match");
+    InnerClass match = fill_case("match", "5", key, match_, t1);
+    match.elements.add(new ElementInfo("type", "Identifier", "window"));
     
-    InnerClass prompt = fill_case("prompt", "8", key, t1);
+    LinkedHashMap<String, String> replace_ = new LinkedHashMap<>();
+    replace_.put("stab_req","");
+    replace_.put("stab_req","LiteralString");
+    replace_.put("literal1",".replace");
+    InnerClass replace = fill_case("replace", "6", key, replace_, t1);
+    match.elements.add(new ElementInfo("type", "Identifier", "window"));
+    
+    LinkedHashMap<String, String> math_ = new LinkedHashMap<>();
+    math_.put("stab_req","");
+    math_.put("stab_req","LiteralNumber");
+    math_.put("literal1",".match");
+    InnerClass math = fill_case("math", "9", key, math_, t1);
+//    math.elements.add(new ElementInfo("type", "Identifier", "Math"));
+
+    LinkedHashMap<String, String> math_floor_ = new LinkedHashMap<>();
+    math_floor_.put("stab_req","");
+    math_floor_.put("stab_req","LiteralNumber");
+    math_floor_.put("literal1","");
+    InnerClass math_floor = fill_case("math.floor", "10", key, math_floor_, t1);
+//    math_floor.elements.add(new ElementInfo("type", "Identifier", "Math"));
+//    math_floor.elements.add(new ElementInfo("type", "Property", "Property:floor"));
+
+    LinkedHashMap<String, String> math_random_ = new LinkedHashMap<>();
+    math_random_.put("stab_req","");
+    math_random_.put("stab_req","LiteralNumber");
+    math_random_.put("literal1","");
+    InnerClass math_random = fill_case("math.random", "11", key, math_random_, t1);
+//    math_random.elements.add(new ElementInfo("type", "Property", "Property:random"));
+//    math_random.elements.add(new ElementInfo("type", "Identifier", "Math"));
+    
+    InnerClass prompt = fill_case("prompt", "12", key, window_, t1);
     prompt.elements.add(new ElementInfo("type", "CallExpression", null));
     prompt.elements.add(new ElementInfo("type", "Identifier", "prompt"));
 
-    InnerClass confirm = fill_case("confirm", "9", key, t1);
+    InnerClass confirm = fill_case("confirm", "13", key, window_, t1);
     confirm.elements.add(new ElementInfo("type", "CallExpression", null));
     confirm.elements.add(new ElementInfo("type", "Identifier", "confirm"));
 
-    InnerClass log = fill_case("console.log", "10", key, t1);
+    InnerClass log = fill_case("console.log", "14", key, window_, t1);
     log.elements.add(new ElementInfo("type", "CallExpression", "Property:log"));
     log.elements.add(new ElementInfo("type", "Identifier", "console"));
 
-    InnerClass window_location = fill_case("window.location", "11", key, t1);
+    InnerClass window_location = fill_case("window.location", "15", key, window_, t1);
     window_location.elements.add(new ElementInfo("type", "Identifier", "window"));
     window_location.elements.add(new ElementInfo("type", "Property", "Property:location"));
     
-    InnerClass document_head = fill_case("document.head", "12", key, t1);
+    InnerClass document_head = fill_case("document.head", "16", key, window_, t1);
     document_head.elements.add(new ElementInfo("type", "Identifier", "document"));
     document_head.elements.add(new ElementInfo("type", "Property", "Property:head"));
     
-    InnerClass document_getElementByTagName = fill_case("document.getelementsbytagname", "13", key, t1);
+    InnerClass document_getElementByTagName = fill_case("document.getelementsbytagname", "17", key, window_, t1);
     document_getElementByTagName.elements.add(new ElementInfo("type", "Identifier", "document"));
     document_getElementByTagName.elements.add(new ElementInfo("type", "Property", "Property:getElementsByTagName"));
     
-    InnerClass document_getElementByClassName = fill_case("document.getelementsbyclassname", "14", key, t1);
+   /* InnerClass document_getElementByClassName = fill_case("document.getelementsbyclassname", "14", key, t1);
     document_getElementByClassName.elements.add(new ElementInfo("type", "Identifier", "document"));
     document_getElementByClassName.elements.add(new ElementInfo("type", "Property", "Property:getElementsByClassName"));
     
@@ -264,12 +300,12 @@ public class GServer {
     mouseout.elements.add(new ElementInfo("type", "Property", "Property:mouseout"));
     
     InnerClass scroll = fill_case("onscroll", "22", key, t1);
-    scroll.elements.add(new ElementInfo("type", "Property", "Property:scroll"));
+    scroll.elements.add(new ElementInfo("type", "Property", "Property:scroll"));*/
     
     templates.add(t1);
   }
   
-  private static InnerClass fill_case(String key, String prog, String actual, Classifier t1) {
+  private static InnerClass fill_case(String key, String prog, String actual, LinkedHashMap<String, String> sheme_, Classifier t1) {
     InnerClass c;
     
     if (actual.equals(key))
@@ -277,24 +313,22 @@ public class GServer {
     else
       c = new InnerClass("falsekey", prog, key);
     
-    LinkedHashMap<String, String> temp3_1 = new LinkedHashMap<>();
-    temp3_1.put("stab_req","");
-    temp3_1.put("literal1",".css()");
-    c.scheme.add(temp3_1);
+    c.scheme.add(sheme_);
     c.description = " Edit CSS. ";
     c.tab = compile_tab(Conf.tabs.get(key).get("id"), Conf.tabs.get(key).get("name"));
-    c.content = compile_content(Conf.tabs.get(key).get("id"), Conf.tabs.get(key).get("title"), Conf.tabs.get(key).get("content"));
+    c.content = compile_content(Conf.tabs.get(key).get("id"), Conf.tabs.get(key).get("title"), Conf.tabs.get(key).get("content"),
+        Conf.tabs.get(key).containsKey("code") ? Conf.tabs.get(key).get("code"): "", Conf.tabs.get(key).containsKey("script") ? Conf.tabs.get(key).get("script"): "");
     t1.classes.add(c);
     
     return c;
   }
   
-  private static String compile_tab(String id, String name) {
-    return "<a class='nav-link' id='tip-"+id+"-tab' data-toggle='pill' href='#tip-"+id+"' role='tab' aria-controls='tip-"+id+"' aria-selected='false'>"+name+"</a>";
+  public static String compile_tab(String id, String name) {
+    return "<a class='nav-link' id='tip-"+id+"-tab' data-toggle='pill' href='#tip-"+id+"' role='tab' aria-controls='tip-1' aria-selected='false'>"+name+"</a>";
   }
 
-  private static String compile_content(String id, String title, String content) {
-    return "<div class='tab-pane fade' id='tip-"+id+"' role='tabpanel' aria-labelledby='tip-"+id+"-tab' data-tip='"+id+"'><div class='code-wrapper'><h3>"+title+"</h3>"+content+"";
+  public static String compile_content(String id, String title, String content, String code, String script) {
+    return " <div class='tab-pane' id='tip-"+id+"' role='tabpanel' aria-labelledby='tip-"+id+"-tab' data-tip='"+id+"'> <script type=\"text/javascript\"> "+script+" </script> <div class='code-wrapper'><h3>"+title+"</h3> "+content+" </div>"+code+" </div>  ";
   }
 
   private static void createEvalCasesJava(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
@@ -350,7 +384,7 @@ public class GServer {
     
     for ( Entry<Integer, String> f : folder1.entrySet() ) {
       t.blocking = false;
-//      if (f.getValue().contains("99726047")) {
+//      if (f.getValue().contains("/39383")) {
         System.err.println("count: "+f.getValue());
         validate_line_by_line(f, g, t, counter, c);
         System.err.println(counter);
@@ -458,6 +492,7 @@ public class GServer {
 //    map.put(0, 0);
 //    map.put(1, 0);
 
+    ArrayList<String> tmp = new ArrayList<String>();
 
     for (int carret = code.length; carret > 2; carret --) {
       ArrayList<Vector[]> res = new ArrayList<>();
@@ -475,15 +510,13 @@ public class GServer {
 
         ArrayList<HashMap<String, String>> response = g.filter_through_npi(send, t);
 
-        System.err.println("^"+response);
         c.add(response, Integer.parseInt(i.get(Collections.max(i.keySet())).program.get("id").getValue().toString()), info);
         if (!response.isEmpty())
           counter.put("yes", counter.get("yes")+1);
         else
           counter.put("no", counter.get("no")+1);
         
-        System.err.println(counter+" * "+c);
-        
+        tmp.add(f.getValue()+" # "+counter+" * "+c);
 //        if (response.size() > 0)
 //        
 ////        if (counter.get("no") > 2820)
@@ -491,8 +524,7 @@ public class GServer {
       }
       }
     }
-    
-    
+    Utils.writeFile(tmp, "/root/ContextToCode/eval", true);
   }
 
   private static ArrayList<Integer> parse_response(ArrayList<HashMap<String, String>> response) {
@@ -525,13 +557,13 @@ public class GServer {
     HashMap<String, Integer> map = new HashMap<>();
 
     for (File f : files) {
-//      if (f.getName().equals("3")) {
+      if (f.getName().equals("0")) {
 
         t.clear();
 
         InnerClass[] code = getRaw(f.getPath());
- //             Utils.writeFile1(new Gson().toJson(code), Conf.root+"/classifiers/"+t.domain+"/all.json", false);
-//              System.exit(1);
+              Utils.writeFile1(new Gson().toJson(code), Conf.root+"/classifiers/"+t.domain+"/all.json", false);
+              System.exit(1);
         g.loadCode(code, g.ASC, t);
 
         g.iterateCode(code, t, f.getPath(), res, 3, map);
@@ -545,7 +577,7 @@ public class GServer {
         System.err.println("count: "+count);
         //      if (count > 1000) 
         //    	  break;  
-//      }
+      }
     }
 
     /*Utils.writeFile1(new Gson().toJson(Utils.sortByValue(popular.ast_types)), Conf.root+"/pop_lines", false);
