@@ -2,15 +2,21 @@ body {
   font-family: Inter;
   background: #F8F8F8;
 }
-p, button, div, a {
+
+p,
+button,
+div,
+a {
   color: #000;
 }
+
 .code-wrapper h3 {
   font-weight: 500;
   font-size: 30px;
   line-height: 36px;
   margin-bottom: 27px;
 }
+
 .code-wrapper p {
   font-size: 14px;
   line-height: 23px;
@@ -21,56 +27,74 @@ p, button, div, a {
 a:hover {
   color: #6c757d;
 }
+
 *:focus {
   outline: none !important;
 }
+
 hr {
-  border-top: 1px solid rgba(255,255,255,.1);
+  border-top: 1px solid rgba(255, 255, 255, .1);
 }
+
 input[type="radio"] {
-  display:none;
+  display: none;
 }
+
 .btn-toolbar label {
   cursor: pointer;
 }
+
 @media (min-width: 767px) {
   .language-js {
     height: 100%;
     margin: -5px !important;
   }
 }
+
 .paddingTop10 {
   padding-top: 10px;
 }
+
 .nav-pills {
   max-height: 100%;
   /*overflow: scroll;*/
 }
+
 .divider {
   width: 100%;
   margin-left: 50px;
 }
+
 .nav-pills .nav-link {
   border-radius: 0 !important;
 }
+
 .nav-link.bg-info {
   color: #FFF;
 }
-.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
   background-color: inherit;
 }
-.selectedNav, .selectedNav:focus, a.bg-info.selectedNav:focus {
+
+.selectedNav,
+.selectedNav:focus,
+a.bg-info.selectedNav:focus {
   font-weight: bold;
   color: #000 !important;
 }
+
 a.bg-info.active.selectedNav:hover {
   font-weight: bold;
   color: #000;
 }
-.nav-pills .nav-link.active.hovered:not(.bg-info) {
-  background-color: rgba(255,255,255,.1);
+
+.nav-pills .nav-link.active.hovered:not(.main_tab) {
+  background-color: rgba(255, 255, 255, .1);
   color: #ababab;
 }
+
 .content {
   background: #FFFFFF;
   position: absolute;
@@ -83,29 +107,44 @@ a.bg-info.active.selectedNav:hover {
   overflow: scroll;
   padding: 10px 10px 10px 15px;
 }
+
 .content.bg-dark:before {
-    content: '';
-    width: 5px;
-    height: 100%;
-    background: grey;
-    position: absolute;
-    top: 0;
-    left: 0;
-    cursor: col-resize;
-    z-index: 10;
+  content: '';
+  width: 5px;
+  height: 100%;
+  background: grey;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: col-resize;
+  z-index: 10;
 }
+
 .btns {
   width: 70%;
   text-align: left;
 }
+
 .nav.nav-pills .nav-link {
   color: #babcc0;
   background: none;
 }
+
 .nav.nav-pills .nav-link.hovered {
   color: #ababab;
 }
+
 .nav.nav-pills .nav-link.active {
   color: #000;
   background-color: none;
+}
+
+.nav.nav-pills .nav-link.main_tab {
+  background: rgba(66, 170, 220, .7);
+  color: #FFF;
+}
+
+.nav-pills .nav-link.active.hovered.main_tab {
+  background: rgba(66, 170, 220, .4);
+  color: #FFF;
 }

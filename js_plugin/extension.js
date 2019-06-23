@@ -3,7 +3,7 @@ var res = {
 	else_tabs: ['alert'],
 	tabs: {
 		ajax: {
-			tab: '<a class="nav-link" id="tip-1-tab" data-toggle="pill" href="#tip-1" role="tab" aria-controls="tip-1" aria-selected="false">jQuery.ajax</a>',
+			tab: '<a class="nav-link main_tab" id="tip-1-tab" data-toggle="pill" href="#tip-1" role="tab" aria-controls="tip-1" aria-selected="false">jQuery.ajax</a>',
 			content: `
 			<div class="tab-pane" id="tip-1" role="tabpanel" aria-labelledby="tip-1-tab" data-tip="1">
 				<script>
@@ -128,7 +128,7 @@ var res = {
 						`
 		},
 		ajax1: {
-			tab: '<a class="nav-link" id="tip-2-tab" data-toggle="pill" href="#tip-2" role="tab" aria-controls="tip-1" aria-selected="false">alert</a>',
+			tab: '<a class="nav-link main_tab" id="tip-2-tab" data-toggle="pill" href="#tip-2" role="tab" aria-controls="tip-1" aria-selected="false">alert</a>',
 			content: `
 			<div class="tab-pane" id="tip-2" role="tabpanel" aria-labelledby="tip-2-tab" data-tip="2">
               <script>
@@ -215,9 +215,208 @@ var res = {
 				<meta charset="UTF-8">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<title>TITLE</title>
-				EXTERNAL_SCRIPTS
+				EXTERNAL_CSS
+				EXTERNAL_JS
 				<script>
+					"use strict";
 					var resCode = {};
+
+					// let acquireVsCodeApi = function(){}; // to test like usual html page
+					const vscode = acquireVsCodeApi();
+
+					function useAdvise(tabId) {
+						let curResCode = resCode['tab' + tabId]
+						let text_ = $(document).find("#tip-" + tabId).find(".code-result").text().replace(curResCode.replace1, '').replace(curResCode.replace2, '');
+						vscode.postMessage({ command: 'use', text: text_ })
+					}
+					function hideAdvise() {
+						vscode.postMessage({ command: 'hide' })
+					}
+
+					// const fields = $('.form-edit').find('input, select, textarea, radio');
+
+					function generateTip(tabId) {
+						// console.log(tabId, !!resCode['tab'+tabId]);
+						let res = resCode['tab' + tabId].template;
+						$("#tip-" + tabId).find('input, select, textarea, radio').each(function (i, f) {
+							let $f = $(f);
+							let partNum = +$f.attr('data-part');
+							res = res.replace('PART' + partNum, $.trim($f.val()));
+						});
+
+						return js_beautify(res, { indent_size: 4 });
+					}
+
+					function rewriteTipRes(tab, tip) {
+						let $el = $(tab).find(".code-result");
+						$el.html(tip);
+						// console.log($el[0]);
+						Prism.highlightElement($el[0]);
+					}
+					$(document).ready(function () {
+						let activePill = null;
+						$('.nav-link').on('click', function () {
+							activePill = this;
+							$('.selectedNav').removeClass('selectedNav');
+							$(activePill).addClass('selectedNav');
+						});
+						$(".nav-link").length && $($(".nav-link")[0]).trigger('click');
+
+						$('.nav-pills > a').on('mouseenter', function (ev) {
+							$(this).addClass('hovered');
+							$(this).tab('show');
+						});
+
+						$('.nav-pills > a').on('mouseleave', function (ev) {
+							$('.hovered').removeClass('hovered');
+							activePill && !$('.hovered').length && $(activePill).tab('show');
+						});
+
+						$('.tab-pane').each(function (i, tab) {
+							$(tab).find('input, select, textarea, radio').on('keyup change', function (ev) {
+								rewriteTipRes(tab, generateTip($(tab).attr('data-tip')));
+							});
+							rewriteTipRes(tab, generateTip($(tab).attr('data-tip')));
+						});
+
+
+						// Minimum resizable area
+						var minWidth = 60;
+						var minHeight = 40;
+
+						// Thresholds
+						var FULLSCREEN_MARGINS = -10;
+						var MARGINS = 4;
+
+						// End of what's configurable.
+						var clicked = null;
+						var onLeftEdge;
+
+						var rightScreenEdge, bottomScreenEdge;
+
+						var preSnapped;
+
+						var b, x, y;
+
+						var redraw = false;
+
+						var pane = document.getElementById('content');
+
+						function setBounds(element, w) {
+							element.style.width = w + 'px';
+						}
+
+
+						// Mouse events
+						pane.addEventListener('mousedown', onMouseDown);
+						document.addEventListener('mousemove', onMove);
+						document.addEventListener('mouseup', onUp);
+
+						// Touch events 
+						pane.addEventListener('touchstart', onTouchDown);
+						document.addEventListener('touchmove', onTouchMove);
+						document.addEventListener('touchend', onTouchEnd);
+
+
+						function onTouchDown(e) {
+							onDown(e.touches[0]);
+							e.preventDefault();
+						}
+
+						function onTouchMove(e) {
+							onMove(e.touches[0]);
+						}
+
+						function onTouchEnd(e) {
+							if (e.touches.length == 0) onUp(e.changedTouches[0]);
+						}
+
+						function onMouseDown(e) {
+							let res = onDown(e);
+							res && e.preventDefault();
+						}
+
+						function onDown(e) {
+							calc(e);
+
+							var isResizing = onLeftEdge;
+
+							clicked = {
+								x: x,
+								y: y,
+								cx: e.clientX,
+								cy: e.clientY,
+								w: b.width,
+								h: b.height,
+								isResizing: isResizing,
+								onLeftEdge: onLeftEdge,
+							};
+
+							return isResizing;
+						}
+
+						function calc(e) {
+							b = pane.getBoundingClientRect();
+							x = e.clientX - b.left;
+							y = e.clientY - b.top;
+
+							onLeftEdge = x < MARGINS;
+
+							rightScreenEdge = window.innerWidth - MARGINS;
+						}
+
+						var e;
+
+						function onMove(ee) {
+							calc(ee);
+
+							e = ee;
+
+							redraw = true;
+
+						}
+
+						function animate() {
+
+							requestAnimationFrame(animate);
+
+							if (!redraw) return;
+
+							redraw = false;
+
+							if (clicked && clicked.isResizing) {
+								if (clicked.onLeftEdge) {
+									var currentWidth = Math.max(clicked.cx - e.clientX + clicked.w, minWidth);
+									if (currentWidth > minWidth) {
+										pane.style.width = currentWidth + 'px';
+									}
+								}
+
+
+								return;
+							} else if (clicked) {
+								return true;
+							}
+
+							// This code executes when mouse moves without clicking
+
+							// style cursor
+							if (onLeftEdge) {
+								pane.style.cursor = 'ew-resize';
+							} else {
+								pane.style.cursor = 'default';
+							}
+						}
+
+						animate();
+
+						function onUp(e) {
+							calc(e);
+
+							clicked = null;
+						}
+
+					});
 				</script>
 			</head>
 			<body>
@@ -282,13 +481,14 @@ function activate(context) {
 
 		function get_scripts() {
 			const styles = ['bootstrap.min.css', 'prism-okaidia.css', 'style.css', 'inter.css'];
-			const js = ['jquery-3.3.1.slim.min.js', 'bootstrap.min.js', 'popper.min.js', 'prism.js', 'prism-javascript.min.js', 'beautify.js', 'beautify-css.js', 'beautify-html.js', 'js.js'];
+			const js = ['jquery-3.3.1.slim.min.js', 'bootstrap.min.js', 'popper.min.js', 'prism.js', 'prism-javascript.min.js', 'beautify.js', 'beautify-css.js', 'beautify-html.js'];
 
+			let externalCSS = [];
 			let externalScripts = [];
 			for(let i=0, len=styles.length;i<len;i++) {
 				let cssFile = styles[i];
 				cssFile = vscode.Uri.file(path.join(context.extensionPath, 'assets', 'css', cssFile)).with({ scheme: 'vscode-resource' });
-				externalScripts.push('<link rel="stylesheet" href="' + cssFile +'">');
+				externalCSS.push('<link rel="stylesheet" href="' + cssFile +'">');
 			}
 			for (let i = 0, len = js.length; i < len; i++) {
 				let jsFile = js[i];
@@ -296,7 +496,7 @@ function activate(context) {
 				externalScripts.push('<script src="' + jsFile + '"></script>');
 			}
 
-			return externalScripts.join("\n");
+			return [externalCSS.join("\n"), externalScripts.join("\n")];
 		}
 
 		function showRes(panel, res, prefix) {
@@ -331,7 +531,15 @@ function activate(context) {
 				return res.tabs[key].content;
 			}).join(''));
 			
-			let html = res.body.replace('MAINTABS', main_tabs).replace('ELSETABS', else_tabs).replace('CONTENTS', contents).replace('EXTERNAL_SCRIPTS', get_scripts());
+			let scripts = get_scripts();
+			let css = scripts[0];
+			let js = scripts[1];
+			let html = res.body
+				.replace('MAINTABS', main_tabs)
+				.replace('ELSETABS', else_tabs)
+				.replace('CONTENTS', contents)
+				.replace('EXTERNAL_CSS', css)
+				.replace('EXTERNAL_JS', js);
 			
 			panel.webview.html = html;
 		}
