@@ -480,7 +480,7 @@ function activate(context) {
 		};
 
 		function get_scripts() {
-			const styles = ['bootstrap.min.css', 'prism-okaidia.css', 'style.css', 'inter.css'];
+			const styles = ['bootstrap.min.css', 'prism.css', 'style.css', 'inter.css'];
 			const js = ['jquery-3.3.1.slim.min.js', 'bootstrap.min.js', 'popper.min.js', 'prism.js', 'prism-javascript.min.js', 'beautify.js', 'beautify-css.js', 'beautify-html.js'];
 
 			let externalCSS = [];
