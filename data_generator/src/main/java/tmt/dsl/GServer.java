@@ -188,88 +188,49 @@ public class GServer {
   private static void createUseCasesJavaScript(Generator g, ArrayList<Classifier> templates, String key) throws JsonSyntaxException, IOException {
     Classifier t1 = new Classifier("sandbox/");
     t1.domain = "/"+key+"/";
-    
-    LinkedHashMap<String, String> number_ = new LinkedHashMap<>();
-    number_.put("stab_req","");
-    number_.put("stab_req","LiteralNumber");
-    number_.put("literal1",".match");
-    InnerClass number = fill_case("number", "7", key, number_, t1);
-//    number.elements.add(new ElementInfo("type", "Identifier", "Number"));
+        
+    LinkedHashMap<String, String> num_ = new LinkedHashMap<>();
+    //* math *//
+    num_.put("stab_req","");
+    num_.put("stab_req","LiteralNumber");
+    //**//
+	
+	LinkedHashMap<String, String> string_ = new LinkedHashMap<>();
+    string_.put("stab_req","");
+    string_.put("stab_req","LiteralString");
+	
+	LinkedHashMap<String, String> doc_ = new LinkedHashMap<>();
+    doc_.put("stab_req","");
+    doc_.put("stab_req","document");
+	
+	LinkedHashMap<String, String> event_ = new LinkedHashMap<>();
+    event_.put("stab_req","");
+    event_.put("stab_req","el");
+	
+    InnerClass math = fill_case("math", "4", key, num_, t1);
 
-    LinkedHashMap<String, String> split_ = new LinkedHashMap<>();
-    split_.put("stab_req","");
-    split_.put("stab_req","LiteralString");
-    split_.put("literal1",".split");
-    InnerClass split = fill_case("split", "8", key, split_, t1);
-//    alert.elements.add(new ElementInfo("type", "CallExpression", null));
-//    alert.elements.add(new ElementInfo("type", "Identifier", "alert"));
-    
-    LinkedHashMap<String, String> window_ = new LinkedHashMap<>();
-    window_.put("stab_req","");
-    InnerClass window = fill_case("window", "4", key, window_, t1);
-    window.elements.add(new ElementInfo("type", "Identifier", "window"));
-    
-    LinkedHashMap<String, String> match_ = new LinkedHashMap<>();
-    match_.put("stab_req","");
-    match_.put("stab_req","LiteralString");
-    match_.put("literal1",".match");
-    InnerClass match = fill_case("match", "5", key, match_, t1);
-    match.elements.add(new ElementInfo("type", "Identifier", "window"));
-    
-    LinkedHashMap<String, String> replace_ = new LinkedHashMap<>();
-    replace_.put("stab_req","");
-    replace_.put("stab_req","LiteralString");
-    replace_.put("literal1",".replace");
-    InnerClass replace = fill_case("replace", "6", key, replace_, t1);
-    match.elements.add(new ElementInfo("type", "Identifier", "window"));
-    
-    LinkedHashMap<String, String> math_ = new LinkedHashMap<>();
-    math_.put("stab_req","");
-    math_.put("stab_req","LiteralNumber");
-    math_.put("literal1",".match");
-    InnerClass math = fill_case("math", "9", key, math_, t1);
-//    math.elements.add(new ElementInfo("type", "Identifier", "Math"));
+    InnerClass math_f = fill_case("math.floor", "6", key, num_, t1);
 
-    LinkedHashMap<String, String> math_floor_ = new LinkedHashMap<>();
-    math_floor_.put("stab_req","");
-    math_floor_.put("stab_req","LiteralNumber");
-    math_floor_.put("literal1","");
-    InnerClass math_floor = fill_case("math.floor", "10", key, math_floor_, t1);
-//    math_floor.elements.add(new ElementInfo("type", "Identifier", "Math"));
-//    math_floor.elements.add(new ElementInfo("type", "Property", "Property:floor"));
+    InnerClass math_r = fill_case("math.random", "7", key, num_, t1);
+	
+    InnerClass getelementbyid = fill_case("document.getelementbyid", "14", key, doc_, t1);
 
-    LinkedHashMap<String, String> math_random_ = new LinkedHashMap<>();
-    math_random_.put("stab_req","");
-    math_random_.put("stab_req","LiteralNumber");
-    math_random_.put("literal1","");
-    InnerClass math_random = fill_case("math.random", "11", key, math_random_, t1);
-//    math_random.elements.add(new ElementInfo("type", "Property", "Property:random"));
-//    math_random.elements.add(new ElementInfo("type", "Identifier", "Math"));
-    
-    InnerClass prompt = fill_case("prompt", "12", key, window_, t1);
-    prompt.elements.add(new ElementInfo("type", "CallExpression", null));
-    prompt.elements.add(new ElementInfo("type", "Identifier", "prompt"));
+    InnerClass getelementsbytagname = fill_case("document.getelementsbytagname", "12", key, doc_, t1);
 
-    InnerClass confirm = fill_case("confirm", "13", key, window_, t1);
-    confirm.elements.add(new ElementInfo("type", "CallExpression", null));
-    confirm.elements.add(new ElementInfo("type", "Identifier", "confirm"));
+    InnerClass getelementsbyclassname = fill_case("document.getelementsbyclassname", "13", key, doc_, t1);
 
-    InnerClass log = fill_case("console.log", "14", key, window_, t1);
-    log.elements.add(new ElementInfo("type", "CallExpression", "Property:log"));
-    log.elements.add(new ElementInfo("type", "Identifier", "console"));
+    InnerClass addeventlistener = fill_case("addeventlistener", "17", key, event_, t1);
+	
+    InnerClass indexof = fill_case("indexof", "15", key, string_, t1);
 
-    InnerClass window_location = fill_case("window.location", "15", key, window_, t1);
-    window_location.elements.add(new ElementInfo("type", "Identifier", "window"));
-    window_location.elements.add(new ElementInfo("type", "Property", "Property:location"));
-    
-    InnerClass document_head = fill_case("document.head", "16", key, window_, t1);
-    document_head.elements.add(new ElementInfo("type", "Identifier", "document"));
-    document_head.elements.add(new ElementInfo("type", "Property", "Property:head"));
-    
-    InnerClass document_getElementByTagName = fill_case("document.getelementsbytagname", "17", key, window_, t1);
-    document_getElementByTagName.elements.add(new ElementInfo("type", "Identifier", "document"));
-    document_getElementByTagName.elements.add(new ElementInfo("type", "Property", "Property:getElementsByTagName"));
-    
+    InnerClass onclick = fill_case("onclick", "18", key, event_, t1);
+
+    InnerClass onscroll = fill_case("onscroll", "21", key, event_, t1);
+
+    InnerClass mouseout = fill_case("mouseout", "20", key, event_, t1);
+
+    InnerClass mouseover = fill_case("mouseover", "19", key, event_, t1);
+
    /* InnerClass document_getElementByClassName = fill_case("document.getelementsbyclassname", "14", key, t1);
     document_getElementByClassName.elements.add(new ElementInfo("type", "Identifier", "document"));
     document_getElementByClassName.elements.add(new ElementInfo("type", "Property", "Property:getElementsByClassName"));
@@ -300,7 +261,24 @@ public class GServer {
     mouseout.elements.add(new ElementInfo("type", "Property", "Property:mouseout"));
     
     InnerClass scroll = fill_case("onscroll", "22", key, t1);
-    scroll.elements.add(new ElementInfo("type", "Property", "Property:scroll"));*/
+    scroll.elements.add(new ElementInfo("type", "Property", "Property:scroll"));
+    
+    InnerClass prompt = fill_case("prompt", "12", key, window_, t1);
+    prompt.elements.add(new ElementInfo("type", "CallExpression", null));
+    prompt.elements.add(new ElementInfo("type", "Identifier", "prompt"));
+
+    InnerClass confirm = fill_case("confirm", "13", key, window_, t1);
+    confirm.elements.add(new ElementInfo("type", "CallExpression", null));
+    confirm.elements.add(new ElementInfo("type", "Identifier", "confirm"));
+
+    InnerClass log = fill_case("console.log", "14", key, window_, t1);
+    log.elements.add(new ElementInfo("type", "CallExpression", "Property:log"));
+    log.elements.add(new ElementInfo("type", "Identifier", "console"));
+
+    InnerClass window_location = fill_case("window.location", "15", key, window_, t1);
+    window_location.elements.add(new ElementInfo("type", "Identifier", "window"));
+    window_location.elements.add(new ElementInfo("type", "Property", "Property:location"));
+    */
     
     templates.add(t1);
   }
@@ -328,7 +306,7 @@ public class GServer {
   }
 
   public static String compile_content(String id, String title, String content, String code, String script) {
-    return " <div class='tab-pane' id='tip-"+id+"' role='tabpanel' aria-labelledby='tip-"+id+"-tab' data-tip='"+id+"'> <script type=\"text/javascript\"> "+script+" </script> <div class='code-wrapper'><h3>"+title+"</h3> "+content+" </div>"+code+" </div>  ";
+    return " <div class='tab-pane' id='tip-"+id+"' role='tabpanel' aria-labelledby='tip-"+id+"-tab' data-tip='"+id+"'> <script type=\"text/javascript\"> "+script+" </script> <div class='code-wrapper'><h1 style='font-size: 2.5rem; font-weight: 700;	margin-top: 0;	margin-bottom: 0.75em; font-size: 1.875rem;	margin-top: 1.875rem;'>"+title+"</h1> "+content+" </div>"+code+" </div>  ";
   }
 
   private static void createEvalCasesJava(Generator g, ArrayList<Classifier> templates) throws JsonSyntaxException, IOException {
