@@ -209,9 +209,9 @@ public class GServer {
 	
     InnerClass math = fill_case("math", "4", key, num_, t1);
 
-    InnerClass math_f = fill_case("math.floor", "6", key, num_, t1);
+   // InnerClass math_f = fill_case("math.floor", "6", key, num_, t1);
 
-    InnerClass math_r = fill_case("math.random", "7", key, num_, t1);
+   // InnerClass math_r = fill_case("math.random", "7", key, num_, t1);
 	
     InnerClass getelementbyid = fill_case("document.getelementbyid", "14", key, doc_, t1);
 
