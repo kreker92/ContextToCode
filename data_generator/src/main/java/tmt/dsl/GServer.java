@@ -221,15 +221,15 @@ public class GServer {
 
     InnerClass addeventlistener = fill_case("addeventlistener", "17", key, event_, t1);
 	
-    InnerClass indexof = fill_case("indexof", "15", key, string_, t1);
+	InnerClass indexof = fill_case("indexof", "15", key, string_, t1);
 
     InnerClass onclick = fill_case("onclick", "18", key, event_, t1);
 
     InnerClass onscroll = fill_case("onscroll", "21", key, event_, t1);
 
-    InnerClass mouseout = fill_case("mouseout", "20", key, event_, t1);
+    InnerClass mouseout = fill_case("onmouseout", "20", key, event_, t1);
 
-    InnerClass mouseover = fill_case("mouseover", "19", key, event_, t1);
+    InnerClass mouseover = fill_case("onmouseover", "19", key, event_, t1);
 
    /* InnerClass document_getElementByClassName = fill_case("document.getelementsbyclassname", "14", key, t1);
     document_getElementByClassName.elements.add(new ElementInfo("type", "Identifier", "document"));
